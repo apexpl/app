@@ -1,0 +1,36 @@
+{
+    "name": "apex/app",
+    "description": "Quality, extensible framework / CMS.", 
+    "type": "package",
+    "homepage": "https://apexpl.io",
+    "authors": [
+        {
+            "name": "Matt Dizak", 
+            "email": "mdizak@apexpl.io"
+        }
+    ], 
+    "license": "MIT",
+    "require": {
+        "php": ">=8.0.0",
+        "apex/cluster": ">=0.1",  
+        "league/flysystem": ">=1.0.6",
+        "symfony/inflector": ">=5.0.2",
+        "symfony/string": "^5.2",
+        "nyholm/psr7": "^1.4",
+        "nyholm/psr7-server": "^1.0",
+        "apex/armor-x509": "^0.1",
+        "apex/armor-sshkeys": "^0.1",
+        "apex/armor-apikeys": "^0.1",
+        "apex/migrations": "^0.1",
+        "apex/syrus": "^0.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": ">=9.1.0"
+    },
+    "autoload": {
+        "psr-4": { 
+            "Apex\\App\\": "src/", 
+            "Apex\\Svc\\": "svc/"
+        }
+    }
+}
