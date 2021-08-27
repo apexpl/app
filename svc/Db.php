@@ -7,7 +7,7 @@ use Apex\Db\Interfaces\DbInterface;
 /**
  * DbInterface
  */
-class Db implements DbInterface
+interface Db extends DbInterface
 {
 
 }

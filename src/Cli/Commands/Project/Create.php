@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Commands\Project;
 use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\{PackageHelper, AccountHelper};
+use Apex\App\Pkg\Filesystem\Package\Installer;
 use Apex\App\Network\Stores\{PackagesStore, ReposStore};
 use Apex\App\Pkg\ProjectManager;
 use Apex\App\Network\NetworkClient;
@@ -38,6 +39,9 @@ class Create implements CliCommandInterface
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;
 
+    #[Inject(Installer::class)]
+    private Installer $installer;
+
     /**
      * Process
      */
@@ -48,7 +52,13 @@ class Create implements CliCommandInterface
         $opt = $cli->getArgs(['repo']);
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
         $repo_alias = $opt['repo'] ?? 'apex';
-        $is_staging = $opt['stagine'] ?? false;
+        $is_staging = $opt['staging'] ?? false;
+
+        // Initial check
+        if (is_dir(SITE_PATH . '/.svn')) { 
+            $cli->error("A project has already been created on this system, and it is already under version control.");
+            return;
+        }
 
         // Check for author
         $author = '';
@@ -68,6 +78,11 @@ class Create implements CliCommandInterface
             $cli->error("Repository is not configured on this machine with alias, $repo_alias");
             return;
         } elseif (!$this->pkg_helper->checkDuplicate($pkg_alias, $repo)) { 
+            return;
+        }
+
+        // Close any open packages
+        if (!$this->closePackages($cli)) { 
             return;
         }
 
@@ -120,6 +135,57 @@ class Create implements CliCommandInterface
 
 
     
+    }
+
+    /**
+     * Close any open packages
+     */
+    private function closePackages(Cli $cli):bool
+    {
+
+        // Check for open packages
+        if (!is_dir(SITE_PATH . '/.apex/svn')) { 
+            return true;
+        }
+        $dirs = scandir(SITE_PATH . '/.apex/svn');
+        if (count($dirs) < 3) { 
+            return true;
+        }
+
+        // Go through packages
+        $cli->send("The following packages are currently open and under version control:\r\n\r\n");
+        foreach ($dirs as $pkg_alias) { 
+            if (in_array($pkg_alias, ['.', '..'])) { continue; }
+            $cli->send("    $pkg_alias\r\n");
+        }
+        $cli->send("\r\n");
+
+        // Confirm
+        if (!$cli->getConfirm("Close the above packages?", 'y')) { 
+            $cli->send("Ok, goodbye.\r\n\r\n");
+            return false;
+        }
+
+        // Close packages
+        foreach ($dirs as $pkg_alias) { 
+            if (in_array($pkg_alias, ['.', '..'])) { continue; }
+
+            // Load package
+            if (!$pkg = $this->pkg_store->get($pkg_alias)) { 
+                continue;
+            }
+
+            // Close package
+            if (!$this->installer->install($pkg)) {
+                $svn_dir = SITE_PATH . '/.apex/svn/' . $pkg_alias; 
+                $cli->send("The SVN directory at $svn_dir is not empty, and should be manually checked.  Package not successfully fully closed.\r\n\r\n");
+            } else { 
+                $cli->send("Successfully closed the package '$pkg_alias', and it is no longer version controlled.\r\n\r\n");
+            }
+        }
+
+        // Return
+        return true;
     }
 
     /**

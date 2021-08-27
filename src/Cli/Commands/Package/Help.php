@@ -25,23 +25,24 @@ class Help
         $help->setParamsTitle('AVAILABLE COMMANDS');
 
         // Add commands
-        $help->addParam('add', 'Add files / directories outside of the version controlled directories to the package.');
-        $help->addParam('checkout', 'Checkout a package from repository, and put it under version control readying it for development.');
-        $help->addParam('close', 'Close a package currently under version control, and move files back into production locations replacing their symlinks.');
+        $help->addParam('add', 'Add external files to a package.');
+        $help->addParam('checkout', 'Checkout a package and put it under version control.');
+        $help->addParam('close', 'Close a package currently under version control.');
         $help->addParam('commit', 'Commit all changes made to a package to the repository.');
         $help->addParam('create', 'Create a new package on the local machine.');
-        $help->addParam('delete', 'Delete a package from the local machine, and if desired, from repository as well.');
+        $help->addParam('delete', 'Delete a package from the local machine.');
+        $help->addParam('foke', 'Fork a package from the repository.');
         $help->addParam('info', 'View general information on a package.');
-        $help->addParam('install', 'Install one or more packages from repository onto the local machine.');
+        $help->addParam('install', 'Install one or more packages from the repository.');
         $help->addParam('list', 'List all packages currently installed on the local machine.');
-        $help->addParam('merge', 'Merge a branch into the current working directory of the package.');
-        $help->addParam('pull', "Update and sync a locally version controlled package with the repository.");
-        $help->addParam('require', 'Install and require a Composer or Apex dependency to a package.');
-        $help->addParam('rm', "remove files / directories from version control that were previously added via 'add' command.");
+        $help->addParam('merge', "Merge a branch from repository into local package.");
+        $help->addParam('pull', "Update and sync a local package with the repository.");
+        $help->addParam('require', 'Install and require a Composer or Apex dependency.');
+        $help->addParam('rm', "remove files previousy added with 'add' command.");
         $help->addParam('rollback', 'Rollback previously installed upgrades.');
-        $help->addParam('scan', 'Scan the package.yml configuration file of a package for changes, and update the database accordingly.');
-        $help->addParam('search', 'Search a repository for any available packages matching given term.');
-        $help->addParam('update', 'Update general package information within the repository (name, access, price, et al)');
+        $help->addParam('scan', 'Scan package.yml configuration file and update database.');
+        $help->addParam('search', 'Search a repository for packages matching a given term.');
+        $help->addParam('update', 'Update general package information within the repository.');
         $help->addParam('upgrade', 'Check for, download and install any available upgrades.');
 
         // Return

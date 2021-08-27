@@ -6,6 +6,7 @@ namespace Apex\App\Pkg\Helpers;
 use Apex\Svc\{Container, Db};
 use Apex\App\Pkg\Helpers\PackageConfig;
 use Apex\App\Network\Models\LocalPackage;
+use Apex\Migrations\Handlers\Installer as MigrationInstaller;
 
 /**
  * Initial install / remove migrations
@@ -21,6 +22,9 @@ class Migration
 
     #[Inject(PackageConfig::class)]
     private PackageConfig $pkg_config;
+
+    #[Inject(MigrationInstaller::class)]
+    private MigrationInstaller $migration_installer;
 
     /**
      * Install
@@ -47,6 +51,10 @@ class Migration
         if (is_object($obj) && method_exists($obj, 'postInstall')) { 
             $obj->postInstall($this->db);
         }
+
+        // Install additional migrations
+        $this->migration_installer->setSendOutput(false);
+        $this->migration_installer->migratePackage($pkg->getAlias(), true);
 
     }
 

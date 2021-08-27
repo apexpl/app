@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Base\Web\Tags;
 
-use Apex\Svc\Container;
+use Apex\Svc\{Container, Convert};
 use Apex\Syrus\Parser\StackElement;
 use Apex\Syrus\Interfaces\TagInterface;
 
@@ -15,6 +15,9 @@ class t_function implements TagInterface
 
     #[Inject(Container::class)]
     private Container $cntr;
+
+    #[Inject(Convert::class)]
+    private Convert $convert;
 
     // Global  functions
     private array $core_functions = [
@@ -33,7 +36,7 @@ class t_function implements TagInterface
         if (!$alias = $e->getAttr('alias')) { 
             return "<b>ERROR:</b> No 'alias' attribute exists within the function tag.";
         }
-        $alias = fcase($alias, 'title');
+        $alias = $this->convert->case($alias, 'title');
 
         // Check for core function
         if (isset($this->core_functions[$alias])) { 

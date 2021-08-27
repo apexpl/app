@@ -9,7 +9,7 @@ use Apex\Db\Mapper\ToInstance;
 /**
  * Mapper Iterable
  */
-class MapperIterable implements \Iterator
+class ModelIterator implements \Iterator
 {
 
     /**

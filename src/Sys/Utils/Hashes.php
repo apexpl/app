@@ -117,9 +117,9 @@ class Hashes
         } elseif ($source[0] == 'stdlist') { 
 
             // Get class name
-            $class_name = "\\Apex\\App\\Sys\\Lists\\" . ucwords($sourc[1]) . "List";
+            $class_name = "\\Apex\\App\\Base\\Lists\\" . ucwords($source[1]) . "List";
             if (!class_exists($class_name)) { 
-                throw new ApexHashesException("Unable to parse data source '$data_source' as source list does not exist at $clsas_name");
+                throw new ApexHashesException("Unable to parse data source '$data_source' as source list does not exist at $class_name");
             }
 
             // Create HTML

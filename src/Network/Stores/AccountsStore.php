@@ -17,15 +17,23 @@ use Symfony\Component\Yaml\Yaml;
 class AccountsStore extends AbstractStore
 {
 
+    #[Inject(Convert::class)]
+    private Convert $convert;
+
+    #[Inject(PackagesStore::class)]
+    private PackagesStore $pkg_store;
+
+    #[Inject(RsaKeyStore::class)]
+    private RsaKeyStore $rsa_store;
+
+    #[Inject(Opus::class)]
+    private Opus $opus;
+
     /**
      * Constructor
      */
     public function __construct(
-        private string $confdir = '',
-        private Opus $opus, 
-        private Convert $convert,
-        private PackagesStore $pkg_store,
-        private RsaKeyStore $rsa_store
+        private string $confdir = ''
     ) { 
 
         // Get confdir

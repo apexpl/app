@@ -6,8 +6,10 @@ namespace Apex\App\Network\Svn;
 use Apex\Svc\Container;
 use Apex\App\Cli\Cli;
 use Apex\App\Sys\Utils\Io;
+use Apex\App\Network\Svn\SvnExport;
 use Apex\App\Network\Sign\VerifyDownload;
 use Apex\App\Network\Stores\PackagesStore;
+use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Pkg\Helpers\Migration;
 use Apex\App\Pkg\Filesystem\Package\Installer;
 use Apex\App\Exceptions\ApexSvnRepoException;
@@ -27,6 +29,9 @@ class SvnInstall
     #[Inject(Io::class)]
     private Io $io;
 
+    #[Inject(SvnExport::class)]
+    private SvnExport $svn_export;
+
     #[Inject(VerifyDownload::class)]
     private VerifyDownload $verifier;
 
@@ -39,44 +44,18 @@ class SvnInstall
     #[Inject(Migration::class)]
     private Migration $migration;
 
+    // Properties
+    private bool $update_composer = false;
+
     /**
      * Install
      */
     public function process(SvnRepo $svn, string $version = '', bool $dev = false, bool $noverify = false)
     {
 
-        // Get latest release
-        if ($version == '' && $dev === false) { 
-            $this->cli->send("Determining latest version... ");
-            if (!$version = $svn->getLatestRelease()) { 
-                throw new ApexSvnRepoException("Unable to determine latest release of package, " . $svn->getPackage()->getAlias() . ".  Use --dev option to download /trunk branch.");
-            }
-            $this->cli->send("v$version\r\n");
-        }
-        $dir_name = $dev === true ? 'trunk' : 'tags/' . rtrim($version, '/') . '/';
-
-        // Get tmp directory
-        $tmp_dir = sys_get_temp_dir() . '/apex-' . uniqid();
-        if (is_dir($tmp_dir)) { 
-            $this->io->removeDir($tmp_dir);
-        }
-
         // Export package
-        $this->cli->send("Downloading package... ");
-        $svn->setTarget($dir_name, 0, false, false);
-        if (!$res = $svn->exec(['export'], [$tmp_dir])) { 
-            $svn->setTarget($dir_name);
-            $res = $svn->exec(['export'], [$tmp_dir]);
-        }
-
-        // Check for error
-        if (!$res) { 
-            throw new ApexSvnRepoException("Unable to export package from SVN, error: " . $svn->error_output);
-        }
-
-        // Get number of files / dirs
-        $num = substr_count($res, "\nA");
-        $this->cli->send("done ($num files / directories).\r\nVerifying digital signature... ");
+        $tmp_dir = $this->svn_export->process($svn, $version, $dev);
+        $this->cli->send("Verifying digital signature... ");
 
         // Verify
         if ($noverify === true || $dev === true) { 
@@ -102,10 +81,61 @@ class SvnInstall
         $this->cli->send("Performing initial migration... ");
             $this->migration->install($pkg);
 
+        // Install dependencies
+        $this->cli->send("done.\r\nInstalling any needed dependencies... ");
+        $this->installDependencies($pkg, $no_verify);
+
+        // Update composer, if needed
+        if ($this->update_composer === true) { 
+            shell_exec("update composer");
+        }
+
         // Success
         $this->cli->send("done.\r\nInstallation complete.\r\n\r\n");
     }
 
-}
+    /**
+     * Install dependencies
+     */
+    private function installDependencies(LocalPackage $pkg, bool $no_verify):void
+    {
 
+        // Apex dependencies
+        $yaml = $pkg->getConfig();
+        $dependencies = $yaml['require'] ?? [];
+        foreach (Dependencies as $pkg_alias => $version) { 
+
+            // Check for latest version
+            if ($version == '*') { 
+                $version = '';
+            }
+
+            // Install package
+            $this->process($pkg->getSvnRepo(), $version, false, $no_verify);
+        }
+
+        // Get composer dependencies
+        $registry = $pkg->getRegistry();
+        $dependencies = $registry['require_composer'] ?? [];
+        if (count($dependencies) == 0) { 
+            return;
+        }
+
+        // Load composer.json file
+        $json = json_decode(file_get_contents(SITE_PATH . '/composer.json'), true);
+
+        // Go through dependencies
+        foreach ($dependencies as $package => $version) { 
+            if (isset($json['require'][$package])) { 
+                continue;
+            }
+            $json['require'][$package] = $version;
+            $this->update_composer = true;
+        }
+
+        // Save composer.json file
+        file_put_contents(SITE_PATH . '/composer.json', json_encode($json, JSON_PRETTY_PRINT));
+    }
+
+}
 

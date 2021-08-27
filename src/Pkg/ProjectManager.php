@@ -78,12 +78,13 @@ class ProjectManager
 
         // Checkout repository
         $svn = $pkg->getSvnRepo();
-        $svn->checkout();
+        $tmp_dir = sys_get_temp_dir() . '/apex-' . uniqid();
+        $svn_url = $svn->getSvnUrl('trunk', false);
+        $svn->exec(['checkout'], [$tmp_dir]); 
 
         // Rename local SVN directory
-        $local_svn_dir = SITE_PATH . '/.apex/svn/' . $pkg->getAlias();
-        rename($local_svn_dir . '/.svn', SITE_PATH . '/.svn');
-        $this->io->removeDir($local_svn_dir);
+        rename($tmp_dir . '/.svn', SITE_PATH . '/.svn');
+        $this->io->removeDir($tmp_dir);
 
         // Save .svnignore file
         file_put_contents(SITE_PATH . '/.svnignore', "vendor\n.apex\n.env\n");
@@ -138,6 +139,11 @@ class ProjectManager
 
         // Transfer database to staging environment
         $dbadapter->transferLocalToStage($pkg, $res['db_password'], $res['db_host'], (int) $res['db_port']);
+
+        // Finalize
+        $this->network->post($pkg->getRepo(), 'stage/finalize', [
+            'pkg_serial' => $pkg->getSerial()
+        ]);
 
         // Set result
         $dbname = str_replace('-', '_', ($pkg->getAuthor() . '_' . $pkg->getAlias()));

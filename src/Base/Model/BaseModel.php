@@ -4,6 +4,8 @@ declare(strict_types = 1);
 namespace Apex\App\Base\Model;
 
 use Apex\Svc\{Db, Di, Convert};
+use Apex\App\Base\Model\ModelIterator;
+use Apex\App\Exceptions\ApexForeignKeyNotExistsException;
 
 /**
  * Base model
@@ -27,12 +29,12 @@ class BaseModel
     /**
      * Where
      */
-    public static function where(string $where_sql, ...$args):MapperIterable
+    public static function where(string $where_sql, ...$args):ModelIterator
     {
         $dbtable = static::$dbtable;
         $db = Di::get(Db::class);
         $stmt = $db->query("SELECT * FROM $dbtable WHERE $where_sql", ...$args);
-        return new MapperIterable($stmt, static::class);
+        return new ModelIterator($stmt, static::class);
     }
 
     /**
@@ -47,11 +49,80 @@ class BaseModel
     /**
      * Get all
      */
-    public static function all(string $order_by = 'id ASC'):MapperIterable
+    public static function all(string $sort_by = 'id', string $sort_dir = 'asc', int $limit = 0, int $offset = 0):ModelIterator
     {
+
+        // Initialize
         $db = Di::get(Db::class);
-        $stmt = $db->query("SELECT * FROM " . static::$dbtable . " ORDER BY $order_by");
-        return new MapperIterable($stmt, static::class);
+        if ($sort_by == '') { 
+            $sort_by = $db->getPrimaryColumn(static::$dbtable);
+        }
+
+        // Start SQL
+        $sql = "SELECT * FROM " . static::$dbtable . " ORDER BY %s";
+        $args = [$sort_by . ' ' . $sort_dir];
+
+        // Add limit
+        if ($limit > 0) { 
+            $sql .= " LIMIT %i";
+            $args[] = $limit;
+        }
+
+        // Add offset
+        if ($offset > 0) { 
+            $sql .= " OFFSET %i";
+            $args[] = $offset;
+        }
+
+        // Execute query, and return
+        $stmt = $db->query($sql, ...$args);
+        return new ModelIterator($stmt, static::class);
+    }
+
+    /**
+     * Get all
+     */
+    public function getChildren(string $foreign_key, string $class_name, string $sort_by = 'id', string $sort_dir = 'asc', int $limit = 0, int $offset = 0):ModelIterator
+    {
+
+        // Initialize
+        $db = Di::get(Db::class);
+
+        // Get foreign key
+        $keys = $db->getReferencedForeignKeys(static::$dbtable);
+        if (!isset($keys[$foreign_key])) { 
+            throw new ApexForeignKeyNotExistsException("No foreign key of '$foreign_key' exists on the database table " . static::$dbtable);
+        }
+        $key = $keys[$foreign_key];
+
+        // Get parent_id
+        $column = $key['column'];
+        $parent_id = $this->$column;
+
+        // Get sort_by
+        if ($sort_by == '') { 
+            $sort_by = $db->getPrimaryColumn($key['ref_table']);
+        }
+
+        // Start SQL
+        $sql = "SELECT * FROM " . $key['ref_table'] . " WHERE $key[ref_column] = %s ORDER BY %s";
+        $args = [$parent_id, $sort_by . ' ' . $sort_dir];
+
+        // Add limit
+        if ($limit > 0) { 
+            $sql .= " LIMIT %i";
+            $args[] = $limit;
+        }
+
+        // Add offset
+        if ($offset > 0) { 
+            $sql .= " OFFSET %i";
+            $args[] = $offset;
+        }
+
+        // Execute query, and return
+        $stmt = $db->query($sql, ...$args);
+        return new ModelIterator($stmt, $class_name);
     }
 
     /**
@@ -153,6 +224,11 @@ class BaseModel
             if ($key == 'convert') { 
                 continue;
             }
+
+            // Check for DateTime
+            if (is_object($value) && $value::class == 'DateTime') { 
+                $value = $value->format('Y-m-d H:i:s');
+            }
             $vars[$key] = $value;
         }
 
@@ -161,4 +237,5 @@ class BaseModel
     }
 
 }
+
 

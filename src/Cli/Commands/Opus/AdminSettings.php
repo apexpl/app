@@ -7,7 +7,7 @@ use Apex\Svc\{Convert, Container};
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\OpusHelper;
 use Apex\App\Network\Stores\PackagesStore;
-use Apex\App\Pkg\Registry;
+use Apex\App\Pkg\Helpers\Registry;
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 

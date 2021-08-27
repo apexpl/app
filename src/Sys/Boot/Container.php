@@ -8,6 +8,7 @@ use Apex\Db\Interfaces\DbInterface;
 use Apex\App\Interfaces\RouterInterface;
 use Apex\Debugger\Interfaces\DebuggerInterface;
 use Apex\Cluster\Interfaces\{BrokerInterface, ReceiverInterface};
+use Apex\Mercury\Interfaces\{EmailerInterface, SmsClientInterface, FirebaseClientInterface, WsClientInterface};
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -95,7 +96,7 @@ class Container
             'syrus.template_dir' => SITE_PATH . '/views', 
             'syrus.site_yml' => SITE_PATH . '/boot/routes.yml', 
             'syrus.theme_uri' => '/themes', 
-            'syrus.php_namespace' => "Apex\\Views", 
+            'syrus.php_namespace' => "Views", 
             'syrus.enable_autorouting' => true, 
             'syrus.auto_extract_title' => true, 
             'syrus.use_cluster' => true, 
@@ -164,8 +165,12 @@ class Container
             \Apex\Svc\Filesystem::class, 
             \Apex\Svc\View::class, 
             \Apex\Svc\Convert::class, 
-        \Apex\Migrations\Migrations::class, 
-        \Apex\App\Adapters\MigrationsConfig::class
+            \Apex\Migrations\Migrations::class, 
+            \Apex\App\Adapters\MigrationsConfig::class,
+            EmailerInterface::class,
+            SmsClientInterface::class,
+            FirebaseClientInterface::class,
+            WsClientInterface::class
         ];
 
         // Mark items as services
@@ -192,12 +197,15 @@ class Container
             \Apex\Svc\Db::class => $items[DbInterface::class], 
             \Apex\Svc\Logger::class => LoggerInterface::class, 
             \Apex\Svc\Debugger::class => DebuggerInterface::class,
+            \Apex\Svc\Emailer::class => EmailerInterface::class,
+            \Apex\Svc\Firebase::class => FirebaseClientInterface::class, 
             \Apex\Svc\HttpClient::class => HttpClientInterface::class, 
             \Apex\Svc\Container::class => ContainerInterface::class, 
-            \Apex\Svc\Convert::class => \Apex\App\Sys\Utils\Convert::class, 
-            \Apex\Svc\Container::class => ContainerInterface::class, 
+            \Apex\Svc\Convert::class => \Apex\App\Sys\Utils\Convert::class,  
             \Apex\Svc\Dispatcher::class => \Apex\Cluster\Dispatcher::class, 
-            \Apex\Migrations\Config::class => \Apex\App\Adapters\MigrationsConfig::class
+            \Apex\Migrations\Config::class => \Apex\App\Adapters\MigrationsConfig::class,
+            \Apex\Svc\SmsClient::class => SmsClientInterface::class,
+            \Apex\Svc\WsClient::class => WsClientInterface::class
         ];
 
         // Mark aliases

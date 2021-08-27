@@ -66,10 +66,10 @@ class Model implements CliCommandInterface
         }
 
         // Build
-        $file = $this->opus->buildModel($filename, SITE_PATH, $dbtable, $type, $magic);
+        $files = $this->opus->buildModel($filename, SITE_PATH, $dbtable, $type, $magic);
 
         // Success message
-        $cli->success("Successfully created new model from database table '$dbtable' which is now available at:", [$file]);
+        $cli->success("Successfully created new model from database table '$dbtable' which is now available at:", $files);
     }
 
 
