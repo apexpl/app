@@ -79,7 +79,6 @@ class RequestInputs
             return $default;
         }
 
-        $key = fcase($m[1], 'title') . '.' . $m[2];
         return array_key_exists($key, $this->_config) ? $this->_config[$key] : $default;
     }
 

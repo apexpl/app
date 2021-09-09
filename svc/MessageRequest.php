@@ -17,6 +17,7 @@ class MessageRequest implements MessageRequestInterface
     // Properties
     private string $type = 'rpc';
     private string $instance_name = '';
+    private ?string $target = null;
     private array $caller;
 
     /**
@@ -64,6 +65,14 @@ class MessageRequest implements MessageRequestInterface
     }
 
     /**
+     * Set target
+     */
+    public function setTarget(string $target):void
+    {
+        $this->target = $target;
+    }
+
+    /**
      * Get instance name
      */
     public function getInstanceName():string { 
@@ -75,6 +84,14 @@ class MessageRequest implements MessageRequestInterface
      */
     public function getType():string { 
         return $this->type; 
+    }
+
+    /**
+     * Get target
+     */
+    public function getTarget():?string
+    {
+        return $this->target;
     }
 
     /**

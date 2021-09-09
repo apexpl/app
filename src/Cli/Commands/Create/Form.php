@@ -5,9 +5,10 @@ namespace Apex\App\Cli\Commands\Create;
 
 use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
-use Apex\App\Cli\Helpers\PackageHelper;
+use Apex\App\Cli\Helpers\{PackageHelper, OpusHelper};
 use Apex\Opus\Opus;
-use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Interfaces\Opus\{CliCommandInterface, FormInterface};
+use redis;
 
 /**
  * Create form
@@ -23,6 +24,12 @@ class Form implements CliCommandInterface
 
     #[Inject(Opus::class)]
     private Opus $opus;
+
+    #[Inject(OpusHelper::class)]
+    private OpusHelper $opus_helper;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     /**
      * Process
@@ -51,6 +58,10 @@ class Form implements CliCommandInterface
             'package' => $pkg_alias,
             'alias' => $alias
         ]);
+
+        // Add to redis
+        $class_name = $this->opus_helper->pathToNamespace($files[0]);
+        $this->redis->sadd('config:interfaces:' . FormInterface::class, $class_name);
 
         // Success message
         $cli->success("Successfully created new form which is now available at:", $files);

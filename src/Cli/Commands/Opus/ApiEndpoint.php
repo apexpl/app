@@ -59,20 +59,14 @@ class ApiEndpoint implements CliCommandInterface
     {
 
         $help = new CliHelpScreen(
-            title: 'Generate Model',
-            usage: 'opus model <FILENAME> --dbtable=<TABLE> [--type=(php8|php7|eloquent|doctrine)] [--magic]',
-            description: 'Generate a new model class.'
+            title: 'Generate API Endpoint',
+            usage: 'opus api-endpoint <FILENAME>',
+            description: 'Generate a new API endpoint class.'
         );
 
         // Params
-        $help->addParam('filename', 'File location of the new model class, relative to the /src/ directory.');
-        $help->addFlag('--dbtable', 'The name of the database table to use to generate property names.  Not required if generating Eloquent model.');
-        $help->addFlat('--type', "Type of model to generate, defaults to 'php8'.  Supported values are: php8, php7, eloquent, doctrine");
-        $help->addFlag('--magic', "No value, and only applicable if type is 'php8' or 'php7'.  If present, will generate model without hard coded get / set methods and instead use magic methods in place via extension.  Otherwise, will generate model with hard coded ge / set methods.");
-
-        // Examples
-        $help->addExample('./apex opus MyShop/Models/Products --dbtable shop_products --magic');
-        $help->addExample('./apex opus model MyShop/Models/ShopOrder --type eloquent');
+        $help->addParam('filename', 'File location of the new API endpoint class, relative to the /src/ directory.');
+        $help->addExample('./apex opus api-endpoint MyShop/Api/Invoices/List');
 
         // Return
         return $help;

@@ -124,7 +124,7 @@ class PackageHelper
                 $this->account = $this->acct_helper->get();
             }
             $this->network->setAuth($this->account);
-            $res = $this->network->post($repo, 'repos/check', ['pkg_alias' => $pkg_alias]);
+            $res = $this->network->post($repo, 'repos/check', ['pkg_serial' => $pkg_serial]);
         }
 
         // Check access

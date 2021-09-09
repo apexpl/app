@@ -39,6 +39,7 @@ class Create implements CliCommandInterface
             return;
         }
         $pkg_alias = $pkg->getAlias();
+        $commit_args = $cli->getCommitArgs();
 
         // Initialize
         $opt = $cli->getArgs(['m', 'file']);
@@ -80,7 +81,7 @@ class Create implements CliCommandInterface
 
         // Create release
         $old_dir = $svn->getCurrentBranch();
-        $svn->copy('trunk', 'tags/' . $version);
+        $svn->copy('trunk', 'tags/' . $version, $commit_args);
 
         // Switch, and add properties
         $svn->switch('tags/' . $version);
@@ -96,7 +97,11 @@ class Create implements CliCommandInterface
         $this->pkg_store->save($pkg);
 
         // Success
-        $cli->send("Successfully created new release on package '$pkg_alias' with version v$version\r\n\r\n");
+        $http_url = 'https://' . $pkg->getRepo()->getHttpHost() . '/' . $pkg->getSerial() . '/release/' . $version;
+        $cli->sendHeader('Successfully Created Release');
+        $cli->send("Successfully created new release on package '$pkg_alias' with version v$version.  You may view the release at:\r\n\r\n");
+        $cli->send("    Web: $http_url\r\n");
+        $cli->send("    SVN: " . $svn->getSvnUrl('tags/' . $version, true) . "\r\n\r\n");
     }
 
     /**

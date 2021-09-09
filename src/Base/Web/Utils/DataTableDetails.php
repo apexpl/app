@@ -1,15 +1,15 @@
 <?php
 declare(strict_types = 1);
 
-namespace Apex\App\Base\Web;
+namespace Apex\App\Base\Web\Utils;
 
 use Apex\Svc\App;
-use Apex\Opus\Interfaces\DataTableInterface;
+use Apex\App\Interfaces\Opus\DataTableInterface;
 
 /**
  * Data table
  */
-class DataTable
+class DataTableDetails
 {
 
     // Properties

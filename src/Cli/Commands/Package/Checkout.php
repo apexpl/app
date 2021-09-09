@@ -43,7 +43,7 @@ class Checkout implements CliCommandInterface
 
         // Get args
         $opt = $cli->getArgs(['repo']);
-        $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
+        $pkg_alias = $this->pkg_helper->getSerial(($args[0] ?? ''));
         $repo_alias = $opt['repo'] ?? 'apex';
 
         // Load package

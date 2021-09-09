@@ -71,7 +71,7 @@ class ReposStore extends AbstractStore
 
         // Save new config
         $config['repos'][$repo->getAlias()] = $repo->toArray();
-        file_put_contents(SITE_PATH . '/etc/.config.yml', Yaml::dump($config));
+        file_put_contents(SITE_PATH . '/etc/.config.yml', Yaml::dump($config, 5));
     }
 
     /**
@@ -88,7 +88,7 @@ class ReposStore extends AbstractStore
 
         // Delete and save
         unset($config['repos'][$repo_alias]);
-        file_put_contents(SITE_PATH . '/etc/.config.yml', Yaml::dump($config));
+        file_put_contents(SITE_PATH . '/etc/.config.yml', Yaml::dump($config, 5));
     }
 
 

@@ -26,7 +26,7 @@ class Bootloader extends RequestInputs
     protected ClientInfo $client;
     protected ?AuthSession $session = null;
     protected ?ArmorUserInterface $user = null;
-    protected ?array $routes_config = null;
+    protected ?array $boot_config = [];
     protected string $content_type = '';
     protected string $path;
     protected bool $path_is_locked = false;
@@ -167,7 +167,7 @@ class Bootloader extends RequestInputs
     /**
      * Set config var
      */
-    public function setConfigVar(string $key, string $value):void
+    public function setConfigVar(string $key, string | int | float $value):void
     {
 
         // Check format

@@ -14,8 +14,9 @@ class DatabaseInstaller
 {
 
     // Properties
-    private static string $db_class = \Apex\Db\Drivers\mySQL\mySQL::class;
-    private static array $default_ports = [
+    public static string $db_class = \Apex\Db\Drivers\mySQL\mySQL::class;
+    public static ?array $connection_info = null;
+    public static array $default_ports = [
         'mySQL' => 3306,
         'PostgreSQL' => 5432,
         'SQLite' => 0
@@ -49,6 +50,11 @@ class DatabaseInstaller
      */
     private static function getConnectionInfo(Cli $cli):array
     {
+
+        // Check if already defined
+        if (self::$connection_info !== null) { 
+            return self::$connection_info;
+        }
 
         // Send header
         $cli->sendHeader('SQL Database Information');

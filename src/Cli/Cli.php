@@ -277,5 +277,28 @@ class Cli extends CliRouter
         $this->send("ERROR: $message\r\n\r\n");
     }
 
+    /**
+     * Render array
+     */
+    public function sendArray(array $inputs):void
+    {
+
+        // Get max size
+        $size = 0;
+        foreach ($inputs as $key => $value) { 
+            $size = strlen($key) > $size ? strlen($key) : $size;
+        }
+        $size += 4;
+
+        // Go through inputs
+        foreach ($inputs as $key => $value) { 
+            $break = "\r\n" . str_pad('', ($size + 4), ' ', STR_PAD_RIGHT);
+            $line = '    ' . str_pad($key, $size, ' ', STR_PAD_RIGHT) . wordwrap($value, (75 - $size - 4), $break);
+            $this->send("$line\r\n");
+        }
+        $this->send("\r\n");
+    }
+
+
 }
 

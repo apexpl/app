@@ -108,13 +108,13 @@ class CliHelpScreen
         // Params
         if (count($this->params) > 0) { 
             $cli->send($this->params_title . "\r\n\r\n");
-            $this->renderArray($this->params);
+            $this->cli->sendArray($this->params);
         }
 
         // Flags
         if (count($this->flags) > 0) { 
             $cli->send("OPTIONAL FLAGS\r\n\r\n");
-            $this->renderArray($this->flags);
+            $this->cli->sendArray($this->flags);
         }
 
         // Examples
@@ -127,28 +127,6 @@ class CliHelpScreen
 
         // End
         $cli->send("-- END --\r\n\r\n");
-    }
-
-    /**
-     * Render array
-     */
-    public function renderArray(array $inputs):void
-    {
-
-        // Get max size
-        $size = 0;
-        foreach ($inputs as $key => $value) { 
-            $size = strlen($key) > $size ? strlen($key) : $size;
-        }
-        $size += 4;
-
-        // Go through inputs
-        foreach ($inputs as $key => $value) { 
-            $break = "\r\n" . str_pad('', ($size + 4), ' ', STR_PAD_RIGHT);
-            $line = '    ' . str_pad($key, $size, ' ', STR_PAD_RIGHT) . wordwrap($value, (75 - $size - 4), $break);
-            $this->cli->send("$line\r\n");
-        }
-        $this->cli->send("\r\n");
     }
 
 }

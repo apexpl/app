@@ -15,15 +15,14 @@ use Apex\Syrus\Exceptions\SyrusTemplateNotFoundException;
 final class View extends \Apex\Syrus\Syrus
 {
 
-    /**
-     * Constructor
-     */
-    public function __construct(
-        private App $app, 
-        private Container $cntr
-    ) {
-        $this->template_dir = SITE_PATH . '/views';
-    }
+    #[Inject(App::class)]
+    private App $app;
+
+    #[Inject(Container::class)]
+    private Container $cntr;
+
+    // Properties
+    private string $javascript = '';
 
     /**
      * Render
@@ -51,8 +50,19 @@ final class View extends \Apex\Syrus\Syrus
             $html = $this->renderBlock($html);
         }
 
+        // Apply Javascript
+        $html = $this->applyJavascript($html);
+
         // Return
         return $html;
+    }
+
+    /**
+     * Add Javascript
+     */
+    public function addJavascript(string $js):void
+    {
+        $this->javascript .= $js;
     }
 
     /**
@@ -71,6 +81,42 @@ final class View extends \Apex\Syrus\Syrus
         // Add vars
         $this->assign('', $vars);
         $this->assign('config', $this->app->getAllConfig());
+    }
+
+    /**
+     * Apply Javascript
+     */
+    private function applyJavascript(string $html):string
+    {
+
+        // Add system CSS
+        $html = str_replace("<body>", base64_decode('Cgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoKICAgIC5mb3JtX3RhYmxlIHsgbWFyZ2luLWxlZnQ6IDI1cHg7IH0KICAgIC5mb3JtX3RhYmxlIHRkIHsKICAgICAgICB0ZXh0LWFsaWduOiBsZWZ0OwogICAgICAgIHZlcnRpY2FsLWFsaWduOiB0b3A7CiAgICAgICAgcGFkZGluZzogOHB4OwogICAgfQoKPC9zdHlsZT4KCgoKCgo=') . '<body>', $html);
+
+        // Check if Javascript enabled
+        if ($this->app->config('core.enable_javascript') != 1 && $this->app->getArea() != 'admin') { 
+            return $html;
+        }
+
+        // Add any defined Javascript
+        if ($this->javascript != '') { 
+            $html = str_replace("</body>", "\t<script type=\"text/javascript\">\n" . $this->javascript . "\n\t</script>\n\n</body>", $html);
+        }
+
+        // Set Apex Javascript
+        $js = "\t" . '<script type="text/javascript" src="/plugins/apex.js"></script>' . "\n";
+        $js .= "\t" . '<script src="/plugins/parsley.js/parsley.min.js" type="text/javascript"></script>' . "\n";
+        $js .= "\t" . '<script src="https://www.google.com/recaptcha/api.js"></script>' . "\n\n";
+        $js .= "</head>\n\n";
+
+        // Add to HTML
+        $html = str_replace("</head>", $js, $html);
+
+        // Add modal HTML
+        //$modal = $this->html_tags->get_tag('modal');
+        //$html = str_replace("<body>", "<body>\n\n$modal\n", $html);
+
+        // Return
+        return $html;
     }
 
 }

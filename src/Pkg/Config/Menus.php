@@ -314,7 +314,7 @@ class Menus
         $reorder = [];
         $rows = $this->db->query("SELECT * FROM cms_menus WHERE package = %s", $this->pkg_alias);
         foreach ($rows as $row) { 
-            $var = $row['area'] . ',' . $row['parent'];
+            $var = $row['area'] . ':' . $row['parent'];
             $reorder[$var] = 1;
         }
 

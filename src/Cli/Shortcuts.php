@@ -14,6 +14,7 @@ class Shortcuts
         'add' => ['package', 'add'],
         'checkout' => ['package', 'checkout'],
         'commit' => ['package', 'commit'],
+        'crontab' => ['sys', 'crontab'],
         'get-config' => ['sys', 'get-config'],
         'install' => ['package', 'install'],
         'scan' => ['package', 'scan'],
@@ -23,6 +24,7 @@ class Shortcuts
         'switch' => ['branch', 'sw'],
         'rm' => ['package', 'rm'],
         'upgrade' => ['package', 'upgrade'],
+        'sql' => ['sys', 'sql'],
         'svn' => ['sys', 'svn']
     ];
     // Top-level shortcuts
@@ -74,6 +76,10 @@ class Shortcuts
             'c' => 'create',
             'log' => 'change-log',
             'd' => 'delete',
+            'list' => 'ls'
+        ],
+
+        'sys' => [
             'list' => 'ls'
         ]
     ];

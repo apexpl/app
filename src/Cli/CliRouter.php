@@ -25,6 +25,7 @@ class CliRouter
         'branch',
         'certs',
         'create',
+        'image',
         'migration',
         'opus',
         'package',
@@ -35,7 +36,7 @@ class CliRouter
 
     // Properties
     protected array $argv = [];
-    protected array $orig_argv = [];
+    public array $orig_argv = [];
     protected string $class_name = '';
     protected bool $is_help = false;
     protected ?string $signing_password = null;
@@ -61,6 +62,7 @@ class CliRouter
             $root_namespace = "\\Apex\\App\\Cli\\Commands\\";
         } else { 
             $root_namespace = "\\App\\" . $this->convert->case($args[0], 'title') . "\\Opus\\Cli\\";
+            array_shift($args);
         }
 
         // Determine command
@@ -105,7 +107,8 @@ class CliRouter
         }
 
         // Check for help
-        if ($args[0] == 'help' || $args[0] == 'h') { 
+        $first = $args[0] ?? '';
+        if ($first == 'help' || $first == 'h') { 
             $is_help = true;
             array_shift($args);
         }
@@ -173,7 +176,7 @@ class CliRouter
     {
 
         // Get args
-        $args = $this->getArgs(['m', 'file']);
+        $opt = $this->getArgs(['m', 'file']);
         $message = $opt['m'] ?? '';
         $file = $opt['file'] ?? '';
 

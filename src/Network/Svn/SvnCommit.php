@@ -36,14 +36,11 @@ class SvnCommit
     /**
      * Process
      */
-    public function process(LocalPackage $pkg, string $message = '', string $commit_file = ''):void
+    public function process(LocalPackage $pkg, array $commit_args = []):void
     {
 
         // Initialize
         $svn = $pkg->getSvnRepo();
-        if ($message == '' && $commit_file == '') { 
-            $message = 'No commit message defined';
-        }
 
         // Check repo exists, if needed
         if (!is_dir(SITE_PATH . '/.apex/svn/' . $pkg->getAlias())) {
@@ -54,7 +51,7 @@ class SvnCommit
 
         // Compare merkle roots
         if (!$this->compareMerkleRoots($svn)) { 
-            $this->cli->error("Your local working copy is older than the SVN repository.  Please first update, see 'apex help package update' for details.");
+            $this->cli->error("Your local working copy is older than the SVN repository.  Please first update, see 'apex help package pulle' for details.");
             return;
         }
 
@@ -67,13 +64,12 @@ class SvnCommit
         // Sign package
         $this->signer->signPackage($svn);
 
-        // Create commit message options
+        // Prepare for commit
         $svn->setTarget('', 0, true);
         $svn->checkSshAgent();
-        $options = $commit_file != '' ? ['--file', $commit_file] : ['-m', $message];
 
         // Process commit
-        $svn->exec(['commit'], $options, true);
+        $svn->exec(['commit'], $commit_args, true);
     }
 
     /**

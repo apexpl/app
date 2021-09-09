@@ -26,7 +26,7 @@ class SyrusAdapter implements LoaderInterface
         private View $view, 
         private Container $cntr
     ) {
-        $this->yaml = $this->app->getRoutesConfig();
+        $this->yaml = $this->app->getRoutesConfig('site.yml');
     }
 
     /**

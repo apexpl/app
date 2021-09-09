@@ -2,12 +2,10 @@
 
 namespace Apex\Svc;
 
-use League\Flysystem\{Filesystem, FilesystemAdapter};
-
 /**
  * StorageInterface
  */
-interface Filesystem extends FilesystemAdapter
+interface Filesystem extends \League\Flysystem\Filesystem
 {
 
 

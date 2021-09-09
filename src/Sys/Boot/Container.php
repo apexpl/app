@@ -50,6 +50,9 @@ class Container
         // Set cluster callbacks
         $cntr = self::bootCluster($cntr);
 
+        // Mark developer defined services
+        $cntr = self::markDeveloperDefinedServices($cntr);
+
         // Set into Di wrapper
         \Apex\Container\Di::setContainer($cntr);
 
@@ -162,7 +165,7 @@ class Container
             \Apex\Cluster\Listener::class, 
             \Apex\Syrus\Syrus::class, 
             \Apex\Svc\Cache::class, 
-            \Apex\Svc\Filesystem::class, 
+            \League\Flysystem\Filesystem::class,
             \Apex\Svc\View::class, 
             \Apex\Svc\Convert::class, 
             \Apex\Migrations\Migrations::class, 
@@ -197,6 +200,7 @@ class Container
             \Apex\Svc\Db::class => $items[DbInterface::class], 
             \Apex\Svc\Logger::class => LoggerInterface::class, 
             \Apex\Svc\Debugger::class => DebuggerInterface::class,
+            \Apex\Svc\Filesystem::class => \League\Flysystem\Filesystem::class,
             \Apex\Svc\Emailer::class => EmailerInterface::class,
             \Apex\Svc\Firebase::class => FirebaseClientInterface::class, 
             \Apex\Svc\HttpClient::class => HttpClientInterface::class, 
@@ -239,7 +243,29 @@ class Container
         return $cntr;
     }
 
+    /**
+     * Mark developer defined services
+     */
+    private static function markDeveloperDefinedServices(ApexContainerInterface $cntr):ApexContainerInterface
+    {
 
+        // Get redis keys
+        $redis = $cntr->get(redis::class);
+        $services = $redis->hgetall('config:services') ?? [];
+
+        // Go through services
+        foreach ($services as $class_name => $pkg_alias) { 
+
+            // Check class exists
+            if (!class_exists($class_name)) { 
+                continue;
+            }
+            $cntr->markItemAsService($class_name);
+        }
+
+        // Return
+        return $cntr;
+    }
 
 }
 

@@ -5,13 +5,13 @@ namespace Apex\App\Cli\Commands\Create;
 
 use Apex\Svc\{Container, Convert};
 use Apex\App\Cli\{Cli, CliHelpScreen};
-use Apex\App\Cli\Helpers\PackageHelper;
+use Apex\App\Cli\Helpers\{PackageHelper, OpusHelper};
 use Apex\App\Pkg\Helpers\Registry;
+use Apex\App\Base\Router\RouterConfig;
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
-use Apex\App\Exceptions\ApexYamlException;
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Yaml\Exception\ParseException;
+use Psr\Http\Server\MiddlewareInterface;
+use redis;
 
 /**
  * Create http controller
@@ -28,8 +28,17 @@ class HttpController implements CliCommandInterface
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
 
+    #[Inject(RouterConfig::class)]
+    private RouterConfig $router_config;
+
     #[Inject(Opus::class)]
     private Opus $opus;
+
+    #[Inject(OpusHelper::class)]
+    private OpusHelper $opus_helper;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     /**
      * Process
@@ -43,9 +52,9 @@ class HttpController implements CliCommandInterface
         }
 
         // Get args
-        $opt = $cli->getArgs(['path']);
+        $opt = $cli->getArgs(['route']);
         $alias = $this->convert->case(($args[1] ?? ''), 'title');
-        $path = $opt['path'] ?? '';
+        $route = $opt['route'] ?? '';
 
         // Check
         if ($alias == '' || !preg_match("/^[a-zA-Z0-9_-]+$/", $alias)) { 
@@ -64,47 +73,17 @@ class HttpController implements CliCommandInterface
         $registry->add('http_controllers', $alias);
 
         // Add route definition, if route defined
-        if ($path != '') { 
-            $registry->add('routes', $path, $alias);
-            $this->addRoute($path, $alias);
+        if ($route != '') { 
+            $this->router_config->addRoute($route, $alias);
+            $registry->add('routes', $route, $alias);
         }
+
+        // Add to redis
+        $class_name = $this->opus_helper->pathToNamespace($files[0]);
+        $this->redis->sadd('config:interfaces:' . MiddlewareInterface::class, $class_name);
 
         // Success message
         $cli->success("Successfully created new HTTP controller, which is now available at:", $files);
-    }
-
-    /**
-     * Add route
-     */
-    private function addRoute(string $uri, string $alias):void
-    {
-
-        // Load router file'
-        try {
-            $yaml = Yaml::parseFile(SITE_PATH . '/boot/routes.yml');
-        } catch (ParseException $e) { 
-            throw new ApexYamlException("Unable to parse routes.yml YAML file, error: " . $e->getMessage());
-        }
-        $routes = $yaml['routes'] ?? [];
-
-        // Add route as needed
-        if (isset($routes['default']) && is_array($routes['default']) && !isset($routes['default'][$uri])) { 
-            $routes['default'][$uri] = $alias;
-        } elseif (!isset($routes[$uri])) { 
-            $routes[$uri] = $alias;
-        } else { 
-            return;
-        }
-        $yaml['routes'] = $routes;
-
-        // Set YAML text
-        $text = "\n##########\n# Routes\n#\n";
-        $text .= "# This file has been auto-generated, but you may modify as desired below.  Please refer to the developer \n";
-        $text .= "# documentation for details on the entries within this file.\n##########\n\n";
-        $text .= Yaml::dump($yaml, 6);
-
-        // Save YAML file
-        file_put_contents(SITE_PATH . '/boot/routes.yml', $text);
     }
 
     /**
@@ -115,15 +94,15 @@ class HttpController implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'Create HTTP Controller',
-            usage: 'create http-controller <PKG_ALIAS> <ALIAS> [--path=]',
+            usage: 'create http-controller <PKG_ALIAS> <ALIAS> [--route=]',
             description: 'Create and register a new HTTP controller within the /src/HttpControllers directory'
         );
 
         // Params
         $help->addParam('pkg_alias', 'Package alias to register HTTP controller to.');
         $help->addParam('alias', 'The alias / filename of the HTTP controller to create.');
-        $help->addFlag('--path', 'If defined, new routes within /boot/routes.yml file will be added.');
-        $help->addExample('./apex create http-controller my-shop products --uri product');
+        $help->addFlag('--route', 'If defined, new route within /boot/routes.yml file will be added.');
+        $help->addExample('./apex create http-controller my-shop products --route product');
 
         // Return
         return $help;

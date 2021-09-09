@@ -17,10 +17,11 @@ class ApexInstaller
 {
 
     // Properties
-    private static string $domain_name = 'localhost';
-    private static string $server_type = 'all';
-    private static string $instance_name = 'main';
-    private static int $enable_admin = 1;
+    public static string $domain_name = 'localhost';
+    public static string $server_type = 'all';
+    public static string $instance_name = 'main';
+    public static int $enable_admin = 1;
+    public static int $enable_javascript = 1;
     public static array $cron_jobs = [];
 
 
@@ -66,7 +67,7 @@ class ApexInstaller
     /**
      * Complete install
      */
-    public static function complete(Cli $cli, redis $redis):App
+    public static function complete(Cli $cli, redis $redis, bool $is_yaml = false):App
     {
 
         // Initialize app
@@ -83,7 +84,7 @@ class ApexInstaller
         self::createEnvFile();
 
         // Add cron jobs
-        self::addCrontab($cli);
+        self::addCrontab($cli, $is_yaml);
 
         // Install any available upgrades
         //$upgrade_client = app::make(upgrade::class);
@@ -104,12 +105,12 @@ class ApexInstaller
         $pkg = $pkg_store->get('core');
 
         // Install core package
-        // Install core package
         $migration = Di::make(Migration::class);
         $migration->install($pkg);
 
         // Update config as needed
         $app->setConfigVar('core.domain_name', self::$domain_name);
+        $app->setConfigVar('core.enable_javascript', self::$enable_javascript);
         $app->setConfigVar('core.encrypt_password', base64_encode(openssl_random_pseudo_bytes(32)));
     }
 
@@ -141,7 +142,7 @@ class ApexInstaller
     /**
      * Add crontab jobs
      */
-    private static function addCrontab(Cli $cli):void
+    private static function addCrontab(Cli $cli, bool $is_yaml = false):void
     {
 
         // Determine cron jobs based on server type
@@ -150,7 +151,7 @@ class ApexInstaller
         }
 
         // Return, if necessary
-        if (count(self::$cron_jobs) == 0 || !function_exists('system')) { 
+        if (count(self::$cron_jobs) == 0 || $is_yaml === true || !function_exists('system')) { 
             return;
         }
 

@@ -101,20 +101,19 @@ class SvnRepo extends SvnClient
     /**
      * Copy
      */
-    public function copy(string $source, string $dest, string $message = ''):void
+    public function copy(string $source, string $dest, array $commit_args):void
     {
 
         // Set target, and get destination URL
         $this->setTarget($source);
         $dest_url = $this->getSvnUrl($dest, false);
 
-        // Create args
-        if ($message == '') { 
-            $message = 'Creating copy';
-        }
+        // Create options
+        $options = [$dest_url];
+        array_push($options, ...$commit_args);
 
         // Copy
-        if (!$this->exec(['copy'], [$dest_url, '-m', $message])) { 
+        if (!$this->exec(['copy'], $options)) { 
             throw new ApexSvnRepoException("Unable to copy SVN repo from $source to $dest, error: " . $this->error_output);
         }
 

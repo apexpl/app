@@ -20,6 +20,9 @@ class SvnExport
     #[Inject(Io::class)]
     private Io $io;
 
+    // Properties
+    public string $svn_dir = '';
+
     /**
      * Process
      */
@@ -35,6 +38,7 @@ class SvnExport
             $this->cli->send("v$version\r\n");
         }
         $dir_name = $dev === true ? 'trunk' : 'tags/' . rtrim($version, '/') . '/';
+        $this->svn_dir = $dir_name;
 
         // Get tmp directory
         $tmp_dir = sys_get_temp_dir() . '/apex-' . uniqid();

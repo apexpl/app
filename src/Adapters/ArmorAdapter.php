@@ -31,12 +31,22 @@ class ArmorAdapter implements AdapterInterface
     {
 
         // Get table and class name
-        if (str_starts_with($uuid, 'a:')) { 
-            $table_name = 'admin';
-            $class_name = \App\Webapp\Admin::class;
-        } else { 
-            $table_name = 'user_profiles';
-            $class_name = \App\Users\User::class;
+        $yaml = $this->app->getRoutesConfig('site.yml');
+        $user_types = $yaml['user_types'] ?? [];
+        $prefix = strtolower(substr($uuid, 0, 1));
+
+        // Get table and class name
+        foreach ($user_types as $type => $vars) { 
+
+            // Skip, if needed
+            if (!str_starts_with($type, $prefix)) { 
+                continue;
+            }
+
+            // Set variables
+            $table_name = $vars['table'];
+            $class_name = $vars['class'];
+            break;
         }
 
         // Get object

@@ -5,13 +5,15 @@ namespace Apex\App\Network\Svn;
 
 use Apex\Svc\Container;
 use Apex\App\Cli\Cli;
-use Apex\App\Sys\Utils\Io;
+use Apex\App\Sys\Utils\{Io, SiteConfig};
 use Apex\App\Network\Svn\SvnExport;
 use Apex\App\Network\Sign\VerifyDownload;
 use Apex\App\Network\Stores\PackagesStore;
+use Apex\App\Base\Router\RouterConfig;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Pkg\Helpers\Migration;
 use Apex\App\Pkg\Filesystem\Package\Installer;
+use Apex\App\Pkg\Config\EmailNotifications;
 use Apex\App\Exceptions\ApexSvnRepoException;
 
 /**
@@ -44,6 +46,15 @@ class SvnInstall
     #[Inject(Migration::class)]
     private Migration $migration;
 
+    #[Inject(RouterConfig::class)]
+    private RouterConfig $router_config;
+
+    #[Inject(SiteConfig::class)]
+    private SiteConfig $site_config;
+
+    #[Inject(EmailNotifications::class)]
+    private EmailNotifications $email_notifications;
+
     // Properties
     private bool $update_composer = false;
 
@@ -55,6 +66,7 @@ class SvnInstall
 
         // Export package
         $tmp_dir = $this->svn_export->process($svn, $version, $dev);
+        $dir_name = $this->svn_export->svn_dir;
         $this->cli->send("Verifying digital signature... ");
 
         // Verify
@@ -83,11 +95,14 @@ class SvnInstall
 
         // Install dependencies
         $this->cli->send("done.\r\nInstalling any needed dependencies... ");
-        $this->installDependencies($pkg, $no_verify);
+        $this->installDependencies($pkg, $noverify);
+
+        // Install registry
+        $this->installRegistry($pkg);
 
         // Update composer, if needed
         if ($this->update_composer === true) { 
-            shell_exec("update composer");
+            shell_exec("composer update");
         }
 
         // Success
@@ -103,7 +118,12 @@ class SvnInstall
         // Apex dependencies
         $yaml = $pkg->getConfig();
         $dependencies = $yaml['require'] ?? [];
-        foreach (Dependencies as $pkg_alias => $version) { 
+        foreach ($dependencies as $pkg_alias => $version) { 
+
+            // Check if installed
+            if ($chk = $this->pkg_store->get($pkg_alias)) { 
+                continue;
+            }
 
             // Check for latest version
             if ($version == '*') { 
@@ -111,7 +131,7 @@ class SvnInstall
             }
 
             // Install package
-            $this->process($pkg->getSvnRepo(), $version, false, $no_verify);
+            $this->process($pkg->getSvnRepo(), (string) $version, false, $no_verify);
         }
 
         // Get composer dependencies
@@ -135,6 +155,44 @@ class SvnInstall
 
         // Save composer.json file
         file_put_contents(SITE_PATH . '/composer.json', json_encode($json, JSON_PRETTY_PRINT));
+    }
+
+    /**
+     * Install registry
+     */
+    private function installRegistry(LocalPackage $pkg):void
+    {
+
+        // Get registry
+        $registry = $pkg->getRegistry();
+        $yaml = $pkg->getConfig();
+
+        // Install e-mail notifications
+        $this->email_notifications->install($yaml);
+
+        // Go through routes
+        $routes = $registry['routes'] ?? [];
+        foreach ($routes as $route => $http_controller) { 
+
+            // Ensure class exists
+            if (!class_exists("\\App\\HttpControllers\\$http_controller")) { 
+                continue;
+            }
+            $this->router_config->addRoute($route, $http_controller);
+        }
+
+        // Add themes
+        $themes = $registry['themes'] ?? [];
+        foreach ($themes as $path => $theme_alias) { 
+            $this->site_config->addTheme($path, $theme_alias);
+        }
+
+        // Add user types
+        $user_types = $registry['user_types'] ?? [];
+        foreach ($user_types as $type => $vars) { 
+            $this->site_config->addUserType($type, $vars['table'], $vars['class']);
+        }
+
     }
 
 }

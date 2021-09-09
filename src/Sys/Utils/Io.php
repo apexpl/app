@@ -5,6 +5,7 @@ namespace Apex\App\Sys\Utils;
 
 use Apex\Svc\Debugger;
 use Apex\App\Exceptions\ApexIoException;
+use ZipArchive;
 
 /**
  * I/O
@@ -121,5 +122,36 @@ class Io
         }
     }
 
+    /**
+     8 Create zip archive
+     */
+    public function createZipArchive(string $source_dir, string $dest = ''):string
+    {
+
+        // Get temp file, if needed
+        if ($dest == '') { 
+            $dest = sys_get_temp_dir() . '/apex-' . uniqid() . '.zip';
+        }
+
+        // Get files from source
+        $files = $this->parseDir($source_dir);
+
+        // Create zip file
+        $zip = new ZipArchive();
+        if (!$zip->open($dest, ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+            throw new ApexIoException("Unable to create zip archive at, $dest");
+        }
+
+        // Add all files
+        foreach ($files as $file) { 
+            $zip->addFile("$source_dir/$file", $file);
+        }
+        $zip->close();
+
+        // Return
+        return $dest;
+    }
+
 }
+
 

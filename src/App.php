@@ -269,23 +269,23 @@ class App extends Bootloader implements RequestHandlerInterface
     /**
      * Get routes config
      */
-    public function getRoutesConfig():array
+    public function getRoutesConfig(string $filename = 'routes.yml'):array
     {
 
         // If already loaded
-        if ($this->routes_config !== null) { 
-            return $this->routes_config;
+        if (isset($this->boot_config[$filename])) { 
+            return $this->boot_config[$filename];
         }
 
         // Load Yaml file
         try {
-            $yaml = Yaml::parseFile(SITE_PATH . '/boot/routes.yml');
+            $yaml = Yaml::parseFile(SITE_PATH . '/boot/' . $filename);
         } catch (\Symfony\Component\Yaml\Exception\ParseException $e) { 
-            throw new ApexYamlException("Unable to parse routes.yml YAML file, error: " . $e->getMessage());
+            throw new ApexYamlException("Unable to parse /boot/$filename YAML file, error: " . $e->getMessage());
         }
 
         // Set and return
-        $this->routes_config = $yaml;
+        $this->boot_config[$filename] = $yaml;
         return $yaml;
     }
 

@@ -4,8 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Pkg\Helpers;
 
 use Apex\Svc\{Container, Convert};
-use Apex\App\Pkg\Registry;
-use Apex\App\Pkg\Config\{ConfigVars, Hashes, Menus};
+use Apex\App\Pkg\Config\{ConfigVars, Hashes, Menus, Services, BoxlistItems};
 use Apex\App\Network\Stores\PackagesStore;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -45,7 +44,7 @@ class PackageConfig
         try {
             $yaml = Yaml::parseFile($filepath);
         } catch (ParseException $e) { 
-            throw new ApexYamlException("Unable to parse routes.yml YAML file, error: " . $e->getMessage());
+            throw new ApexYamlException("Unable to parse $filename YAML file, error: " . $e->getMessage());
         }
 
         // Return
@@ -61,6 +60,7 @@ class PackageConfig
         // Load config
     $pkg_alias = $this->convert->case($pkg_alias, 'lower');
         $yaml = $this->load($pkg_alias);
+        $registry = $this->load($pkg_alias, 'registry.yml');
 
         // Install config vars
         $config_vars = $this->cntr->make(ConfigVars::class, ['pkg_alias' => $pkg_alias]);
@@ -74,6 +74,13 @@ class PackageConfig
         $menus = $this->cntr->make(Menus::class, ['pkg_alias' => $pkg_alias]);
         $menus->install($yaml);
 
+        // Install services
+        $services = $this->cntr->make(Services::class, ['pkg_alias' => $pkg_alias]);
+        $services->install($registry);
+
+        // Install boxlist items
+        $boxlist_items = $this->cntr->make(BoxlistItems::class, ['pkg_alias' => $pkg_alias]);
+        $boxlist_items->install($yaml);
     }
 
     /**
@@ -85,6 +92,7 @@ class PackageConfig
         // Load config
         $pkg_alias = $this->convert->case($pkg_alias, 'lower');
         $yaml = $this->load($pkg_alias);
+        $registry = $this->load($pkg_alias, 'registry.yml');
 
         // Remove config vars
         $config_vars = $this->cntr->make(ConfigVars::class, ['pkg_alias' => $pkg_alias]);
@@ -97,6 +105,14 @@ class PackageConfig
         // Remove menus
         $menus = $this->cntr->make(Menus::class, ['pkg_alias' => $pkg_alias]);
         $menus->remove($yaml);
+
+        // Remove services
+        $services = $this->cntr->make(Services::class, ['pkg_alias' => $pkg_alias]);
+        $services->remove($registry);
+
+        // Remove boxlist items
+        $boxlist_items = $this->cntr->make(BoxlistItems::class, ['pkg_alias' => $pkg_alias]);
+        $boxlist_items->remove($yaml);
     }
 
 }

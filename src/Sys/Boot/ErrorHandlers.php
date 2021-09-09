@@ -96,6 +96,7 @@ class ErrorHandlers
 
         // Echo output
         header("Content-type: application/json");
+        http_response_code(500);
         echo json_encode($vars);
         exit(0);
     }

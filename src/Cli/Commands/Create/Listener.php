@@ -5,9 +5,10 @@ namespace Apex\App\Cli\Commands\Create;
 
 use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
-use Apex\App\Cli\Helpers\PackageHelper;
+use Apex\App\Cli\Helpers\{PackageHelper, OpusHelper};
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Interfaces\ListenerInterface;
 use redis;
 
 /**
@@ -25,6 +26,9 @@ class Listener implements CliCommandInterface
 
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
+
+    #[Inject(OpusHelper::class)]
+    private OpusHelper $opus_helper;
 
     #[Inject(redis::class)]
     private redis $redis;
@@ -65,6 +69,10 @@ class Listener implements CliCommandInterface
             $class_name = "\\App\\" . $this->convert->case($pkg_alias, 'title') . "\\Listeners\\" . $this->convert->case($alias, 'title');
             $this->redis->hset('config:listeners:' . $routing_key, $pkg_alias, $class_name);
         }
+
+        // Add to redis
+        $class_name = $this->opus_helper->pathToNamespace($files[0]);
+        $this->redis->sadd('config:interfaces:' . ListenerInterface::class, $class_name);
 
         // Success message
         $cli->success("Successfully created new listener which is now available at:", $files);

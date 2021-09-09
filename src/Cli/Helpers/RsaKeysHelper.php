@@ -26,7 +26,7 @@ class RsaKeysHelper
     /**
      * Get SSH key
      */
-    public function get(bool $is_ssh = false):RsaKey
+    public function get(bool $is_ssh = false, string $username = 'default'):RsaKey
     {
 
         // Get keys
@@ -50,7 +50,7 @@ class RsaKeysHelper
         }
 
         // Get new key
-        $rsa = $this->generate();
+        $rsa = $this->generate($username);
         if ($is_ssh === true) { 
             $this->store->addSshAgent($rsa->getAlias());
         }
@@ -60,7 +60,7 @@ class RsaKeysHelper
     /**
      * Generate new SSH key
      */
-    public function generate():RsaKey
+    public function generate(string $username = 'default'):RsaKey
     {
 
         // Get password
@@ -83,7 +83,7 @@ class RsaKeysHelper
 
         // Save key
     do { 
-            $alias = strtolower($this->cli->getInput("Enter alias you wish to save this key as [default]: ", 'default'));
+            $alias = strtolower($this->cli->getInput("Enter alias you wish to save this key as [$username]: ", $username));
             if ($alias == '' || !preg_match("/^[a-zA-z0-9_-]+$/", $alias)) { 
                 $this->cli->send("Invalid alias, can not contain spaces or special characters.  Please try again.\r\n\r\n");
                 continue;

@@ -13,6 +13,9 @@ use redis as redisdb;
 class RedisInstaller
 {
 
+    // Properties
+        public static ?array $info = null;
+
     /**
      * Setup
      */
@@ -37,6 +40,11 @@ class RedisInstaller
      */
     private static function getConnectionInfo(Cli $cli):array
     {
+
+        // Check if already defined via Yaml installer
+        if (self::$info !== null) { 
+            return self::$info;
+        }
 
         // Initialize
         $info = [

@@ -18,9 +18,20 @@ class Installer
     public static function run():void
     {
 
-        // Environment checks
+
+        // Intialize Cli class
+        global $argv;
         $cli = new Cli;
+        $cli->orig_argv = $argv;
+
+        // Environment checks
         EnvChecks::check($cli);
+
+        // Check for yaml file
+        if (file_exists(SITE_PATH . '/install.yml') || file_exists(SITE_PATH . '/install.yaml')) { 
+            YamlInstaller::process();
+            return;
+        }
 
         // Get instance info
         ApexInstaller::getInstanceInfo($cli);
@@ -34,6 +45,12 @@ class Installer
         // Complete install
         $app = ApexInstaller::complete($cli, $redis);
 
+        // Check for installation image
+        $opt = $cli->getArgs(['image']);
+        if (isset($opt['image']) && $opt['image'] != '') { 
+            ImageInstaller::install($opt['image'], $app, $cli);
+        }
+
         // Welcome message
         self::welcomeMessage($cli, $app);
 
@@ -44,25 +61,27 @@ class Installer
     /**
      * Welcome message
      */
-    private static function welcomeMessage($cli, App $app):void
+    public static function welcomeMessage($cli, App $app):void
     {
 
         // Initialize
         $admin_url = 'http://' . $app->config('core.domain_name') . '/admin/';
 
         // Output message
-        $cli->send("Thank you!  Apex has now been successfully installed on your server.\n");
+        $cli->sendHeader('Installation Successful');
+        $cli->send("Thank you!  Apex has now been successfully installed on your server.\r\n");
         if (count(ApexInstaller::$cron_jobs) > 0) { 
-            $cli->send("\nTo complete installation, please ensure the following crontab job is added.\n\n");
+            $cli->send("\r\nTo complete installation, please ensure the following crontab job is added.\r\n\r\n");
             foreach (ApexInstaller::$cron_jobs as $job) { 
                 $cli->send("      $job\n");
             }
         }
+        $cli->send("\r\n");
 
         // Conclusion
-        $cli->send("\nYou may continue to your administration panel and create your first administrator by visiting:\n");
-        $cli->send("      $admin_url\n\n");
-        $cli->send("Thank you for choosing Apex.  You may view all documentation and training materials at https://apexpl.io/docs/\n");
+        $cli->send("If the 'webapp' package is installed, you may continue to your administration panel and create your first administrator by visiting:\r\n\r\n");
+        $cli->send("      $admin_url\r\n\r\n");
+        $cli->send("Thank you for choosing Apex.  You may view all documentation and training materials at https://apexpl.io/docs/\r\n\r\n");
     }
 
 }

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Cli\Helpers;
 
 use Apex\Svc\{Container, Debugger};
-use Apex\App\Cli\CLi;
+use Apex\App\Cli\Cli;
 use Apex\App\Cli\Helpers\NetworkHelper;
 use Apex\App\Network\Models\{LocalRepo, LocalAccount};
 use Apex\App\Cli\Helpers\{RsaKeysHelper, CertificateHelper};
@@ -23,7 +23,7 @@ class AccountHelper
      * Constructor
      */
     public function __construct( 
-        private Cli $cli, 
+        private Cli $cli,
         private AccountsStore $store,
         private CertificateHelper $certs, 
         private RsaKeysHelper $rsa_keys, 

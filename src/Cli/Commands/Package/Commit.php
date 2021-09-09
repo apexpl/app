@@ -41,8 +41,7 @@ class Commit implements CliCommandInterface
         // Get args
         $opt = $cli->getArgs(['m', 'file']);
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
-        $message = $opt['m'] ?? '';
-        $commit_file = $opt['file'] ?? '';
+        $commit_args = $cli->getCommitArgs();
 
         // Initialize package
         if (!$pkg = $this->initPackage($pkg_alias, $cli)) { 
@@ -50,7 +49,7 @@ class Commit implements CliCommandInterface
         }
 
         // Commit
-        $this->svn_commit->process($pkg, $message, $commit_file);
+        $this->svn_commit->process($pkg, $commit_args);
 
         // Save package, if needed
         if ($pkg->isModified() === true) { 

@@ -11,7 +11,7 @@ use Apex\App\Interfaces\Opus\CliCommandInterface;
 /**
  * Scan listeners
  */
-class ScanListeners implements CliCommandInterface
+class ScanClasses implements CliCommandInterface
 {
 
     #[Inject(Container::class)]
@@ -24,11 +24,11 @@ class ScanListeners implements CliCommandInterface
     {
 
         // Scan
-        $scanner = $this->cntr->make(\Apex\App\Sys\Utils\ScanListeners::class);
+        $scanner = $this->cntr->make(\Apex\App\Sys\Utils\ScanClasses::class);
         $scanner->scan();
 
         // Success
-        $cli->send("Successfully scanned all listeners and updated routing keys.\r\n\rn");
+        $cli->send("Successfully scanned all classes and updated routing keys and child classes.\r\n\r\n");
     }
 
     /**

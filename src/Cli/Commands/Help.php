@@ -29,6 +29,7 @@ class Help
         $help->addParam('acl', 'Manage access to repositories and signing certificates.');
         $help->addParam('branch', 'Create and manage branches on repositories.');
         $help->addParam('create', 'Create components (views, http controllers, tables, et al)');
+        $help->addParam('image', 'Create and manage installation images.');
         $help->addParam('migration', 'Create and manage database migrations.');
         $help->addParam('opus', 'Code generation utilities (models, crud, et al)');
         $help->addParam('package', 'Create and manage packages, checkout, commit, et al.');
