@@ -136,7 +136,7 @@ class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \jsonSerial
         // Initialize
         $json = [];
         foreach ($this->items as $item) { 
-            $json[] = FromInstance::$item);
+            $json[] = FromInstance::map($item);
         }
 
         // Return

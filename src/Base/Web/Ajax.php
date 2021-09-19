@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Base\Web;
 
 use Apex\App\Base\Web\Components;
+use Apex\App\Base\Web\Utils\DataTableDetails;
 use Apex\App\Exceptions\ApexComponentNotExistsException;
 
 /**
@@ -13,7 +14,7 @@ class Ajax
 {
 
     #[Inject(Components::class)]
-    private Components $components;
+    protected Components $components;
 
     // Properties
     public array $results = [];
@@ -58,7 +59,7 @@ class Ajax
     { 
 
         // Check table component
-        if (!$table = $this->components->load('DataTable', $table_alias, $data)) { 
+        if (!$table = $this->components->load('DataTable', $table_alias, ['attr' => $data])) { 
             throw new ApexComponentNotExistsException("Data table does not exist with the alias, $table_alias");
         }
 
@@ -91,24 +92,34 @@ class Ajax
     /**
      * Set pagination
      */
-    final public function setPagination(string $divid, array $details):void
+    final public function setPagination(string $divid, DataTableDetails $details):void
     { 
 
         // Get nav function
         $vars = $this->app->getAllPost();
         unset($vars['page']);
-        $nav_func = "<a href=\"javascript:ajax_send('core/navigate_table', '" . http_build_query($vars) . "&page=~page~', 'none');\">";
+        $nav_func = "<a href=\"javascript:ajaxSend('webapp/navigate_table', '" . http_build_query($vars) . "&page=~page~', 'none');\">";
+
+        // Set variables
+        list($max_items, $half_items) = [10, 5];
+        $total_pages = ceil($details->total_rows / $details->rows_per_page);
+        $pages_remaining = ceil(($details->total_rows - ($details->page * $details->rows_per_page)) / $details->rows_per_page);
+        $start_page = ($pages_remaining > $half_items && $details->page > $half_items) ? ($details->page - $half_items) : 1;
+
+        // Get end page
+        $max_items = ($start_page > $half_items) ? $half_items : ($max_items - $details->page);
+        $end_page = ($pages_remaining > $max_items) ? ($details->page + $max_items) : $total_pages;
 
         // Set AJAX
         $this->add('set_pagination', array(
-            'divid' => $divid,
-            'start' => $details['start'],
-            'total' => $details['total'],
-            'page' => $details['page'],
-            'start_page' => $details['start_page'],
-            'end_page' => $details['end_page'],
-            'rows_per_page' => $details['rows_per_page'],
-            'total_pages' => $details['total_pages'],
+            'divid' => preg_replace('/^tbl/', '', $divid),
+            'start' => $details->start,
+            'total' => $details->total_rows,
+            'page' => $details->page,
+            'start_page' => $start_page,
+            'end_page' => $end_page,
+            'rows_per_page' => $details->rows_per_page,
+            'total_pages' => $total_pages,
             'nav_func' => $nav_func)
         );
 

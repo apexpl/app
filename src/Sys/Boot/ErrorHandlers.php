@@ -25,8 +25,24 @@ class ErrorHandlers
     public function error(int $errno, string $message, string $file, int $line):void
     {
 
-        // Initialize
+        // Format file
         $file = str_replace(SITE_PATH, '', $file);
+        if (preg_match("/\/\.apex\/svn\/(.+?)\/(.+?)\/(.+)$/", $file, $m)) { 
+            $pkg_alias = ucwords($m[1]);
+            $type = $m[2];
+            $parts = explode('/', $m[3]);
+            if (in_array($parts[0], ['src','etc','docs','tests'])) { 
+                $parts[0] = ucwords($parts[0]);
+        }
+
+            $file = match(true) { 
+                (in_array($type, ['src','etc','docs','tests'])) ? true : false => $type . '/' . $pkg_alias . '/' . implode('/', $parts), 
+                ($type == 'views') ? true : false => preg_replace("/^\/\.apex\/svn/", "", $file),
+                ($type == 'ext') ? true : false => implode('/', $parts), 
+                ($type == 'share' && $parts[0] == 'HttpControllers') ? true : false => 'src/HttpControllers/' . $parts[1], 
+                default => $file
+            };
+        }
 
         // Get container items
         $this->app = Di::get(App::class);

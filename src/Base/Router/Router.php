@@ -33,6 +33,7 @@ class Router implements RouterInterface
         $http_controller = $routes['default'] ?? 'PublicSite';
         $path = ltrim($request->getUri()->getPath(), '/');
         $params = [];
+        $match_num = 0;
 
         // Go through routes
         foreach ($routes as $chk_path => $controller) { 
@@ -111,12 +112,21 @@ class Router implements RouterInterface
         // Check if multi host
         $first = array_keys($routes)[0];
         if (!is_array($routes[$first])) { 
-            return $routes;
+            $res = $routes;
+        } else { 
+
+            // Check for host based route
+            $host = preg_replace("/^www\./", '', strtolower($host));
+            $res = $routes[$host] ?? $routes['default'];
         }
 
-        // Check for host based route
-        $host = preg_replace("/^www\./", '', strtolower($host));
-        return $routes[$host] ?? $routes['default'];
+        // Sort routes
+        uksort($res, function ($a, $b) {
+            return substr_count($a, '/') >= substr_count($b, '/') ? -1 : 1;
+        });
+
+        // Return
+        return $res;
     }
 
 }

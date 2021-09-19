@@ -187,7 +187,7 @@ class App extends Bootloader implements RequestHandlerInterface
 
         // Check for session
         if ($this->user === null && $this->session !== null) { 
-            $this->user = $session->getUser();
+            $this->user = $this->session->getUser();
         }
 
         // Return
@@ -269,11 +269,11 @@ class App extends Bootloader implements RequestHandlerInterface
     /**
      * Get routes config
      */
-    public function getRoutesConfig(string $filename = 'routes.yml'):array
+    public function getRoutesConfig(string $filename = 'routes.yml', bool $ignore_cache = false):array
     {
 
         // If already loaded
-        if (isset($this->boot_config[$filename])) { 
+        if (isset($this->boot_config[$filename]) && $ignore_cache === false) { 
             return $this->boot_config[$filename];
         }
 

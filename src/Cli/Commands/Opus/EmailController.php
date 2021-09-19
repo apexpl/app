@@ -6,7 +6,9 @@ namespace Apex\App\Cli\Commands\Opus;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\OpusHelper;
 use Apex\Opus\Opus;
+use Apex\App\Interfaces\EmailNotificationControllerInterface;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use redis;
 
 /**
  * Create e-mail controller
@@ -19,6 +21,9 @@ class EmailController implements CliCommandInterface
 
     #[Inject(Opus::class)]
     private Opus $opus;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     /**
      * Process
@@ -47,6 +52,10 @@ class EmailController implements CliCommandInterface
 
         // Build
         $file = $this->opus->buildClass('email_controller', $filename, '', SITE_PATH);
+
+        // Add to redis
+        $class_name = $this->helper->pathToNamespace($file);
+        $this->redis->sadd('config:interfaces:' . EmailNotificationControllerInterface::class, $class_name);
 
         // Success message
         $cli->success("Successfully created new e-mail controller which is now available at:", [$file]);

@@ -23,7 +23,7 @@ class SiteConfig
     {
 
         // Get yaml
-        $yaml = $this->app->getRoutesConfig('site.yml');
+        $yaml = $this->app->getRoutesConfig('site.yml', true);
         $themes = $yaml['themes'] ?? [];
 
         // Add theme
@@ -42,7 +42,7 @@ class SiteConfig
     {
 
         // Load yaml file
-        $yaml = $this->app->getRoutesConfig('site.yml');
+        $yaml = $this->app->getRoutesConfig('site.yml', true);
         $themes = $yaml['themes'] ?? [];
 
         // Remove theme
@@ -61,7 +61,7 @@ class SiteConfig
     {
 
         // Load yaml file
-        $yaml = $this->app->getRoutesConfig('site.yml');
+        $yaml = $this->app->getRoutesConfig('site.yml', true);
         $types = $yaml['user_types'] ?? [];
 
         // Add user type
@@ -83,7 +83,7 @@ class SiteConfig
     {
 
         // Load yaml file
-        $yaml = $this->app->getRoutesConfig('site.yml');
+        $yaml = $this->app->getRoutesConfig('site.yml', true);
         $types = $yaml['user_types'] ?? [];
 
         // Remove type
@@ -102,8 +102,7 @@ class SiteConfig
     {
 
         // Generate text
-        $text = "\n##########\n# Site Config\n#\n";
-        $text .= "# This file has been auto-generated, but you may modify as desired below.  Please refer to the developer \n";
+        $text = "\n##########\n# Site Config\n#\n";        $text .= "# This file has been auto-generated, but you may modify as desired below.  Please refer to the developer \n";
         $text .= "# documentation for details on the entries within this file.\n##########\n\n";
         $text .= Yaml::dump($yaml, 6);
 

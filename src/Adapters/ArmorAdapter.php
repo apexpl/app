@@ -3,16 +3,15 @@ declare(strict_types = 1);
 
 namespace Apex\App\Adapters;
 
-use Apex\Svc\{App, View};
-use Apex\Container\Di;
-use Apex\Armor\Enums\{EmailMessageType, PhoneMessageType};
+use Apex\Svc\{App, View, Container, SmsClient, Emailer};
 use Apex\Db\Interfaces\DbInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Apex\Mercury\Email\{Emailer, EmailMessage};
-use Apex\Mercury\SMS\Nexmo;
+use Apex\Mercury\Email\EmailMessage;
 use Apex\Armor\Auth\AuthSession;
 use Apex\Armor\User\ArmorUser;
 use Apex\Armor\Interfaces\{AdapterInterface, ArmorUserInterface};
+use App\Webapp\Notifications\ArmorController;
+use App\Webapp\Models\EmailNotification;
 use Apex\Armor\Exceptions\{ArmorOutOfBoundsException, ArmorNotImplementedException};
 
 /**
@@ -23,6 +22,12 @@ class ArmorAdapter implements AdapterInterface
 
     #[Inject(App::class)]
     private App $app;
+
+    #[Inject(Container::class)]
+    private Container $cntr;
+
+    #[Inject(DbInterface::class)]
+    private DbInterface $db;
 
     /**
      * Get user by uuid
@@ -64,19 +69,39 @@ class ArmorAdapter implements AdapterInterface
      */
     public function sendEmail(ArmorUserInterface $user, string $type, string $armor_code, string $new_email = ''):void
     {
-file_put_contents(SITE_PATH . '/t.txt', "SEND E_MAIL $type to " . $user->getEmail() . "\n", FILE_APPEND);
-        // Get e-mail message
-        $msg = $this->getEmailMessage($type, ['armor_code' => $armor_code]);
 
-        // Set recipient
-        if ($new_email != '') { 
-            $msg->setToEmail($new_email);
-        } else { 
-            $msg->setToEmail($user->getEmail());
+        // Get e-mail message
+        if (!$email = EmailNotification::whereFirst('controller = %s AND alias = %s', ArmorController::class, $type)) {
+            throw new ArmorOutOfBoundsException("No e-mail message exists with the type, $type");
         }
 
-        // Send message
-        $emailer = Di::get(Emailer::class);
+        // Create merge vars
+        $replace = $user->toArray();
+        $replace['site_name'] = $this->app->config('core.site_name');
+        $replace['domain_name'] = $this->app->config('core.domain_name');
+        $replace['code'] = $armor_code;
+
+        // Replace as needed in e-mail message
+        list($subject, $contents) = [$email->subject, $email->contents];
+        foreach ($replace as $key => $value) {
+            $subject = str_replace("~$key~", (string) $value, $subject);
+            $contents = str_replace("~$key~", (string) $value, $contents);
+        }
+
+        // Get sender
+        $sender = $this->getUuid($this->db, $email->sender);
+
+        // Create e-mail message
+        $msg = $this->cntr->make(EmailMessage::class, [
+            'to_email' => $new_email == '' ? $user->getEmail() : $new_email,
+            'from_email' => $sender->getEmail(),
+            'content_type' => $email->content_type,
+            'subject' => $subject,
+            'contents' => $contents
+        ]);
+
+        // Send e-mail
+        $emailer = $this->cntr->get(Emailer::class);
         $emailer->send($msg);
     }
 
@@ -92,7 +117,7 @@ file_put_contents(SITE_PATH . '/t.txt', "SEND E_MAIL $type to " . $user->getEmai
         $phone = $new_phone != '' ? $new_phone : $user->getPhone();
 
         // Send SMS
-        $nexmo = Di::make(Nexmo::class);
+        $nexmo = $this->cntr->make(SmsClient::class);
         $mid = $nexmo->send($phone, $message);
     }
 
@@ -102,11 +127,6 @@ file_put_contents(SITE_PATH . '/t.txt', "SEND E_MAIL $type to " . $user->getEmai
     public function handleSessionStatus(AuthSession $session, string $status):void
     {
 
-        // Check if Syrus installed
-        if (!class_exists(Syrus::class)) { 
-            throw new ArmorNotImplementedException("This method has not been implemented by the adapter, and the Syrus package is not installed on this system.  Please either develop an adapter to work with your template engine, or install the Syrus Template Envrin (https://github.com/apexpl/syrus)");
-        }
-
         // Get template file
         $file = match($status) { 
             'email' => '/members/2fa_email.html', 
@@ -115,10 +135,10 @@ file_put_contents(SITE_PATH . '/t.txt', "SEND E_MAIL $type to " . $user->getEmai
             default => '/members/index'
         };
 
-        // Display template
-        $syrus = Di::get(Syrus::class);
-        $syrus->setTemplateFile($file);
-        //echo $syrus->render(); exit;
+        // Display template$syrus = Di::get(Syrus::class);
+        $this->view->setTemplateFile($file);
+        echo $this->view->render();
+        exit(0);
     }
 
     /**
@@ -134,53 +154,6 @@ file_put_contents(SITE_PATH . '/t.txt', "SEND E_MAIL $type to " . $user->getEmai
         $syrus = Di::get(Syrus::class);
         $syrus->setTemplateFile('/members/twofactor2.html', true);
 
-    }
-
-    /**
-     * Get e-mail message
-     */
-    private function getEmailMessage(string $type, array $replace = []):EmailMessage
-    {
-
-        // Set files
-        $files = [
-            EmailMessageType::VERIFY => 'verify_email.txt', 
-            EmailMessageType::VERIFY_OTP => 'verify_email_otp.txt', 
-            EmailMessageType::TWO_FACTOR => 'two_factor_email.txt', 
-            EmailMessageType::TWO_FACTOR_OTP => 'two_factor_email_otp.txt', 
-            EmailMessageType::RESET_PASSWORD => 'reset_password_email.txt' 
-        ];
-
-        // Ensure message exists
-        if (!isset($files[$type])) { 
-            throw new ArmorOutOfBoundsException("No e-mail message exists with the type, $type");
-        }
-
-        $msg = new EmailMessage();
-        $msg->importFromFile(SITE_PATH . '/boot/emails/' . $files[$type]);
-
-        // Set variables
-        $subject = $msg->getSubject();
-        $message = $msg->getMessage();
-
-        // Add domain to replace
-        if (!isset($replace['domain'])) { 
-            $cookie = Di::get('armor.cookie') ?? [];
-            $replace['domain_name'] = $cookie['domain'] ?? '127.0.0.1';
-        }
-
-        // Replace fields
-        foreach ($replace as $key => $value) { 
-            $subject = str_replace("~$key~", $value, $subject);
-            $message = str_replace("~$key~", $value, $message);
-        }
-
-        // Set subject / message
-        $msg->setSubject($subject);
-        $msg->setMessage($message);
-
-        // Return
-        return $msg;
     }
 
     /**

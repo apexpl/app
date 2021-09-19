@@ -5,8 +5,8 @@ namespace Apex\App\Cli\Commands\Branch;
 
 use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
+use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Network\Models\LocalPackage;
-use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 
@@ -19,8 +19,8 @@ class Create implements CliCommandInterface
     #[Inject(Convert::class)]
     private Convert $convert;
 
-    #[Inject(PackagesStore::class)]
-    private PackagesStore $pkg_store;
+    #[Inject(PackageHelper::class)]
+    private PackageHelper $pkg_helper;
 
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;
@@ -38,8 +38,7 @@ class Create implements CliCommandInterface
         $from_branch = $this->convert->case(($opt['from-branch'] ?? 'trunk'), 'lower');
 
         // Load package
-        if (!$pkg = $this->pkg_store->get($pkg_alias)) { 
-            $cli->error("Package does not exist, $pkg_alias");
+        if (!$pkg = $this->pkg_helper->get($pkg_alias)) { 
             return;
         } elseif (($svn = $pkg->getSvnRepo()) === null) { 
             $cli->error("This package has not yet been assigned to a repository.  Please first commit the package, see 'apex help package commit' for details.");
@@ -72,10 +71,15 @@ class Create implements CliCommandInterface
         ]);
 
         // Create branch
-        $svn->copy($from_branch, 'branches/' . $branch_name);
+        $svn->copy($from_branch, 'branches/' . $branch_name, ['-m', 'Creating branch']);
+        $svn->switch('branches/' . $branch_name);
 
         // Success
-        $cli->send("Successfully created new branch on package $pkg_alias with name, $branch_name\r\n\r\n");
+        $http_url = 'https://' . $pkg->getRepo()->getHttpHost() . '/' . $pkg->getSerial() . '/branches/' . $branch_name;
+        $cli->sendHeader("Successfully Created Branch");
+        $cli->send("Successfully created new branch on package $pkg_alias with name, $branch_name which may now be found at:\r\n\r\n");
+        $cli->send("    Web: $http_url\r\n");
+        $cli->send("    SVN: " . $svn->getSvnUrl('branches/' . $branch_name, true) . "\r\n\r\n");
     }
 
     /**

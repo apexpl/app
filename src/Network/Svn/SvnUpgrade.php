@@ -181,7 +181,9 @@ class SvnUpgrade
         $is_ssh = false;
 
         // Get inventory
-        $inventory = $this->svn_changelog->get($pkg->getSvnRepo(), $pkg->getVersion());
+        if (!$inventory = $this->svn_changelog->get($pkg->getSvnRepo(), $pkg->getVersion())) { 
+            return null;
+        }
         $this->cli->send(count($inventory['updated']) . ' files found... ');
 
         // Create tmp dir

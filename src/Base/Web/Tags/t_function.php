@@ -28,7 +28,8 @@ class t_function implements TagInterface
         'DisplayForm' => \Apex\App\Base\Web\Render\Form::class,
         'DisplayTable' => \Apex\App\Base\Web\Render\DataTable::class,
         'DisplayAutoComplete' => \Apex\App\Base\Web\Render\AutoComplete::class,
-        'DisplayTabControl' => \Apex\App\Base\Web\Render\TabControl::class
+        'DisplayTabControl' => \Apex\App\Base\Web\Render\TabControl::class,
+        'DisplayGraph' => \Apex\App\Base\Web\Render\Graph::class,
     ];
 
 

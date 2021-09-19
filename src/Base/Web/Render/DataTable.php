@@ -68,7 +68,7 @@ class DataTable
             $has_sort = in_array($alias, $sortable) ? 1 : 0;
             $tpl .= "    <th has_sort=\"$has_sort\" alias=\"$alias\">$name</th>\n";
         }
-        $tpl .= "</tr></thead><tbody>\n";
+        $tpl .= "</tr></thead><tbody id=\"" . $attr['id'] . "_tbody\">\n";
 
         // Go through rows
         foreach ($details->rows as $row) { 
@@ -86,9 +86,17 @@ class DataTable
             }
             $tpl .= "</tr>\n";
         }
-        $tpl .= "</tbody></s:data_table>\n\n";
+
+        // Add delete button, if needed
+        $delete_button = $obj->delete_button ?? '';
+        if ($delete_button != '') {
+            $tpl .= "\n<s:button_group>\n";
+            $tpl .= "    <s:button href=\"javascript:ajaxConfirm('Are you sure you want to delete the checked records?', 'webapp/delete_checked_rows', 'table=" . $table . "&id=" . $attr['id'] . "');\" label=\"Delete Checked Rows\">\n";
+            $tpl .= "</s:button_group>\n\n";
+        }
 
         // Return
+        $tpl .= "</tbody></s:data_table>\n\n";
         return $this->view->renderBlock($tpl);
     }
 
@@ -109,9 +117,9 @@ class DataTable
             'total_rows' => $details->total_rows, 
             'rows_per_page' => $details->rows_per_page, 
             'current_page' => $details->page, 
-            'search_href' => "javascript:sendAjax('Webapp/searchTable', '$ajax_data', 'search_" . $attr['id'] . "');", 
-            'sort_href' => "javascript:sendAjax('Webapp/sortTable', '$ajax_data&sort_col=~col_alias~&sort_dir=~sort_dir~');", 
-            'pgn_href' => "javascript:sendAjax('Webapp/navigateTable', '$ajax_data&page=~page~');" 
+            'search_href' => "javascript:ajaxSend('webapp/search_table', '$ajax_data', 'search_" . $attr['id'] . "');", 
+            'sort_href' => "javascript:ajaxSend('webapp/sort_table', '$ajax_data&sort_col=~col_alias~&sort_dir=~sort_dir~');", 
+            'pgn_href' => "javascript:ajaxSend('Webapp/navigateTable', '$ajax_data&page=~page~');" 
         ];
 
         // Get TPL code

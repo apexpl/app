@@ -26,6 +26,7 @@ class SvnChangelog
         if ($new_version == 'latest' && null === ($new_version = $svn->getLatestRelease())) {
             return null;
         }
+        $pkg_alias = $svn->getPackage()->getSerial();
 
         // Get releases
         $releases = $svn->getReleases();

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Pkg\Helpers;
 
 use Apex\Svc\{Container, Convert};
-use Apex\App\Pkg\Config\{ConfigVars, Hashes, Menus, Services, BoxlistItems};
+use Apex\App\Pkg\Config\{ConfigVars, Hashes, Menus, Services, BoxlistItems, DashboardItems};
 use Apex\App\Network\Stores\PackagesStore;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -113,6 +113,10 @@ class PackageConfig
         // Remove boxlist items
         $boxlist_items = $this->cntr->make(BoxlistItems::class, ['pkg_alias' => $pkg_alias]);
         $boxlist_items->remove($yaml);
+
+        // Remove dashboard items
+        $dashboard_items = $this->cntr->make(DashboardItems::class);
+        $dashboard_items->remove($pkg_alias);
     }
 
 }

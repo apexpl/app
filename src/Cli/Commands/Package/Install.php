@@ -59,7 +59,7 @@ class Install implements CliCommandInterface
         $install_queue = [];
         foreach ($args as $pkg_alias) { 
             $pkg_alias = $this->pkg_helper->getSerial($pkg_alias);
-            if (!$pkg = $this->pkg_helper->checkPackageAccess($repo, $pkg_alias, 'can_read')) { 
+            if (!$pkg = $this->pkg_helper->checkPackageAccess($repo, $pkg_alias, 'can_read', true)) { 
                 $cli->error("You do not have access to download the package '$pkg_alias'");
                 return;
             }

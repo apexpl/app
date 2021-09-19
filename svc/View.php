@@ -71,10 +71,17 @@ final class View extends \Apex\Syrus\Syrus
     private function loadBasevariables():void
     {
 
+        // Get user type
+        $user_type = $this->app->getUser()?->getType();
+        if ($user_type === null) { 
+            $user_type = 'public';
+        }
+
         // Set vars
         $vars = [
             'theme_uri' => '/themes/' . $this->getTheme(), 
             'is_auth' => $this->app->isAuth() === true ? 1 : 0, 
+            'user_type' => $user_type,
             'current_year' => date('Y') 
         ];
 

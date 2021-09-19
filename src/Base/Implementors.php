@@ -59,6 +59,26 @@ class Implementors
         return $values;
     }
 
+    /**
+     * Create select options
+     */
+    public function createSelectOptions(string $interface_name, string $property_name, string $selected = ''):string
+    {
+
+        // Get values
+        $values = $this->getPropertyValues($interface_name, $property_name);
+
+        // Create options
+        $html = '';
+        foreach ($values as $value => $name) {
+            $chk = $value == $selected ? 'selected="selected"' : '';
+            $html .= "<option value=\"$value\" $chk>$name</option>";
+        }
+
+        // Return
+        return $html;
+    }
+
 }
 
 

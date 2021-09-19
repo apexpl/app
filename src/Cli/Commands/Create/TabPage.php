@@ -55,7 +55,7 @@ class TabPage implements CliCommandInterface
         }
 
         // Ensure parent tab control exists
-        $parent_class = "\\App\\" . $this->convert->case($match[1], 'title') . "\\Opus\\TabControls\\" . $this->convert->case($match[2], 'title');
+        $parent_class = "App\\" . $this->convert->case($match[1], 'title') . "\\Opus\\TabControls\\" . $this->convert->case($match[2], 'title');
         if (!class_exists($parent_class)) { 
             $cli->error("The parent tab control does not exist at, $parent ($parent_class)");
             return;
@@ -81,7 +81,7 @@ class TabPage implements CliCommandInterface
 
         // Add to redis
         $class_name = "App\\" . $this->convert->case($pkg_alias, 'title') . "\\Opus\\TabControls\\$child_dir\\" . $this->convert->case($alias, 'title');
-        $this->redis->sadd('config:child_casses:' . $parent_class, $class_name);
+        $this->redis->sadd('config:child_classes:' . $parent_class, $class_name);
         $this->redis->sadd('config:interface:' . TabPageInterface::class, $class_name);
 
         // Success message

@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Commands\Release;
 use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
+use Apex\App\Sys\Utils\ScanClasses;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
@@ -27,6 +28,9 @@ class Create implements CliCommandInterface
 
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
+
+    #[Inject(ScanClasses::class)]
+    private ScanClasses $scan_classes;
 
     /**
      * Process
@@ -70,6 +74,9 @@ class Create implements CliCommandInterface
             $cli->error("The release already exists, v$version");
             return;
         }
+
+        // Scan classes
+        $this->scan_classes->scan();
 
         // Send API call
         $this->network->setAuth($pkg->getLocalAccount());

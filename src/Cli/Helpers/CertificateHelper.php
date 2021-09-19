@@ -25,7 +25,7 @@ class CertificateHelper
     /**
      * Generate CSR
      */
-    public function generate(string $common_name):?Certificate
+    public function generate(string $common_name, string $username = 'default'):?Certificate
     {
 
         // Send header
@@ -40,7 +40,7 @@ class CertificateHelper
 
         // Get RSA key
         $this->cli->sendHeader('Signing Password');
-        $rsa = $this->rsa_helper->get();
+        $rsa = $this->rsa_helper->get(false, $username);
 
         // Set signing password, if needed
         if ($rsa->getPassword() !== null) { 

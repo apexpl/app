@@ -5,8 +5,11 @@ namespace Apex\App\Cli\Commands\Opus;
 
 use Apex\Svc\{Convert, Db};
 use Apex\App\Cli\{Cli, CliHelpScreen};
+use Apex\App\Cli\Helpers\OpusHelper;
 use Apex\Opus\Opus;
+use Apex\App\Interfaces\BaseModelInterface;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use redis;
 
 /**
  * Create model
@@ -22,6 +25,12 @@ class Model implements CliCommandInterface
 
     #[Inject(Opus::class)]
     private Opus $opus;
+
+    #[Inject(OpusHelper::class)]
+    private OpusHelper $opus_helper;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     /**
      * Process
@@ -68,10 +77,15 @@ class Model implements CliCommandInterface
         // Build
         $files = $this->opus->buildModel($filename, SITE_PATH, $dbtable, $type, $magic);
 
+        // Add to redis
+        foreach ($files as $file) {
+            $class_name = $this->opus_helper->pathToNamespace($file);
+            $this->redis->sadd('config:interfaces:' . BaseModelInterface::class, $class_name);
+        }
+
         // Success message
         $cli->success("Successfully created new model from database table '$dbtable' which is now available at:", $files);
     }
-
 
     /**
      * Help

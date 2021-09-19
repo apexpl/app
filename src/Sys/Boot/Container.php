@@ -113,6 +113,13 @@ class Container
             $cntr->set($item, $value);
         }
 
+        // Set armor cookie
+        if ($domain_name = $redis->hget('config', 'core.domain_name')) {
+            $cookie = $cntr->get('armor_cookie');
+            $cookie['domain'] = $domain_name;
+        $cntr->set('armor.cookie', $cookie);
+        }
+
         // Return
         return $cntr;
     }

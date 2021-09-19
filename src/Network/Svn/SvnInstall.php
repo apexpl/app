@@ -5,7 +5,7 @@ namespace Apex\App\Network\Svn;
 
 use Apex\Svc\Container;
 use Apex\App\Cli\Cli;
-use Apex\App\Sys\Utils\{Io, SiteConfig};
+use Apex\App\Sys\Utils\{Io, SiteConfig, ScanClasses};
 use Apex\App\Network\Svn\SvnExport;
 use Apex\App\Network\Sign\VerifyDownload;
 use Apex\App\Network\Stores\PackagesStore;
@@ -13,7 +13,7 @@ use Apex\App\Base\Router\RouterConfig;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Pkg\Helpers\Migration;
 use Apex\App\Pkg\Filesystem\Package\Installer;
-use Apex\App\Pkg\Config\EmailNotifications;
+use Apex\App\Pkg\Config\{EmailNotifications, DashboardItems};
 use Apex\App\Exceptions\ApexSvnRepoException;
 
 /**
@@ -55,6 +55,12 @@ class SvnInstall
     #[Inject(EmailNotifications::class)]
     private EmailNotifications $email_notifications;
 
+    #[Inject(DashboardItems::class)]
+    private DashboardItems $dashboard_items;
+
+    #[Inject(ScanClasses::class)]
+    private ScanClasses $scan_classes;
+
     // Properties
     private bool $update_composer = false;
 
@@ -86,7 +92,7 @@ class SvnInstall
         // Insert
         $pkg = $svn->getPackage();
         $pkg->setIsLocal(false);
-        $pkg->setVersion($version);
+        $pkg->setVersion($this->svn_export->version);
         $this->pkg_store->save($pkg);
 
         // Initial migration
@@ -99,6 +105,9 @@ class SvnInstall
 
         // Install registry
         $this->installRegistry($pkg);
+
+        // Scan classes
+        $this->scan_classes->scan();
 
         // Update composer, if needed
         if ($this->update_composer === true) { 
@@ -170,10 +179,12 @@ class SvnInstall
         // Install e-mail notifications
         $this->email_notifications->install($yaml);
 
+        // Install dashboard items
+        $this->dashboard_items->install($pkg->getAlias());
+
         // Go through routes
         $routes = $registry['routes'] ?? [];
         foreach ($routes as $route => $http_controller) { 
-
             // Ensure class exists
             if (!class_exists("\\App\\HttpControllers\\$http_controller")) { 
                 continue;

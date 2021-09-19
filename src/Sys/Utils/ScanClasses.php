@@ -49,7 +49,7 @@ class ScanClasses
             }
 
             // Load object
-            $class_name = "\\" . $this->opus_helper->pathToNamespace($file);
+            $class_name = $this->opus_helper->pathToNamespace($file);
             $obj = new \ReflectionClass($class_name);
 
             // Get interfaces class implements

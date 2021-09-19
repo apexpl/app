@@ -5,12 +5,13 @@ namespace Apex\App\Base\Model;
 
 use Apex\Svc\{Db, Di, Convert};
 use Apex\App\Base\Model\ModelIterator;
+use Apex\App\Interfaces\BaseModelInterface;
 use Apex\App\Exceptions\ApexForeignKeyNotExistsException;
 
 /**
  * Base model
  */
-class BaseModel
+class BaseModel implements BaseModelInterface
 {
 
     #[Inject(Convert::class)]

@@ -23,6 +23,7 @@ class Shortcuts
         'set-config' => ['sys', 'set-config'],
         'switch' => ['branch', 'sw'],
         'rm' => ['package', 'rm'],
+            'test' => ['package', 'test'],
         'upgrade' => ['package', 'upgrade'],
         'sql' => ['sys', 'sql'],
         'svn' => ['sys', 'svn']
@@ -103,14 +104,15 @@ class Shortcuts
         }
 
         // Check for skip
-        $first = $args[0];
+        $first = $args[0] ?? '';
         if (isset(self::$skip_top_level[$first])) { 
             array_unshift($args, self::$skip_top_level[$first][0]);
             $args[1] = self::$skip_top_level[$first][1];
         }
 
         // Replace top level
-        if (isset(self::$top_level[$args[0]])) { 
+        $first = $args[0] ?? '';
+        if (isset(self::$top_level[$first])) { 
             $args[0] = self::$top_level[$args[0]];
         }
 

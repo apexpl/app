@@ -65,6 +65,7 @@ class Bootloader extends RequestInputs
 
         // Load environment
         require_once("$boot_dir/init/app.php");
+        require_once(__DIR__ . '/Common.php');
 
         // Check if installed, and if not, run installer
         if (!getEnv('redis_host')) { 
@@ -116,6 +117,7 @@ class Bootloader extends RequestInputs
             'get' => $_GET,
             'post' => $_POST,
             'cookie' => $_COOKIE,
+            'files' => $_FILES,
             'server' => filter_input_array(INPUT_SERVER, FILTER_SANITIZE_STRING) ?? [], 
             'path_params' => []
         ];

@@ -138,7 +138,7 @@ class Convert
         $word = match ($case) { 
             'camel' => $word->camel(), 
             'title' => $word->camel()->title(), 
-            'lower' => strtolower(preg_replace("/(.)([A-Z][a-z])/", '$1_$2', (string) $word)), 
+            'lower' => strtolower(preg_replace("/(.)([A-Z][a-z])/", '$1_$2', (string) $word)),
             'upper' => strtoupper(preg_replace("/(.)([A-Z][a-z])/", '$1_$2', (string) $word)), 
             'phrase' => ucwords(strtolower(preg_replace("/(.)([A-Z][a-z])/", '$1 $2', (string) $word->camel()))), 
             default => $word

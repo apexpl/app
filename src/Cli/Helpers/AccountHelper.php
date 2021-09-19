@@ -127,7 +127,7 @@ class AccountHelper
 
         // Generate CSR
         $common_name = $username . '@' . $repo->getAlias();
-        if (!$csr = $this->certs->generate($common_name)) { 
+        if (!$csr = $this->certs->generate($common_name, $username)) { 
             $this->cli->error("Unable to generate CSR, please try again.");
             return null;
         }
@@ -142,7 +142,7 @@ class AccountHelper
             // Generate new SSH key
             $this->cli->send("\r\n");
             $this->cli->sendHeader('SSH Key');
-            $ssh = $this->rsa_keys->generate();
+            $ssh = $this->rsa_keys->generate($username . '-ssh');
         }
 
         // Debug

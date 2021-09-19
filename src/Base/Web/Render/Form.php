@@ -3,8 +3,9 @@ declare(strict_types = 1);
 
 namespace Apex\App\Base\Web\Render;
 
-use Apex\Svc\View;
+use Apex\Svc\{App, View};
 use Apex\App\Base\Web\Components;
+use Apex\App\Base\Web\Utils\FormField;
 use Apex\Syrus\Parser\StackElement;
 
 /**
@@ -13,13 +14,14 @@ use Apex\Syrus\Parser\StackElement;
 class Form
 {
 
+    #[Inject(App::class)]
+    private App $app;
+
     #[Inject(View::class)]
     private View $view;
 
     #[Inject(Components::class)]
     private Components $components;
-
-
     /**
      * Render
      */
@@ -47,6 +49,11 @@ class Form
         $html = "<s:form_table>\n";
         foreach ($fields as $name => $vars) { 
 
+            // Get array, if FormField
+            if ($vars instanceof FormField) {
+                $vars = $vars->toArray();
+            }
+
             // Get value
             if (isset($values[$name])) { 
                 $vars['value'] = $values[$name];
@@ -60,8 +67,16 @@ class Form
 
             // Add to HTML
             $html .= "    <s:ft_" . $vars['field'] . " $attr_string>\n";
+
+                    // Add select options or textarea value
+            if ($vars['field'] == 'select' && isset($vars['options']) && $vars['options'] != '') { 
+                $html .= $vars['options'] . "\n</s:ft_select>\n";
+            } elseif ($vars['field'] == 'textarea' && isset($vars['value']) && $vars['value'] != '') { 
+                $html .= $vars['value'] . "\n</s:ft_textarea>\n";
+            }
         }
         $html .= "</s:form_table>\n";
+
 
         // Return
         return $this->view->renderBlock($html);
@@ -76,7 +91,9 @@ class Form
         // Go through
         $string = '';
         foreach ($vars as $key => $value) { 
-            if ($key == 'field' || $value == '') { 
+            if (in_array($key, ['field','options']) || $value == '') { 
+                continue;
+            } elseif ($vars['field'] == 'textarea' && $key == 'value') { 
                 continue;
             }
             $string .= $key . '="' . $value . '" ';

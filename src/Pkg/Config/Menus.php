@@ -57,6 +57,7 @@ class Menus
 
             // Go through sub-menus
             $submenus = $vars['menus'] ?? [];
+            $position = 'top';
             foreach ($submenus as $sub_alias => $sub_name) { 
 
                 // Set sub_vars
@@ -64,10 +65,15 @@ class Menus
                 $sub_vars['alias'] = $sub_alias;
                 $sub_vars['area'] = $vars['area'];
                 $sub_vars['parent'] = $vars['alias'];
+                $sub_vars['position'] = $position;
 
                 // Add menu
                 $this->addMenu($sub_vars);
+                $position = 'after ' . $sub_alias;
+
+                // Add to done
                 $done[] = implode(":", [$vars['area'], $vars['alias'], $sub_alias]);
+                $reorder[$vars['area'] . ':' . $vars['alias']] = 1;
             }
         }
 

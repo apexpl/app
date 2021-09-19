@@ -22,6 +22,7 @@ class SvnExport
 
     // Properties
     public string $svn_dir = '';
+    public string $version = '';
 
     /**
      * Process
@@ -39,6 +40,7 @@ class SvnExport
         }
         $dir_name = $dev === true ? 'trunk' : 'tags/' . rtrim($version, '/') . '/';
         $this->svn_dir = $dir_name;
+        $this->version = $version;
 
         // Get tmp directory
         $tmp_dir = sys_get_temp_dir() . '/apex-' . uniqid();

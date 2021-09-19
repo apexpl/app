@@ -9,6 +9,7 @@ use Apex\App\Network\Svn\{SvnRepo, SvnCheckout};
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Pkg\Filesystem\Package\Compiler;
+use Apex\App\Pkg\Helpers\RegistryCleaner;
 use Apex\App\Network\Sign\Signer;
 use Apex\App\Exceptions\{ApexCompilerException, ApexSvnRepoException};
 
@@ -20,6 +21,9 @@ class SvnCommit
 
     #[Inject(Cli::class)]
     private Cli $cli;
+
+    #[Inject(RegistryCleaner::class)]
+    private RegistryCleaner $cleaner;
 
     #[Inject(Compiler::class)]
     private Compiler $compiler;
@@ -54,6 +58,9 @@ class SvnCommit
             $this->cli->error("Your local working copy is older than the SVN repository.  Please first update, see 'apex help package pulle' for details.");
             return;
         }
+
+        // Clean registry
+        $this->cleaner->clean($pkg);
 
         // Compile the package
         $this->cli->send("Compiling package... ");

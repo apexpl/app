@@ -39,33 +39,32 @@ class Info implements CliCommandInterface
             return;
         }
 
-
         // Get info
         $res = $this->network->post($pkg->getRepo(), 'repos/check', ['pkg_serial' => $pkg->getSerial()]);
-        print_r($res); exit;
 
         // Set variables
         $svn = $pkg->getSvnRepo();
-        $repo_url = 'https://' . $repo->getHttpHost() . '/' . $pkg->getSerial();
 
         // Get current branch
         if (is_dir(SITE_PATH . '/.apex/svn/' . $pkg->getAlias())) { 
         $branch = $svn->getCurrentBranch() ?? 'trunk';
-            $svn_dir = $branch == 'trunk' ? 'trunk' : 'branches/' . $branch;
+            $svn_dir = $branch == 'trunk' ? 'trunk' : $branch;
         } else { 
             $branch = 'N/A'; 
             $svn_dir = 'trunk';
         }
-        $svn_url = $svn->getSvnUrl($svn_dir);
+        $svn_url = $svn->getSvnUrl($svn_dir, true);
 
-        // Start package info
-        $cli->send($pkg->getSerial() . ' Package Info');
-        $cli->send("Alias:           " . $pkg->getAlias() . "\r\n");
-        $cli->send("Name:            " . $res['name'] . "\r\n");
-        $cli->send("Category:        " . $res['category'] . "\r\n");
-        $cli->send("Author:          " . $pkg->getAuthor() . "\r\n");
-        $cli->send("Repo URL:        " . $repo_url . "\r\n");
-        $cli->send("SVN URL:         " . $svn_url . "\r\n\r\n");
+        // Get repo url
+        $repo_url = 'https://' . $repo->getHttpHost() . '/' . $pkg->getSerial();
+        if ($svn_dir != 'trunk') { 
+            $repo_url .= '/' . $svn_dir;
+        }
+
+        // Get latest release
+        if (!$latest_release = $svn->getLatestRelease()) { 
+            $latest_release = 'Not Released';
+        }
 
         // Get price
         $price = $this->convert->money((float) $res['price']);
@@ -73,12 +72,26 @@ class Info implements CliCommandInterface
             $price .= ' + ' . $this->convert->money((float) $res['price_recurring']);
         }
 
-        // Send additional
-        $cli->send("Version:         " . $pkg->getVersion() . "\r\n");
-        $cli->send("Current Branch:  " . $branch . "\r\n");
-        $cli->send("Access:            " . ucwords($res['access']) . "\r\n");
-        $cli->send("Price:         " . $price . "\r\n");
+        // Set output vars
+        $output = [
+            'Name:' => $pkg->getSerial(),
+            'Category:' => $res['category'],
+            'Latest Release:' => $latest_release,
+            'Current Branch:' => '/' . $svn_dir,
+            '' => '',
+            'Access' => ucwords($res['access']),
+            'Price:' => $price,
+            'Downloads:' => (string) $res['downloads'],
+            'Stars:' => (string) $res['stars'],
+            'Watchers:' => (string) $res['watchers'],
+            '' => '',
+            'Web:' => $repo_url,
+            'SVN:' => $svn_url
+        ];
 
+        // Send output
+        $cli->sendHeader($pkg->getSerial() . ' Package Info');
+        $cli->sendArray($output);
     }
 
     /**

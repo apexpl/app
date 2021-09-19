@@ -7,6 +7,7 @@ use Apex\Svc\Container;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Pkg\Helpers\Registry;
+use Apex\App\Base\Router\RouterConfig;
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 
@@ -25,6 +26,9 @@ class View implements CliCommandInterface
     #[Inject(Container::class)]
     private Container $cntr;
 
+    #[Inject(RouterConfig::class)]
+    private RouterConfig $router_config;
+
     /**
      * Process
      */
@@ -32,6 +36,10 @@ class View implements CliCommandInterface
     {
 
         // Initialize
+        $opt = $cli->getArgs(['route']);
+        $route = $opt['route'] ?? '';
+
+        // Get package
         if (!$pkg = $this->pkg_helper->get(($args[0] ?? ''))) { 
             return;
         }
@@ -63,6 +71,12 @@ class View implements CliCommandInterface
         $registry = $this->cntr->make(Registry::class, ['pkg_alias' => $pkg_alias]);
         $registry->add('views', $uri);
 
+        // Add route definition, if route defined
+        if ($route != '') { 
+            $this->router_config->addRoute($route, 'PublicSite');
+            $registry->add('routes', $route, 'PublicSite');
+        }
+
         // Success message
         $cli->success("Successfully created new view for URI $uri, and files are now available at:", $files);
     }
@@ -75,13 +89,14 @@ class View implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'Create View',
-            usage: 'create view <PKG_ALIAS> <URI>',
+            usage: 'create view <PKG_ALIAS> <URI> [--route=]',
             description: 'Create a new view.'
         );
 
         // Params
         $help->addParam('pkg_alias', 'Package alias to register the view to.');
         $help->addParam('uri', 'The URI of the new view, as will be viewed within the web browser and placed relative to the /views/html/ directory.');
+        $help->addFlag('--route', 'Optional route and if specified will add a new route to the /boot/routes.yml file.');
         $help->addExample('./apex create view my-shop admin/products/add');
 
         // Return

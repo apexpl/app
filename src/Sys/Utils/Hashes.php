@@ -88,7 +88,7 @@ class Hashes
      */
     public function parseDataSource(
         string $data_source, 
-        string $value = '', 
+        string | array $value = '', 
         string $form_field = 'select', 
         string $form_name = ''
     ):string {
@@ -96,6 +96,7 @@ class Hashes
         // Initialize
         $source = explode(".", $data_source);
         $this->debugger?->add(5, tr("Parsing hash data source, {1}", $data_source));
+        $html = '';
 
         // Hash
         if ($source[0] == 'hash') { 

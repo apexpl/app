@@ -3,6 +3,8 @@ declare(strict_types = 1);
 
 namespace Apex\App\Sys\Boot;
 
+use Apex\Armor\Auth\Operations\Cookie;
+
 /**
  * Request inputs
  */
@@ -60,13 +62,69 @@ class RequestInputs
     }
 
     /**
+     * Set cookie
+     */
+    public function setCookie(string $name, string $value, int $expires = 0, ?array $options = null):void
+    {
+        Cookie::set($name, $value, $expires, $options);
+    }
+
+    /**
+     * File name
+     */
+    public function fileName(string $key):?string
+    {
+        return array_key_exists($key, $this->inputs['files']) ? $this->inputs['files'][$key]['name'] : null;
+    }
+
+    /**
+     * File tmp_name
+     */
+    public function fileTmpName(string $key):?string
+    {
+        return array_key_exists($key, $this->inputs['files']) ? $this->inputs['files'][$key]['tmp_name'] : null;
+    }
+
+    /**
+     * File type
+     */
+    public function fileType(string $key):?string
+    {
+        return array_key_exists($key, $this->inputs['files']) ? $this->inputs['files'][$key]['type'] : null;
+    }
+
+    /**
+     * File contents
+     */
+    public function fileContents(string $key):?string
+    {
+        return array_key_exists($key, $this->inputs['files']) ? file_get_contents($this->inputs['files'][$key]['tmp_name']) : null;
+    }
+
+    /**
+     * File stream
+     */
+    public function fileStream(string $key):?stream
+    {
+        return array_key_exists($key, $this->inputs['files']) ? fopen($this->inputs['files'][$key]['tmp_name'], 'r') : null;
+    }
+
+    /**
+     * File
+     */
+    public function file(string $key):?array
+    {
+        return array_key_exists($key, $this->inputs['files']) ? $this->inputs['files'][$key] : null;
+    }
+
+    /**
      * Path param
      */
     public function pathParam(string $key, $default = null)
     {
         return array_key_exists($key, $this->inputs['path_params']) ? $this->inputs['path_params'][$key] : $default; 
-    
-}
+    }
+
     /**
      * Config var
      */
@@ -120,6 +178,18 @@ class RequestInputs
     public function hasCookie(string $key):bool
     {
         return array_key_exists($key, $this->inputs['cookie']); 
+    }
+
+    /**
+     * Has $_FILE
+     */
+    public function hasFile(string $key):bool
+    {
+        if (isset($this->inputs['files'][$key]) && is_array($this->inputs['files'][$key]) && isset($this->inputs['files'][$key]['tmp_name']) && $this->inputs['files'][$key]['tmp_name'] != '') { 
+            return true;
+        } else { 
+            return false;
+        }
     }
 
     /**
@@ -179,6 +249,14 @@ class RequestInputs
     }
 
     /**
+     * Get all $_FILES
+     */
+    public function getAllFile():array
+    {
+        return $this->inputs['files'];
+    }
+
+    /**
      * Get all path params
      */
     public function getAllPathParams():array
@@ -225,6 +303,14 @@ class RequestInputs
     public function clearCookie():void
     {
         $this->inputs['cookie'] = [];
+    }
+
+    /**
+     * Clear $_FILES
+     */
+    public function clearFile():void
+    {
+        $this->inputs['files'] = [];
     }
 
     /**

@@ -24,7 +24,7 @@ class RouterConfig
     {
 
         // Load router file'
-        $yaml = $this->app->getRoutesConfig();
+        $yaml = $this->app->getRoutesConfig('routes.yml', true);
         $routes = $yaml['routes'] ?? [];
 
         // Add route as needed

@@ -3,7 +3,9 @@ declare(strict_types = 1);
 
 namespace Apex\App\Interfaces;
 
-use Apex\Mercury\Email\EmailContact;
+use Apex\Mercury\Email\{EmailContact, EmailContactCollection};
+use Apex\App\Base\Web\Utils\FormBuilder;
+use Apex\App\Interfaces\UserInterface;
 
 /**
  * Notifications controller interface
@@ -18,7 +20,7 @@ interface EmailNotificationControllerInterface
      * e-mail notification with this controller, and allow the 
      * administrator to define the conditionals of the e-mail.
      */
-    public function getConditionFormFields(FormFieldsCreator $creator):array;
+    public function getConditionFormFields(FormBuilder $builder):array;
 
     /**
      * Get available senders
@@ -64,7 +66,7 @@ interface EmailNotificationControllerInterface
      * This should return the sender name and e-mail address as a 
      * EmailContact object.  Otherwise, return null.
      */
-    public function getSender(string $sender, string $uuid, array $data = []):?EmailContact;
+    public function getSender(string $sender, UserInterface $user, array $data = []):?EmailContact;
 
     /**
      * Get recipient
@@ -73,7 +75,7 @@ interface EmailNotificationControllerInterface
      * This should return the recipient name and e-mail address as a 
      * EmailContact object.  Otherwise, return null.
      */
-    public function getRecipient(string $recipient, string $uuid, array $data = []):?EmailContact;
+    public function getRecipients(string $recipient, UserInterface $user, array $data = []):?EmailContactCollection;
 
     /**
      * Get reply-to
@@ -89,7 +91,16 @@ interface EmailNotificationControllerInterface
      * If necessary, you can return the Cc e-mail address of the message here.  
      * Otherwise, return null.
      */
-    public function getCc(array $data = []):?string;
+    public function getCc(array $data = []):?array;
+
+    /**
+     * Get bcc
+     *
+     * If necessary, you can return the bcc e-mail address of the message here.  
+     * Otherwise, return null.
+     */
+    public function getBcc(array $data = []):?array;
+
 
 }
 

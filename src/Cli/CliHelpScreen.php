@@ -19,12 +19,12 @@ class CliHelpScreen
      * Constructor
      */
     public function __construct(
-        private string $title, 
-        private string $usage, 
-        private string $description = '',
-        private array $params = [], 
-        private array $flags = [], 
-        private array $examples = []
+        public string $title, 
+        public string $usage, 
+        public string $description = '',
+        public array $params = [], 
+        public array $flags = [], 
+        public array $examples = []
     ) { 
 
     }

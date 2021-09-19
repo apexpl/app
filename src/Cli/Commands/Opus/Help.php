@@ -26,7 +26,7 @@ class Help
 
         // Set commands
         $help->addParam('admin-settings', 'Generate views within the admin panel to define settings for a package.');
-        $help->addParam('aip-endpoint', 'Generate a new REST API endpoint class.');
+        $help->addParam('api-endpoint', 'Generate a new REST API endpoint class.');
         $help->addParam('collection', 'Generate full collection with array and iterator functionality constrained to a single model class.');
         $help->addParam('email-controller', 'Create new e-mail notification controller class.');
         $help->addParam('html-tag', 'Create new HTML tag class allowing <s:tag> to work within templates.');

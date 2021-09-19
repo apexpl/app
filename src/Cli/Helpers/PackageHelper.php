@@ -105,12 +105,13 @@ class PackageHelper
     /**
      * Check package access
      */
-    public function checkPackageAccess(LocalRepo $repo, string $pkg_alias, string $column = 'can_download'):?LocalPackage
+    public function checkPackageAccess(LocalRepo $repo, string $pkg_alias, string $column = 'can_read', bool $is_install = false):?LocalPackage
     {
 
         // Check repository for package
+        $is_install = $is_install === true ? 1 : 0;
         $pkg_serial = $this->getSerial($pkg_alias);
-        if (!$res = $this->network->post($repo, 'repos/check', ['pkg_serial' => $pkg_serial])) { 
+        if (!$res = $this->network->post($repo, 'repos/check', ['pkg_serial' => $pkg_serial, 'is_install' => $is_install])) { 
             $this->cli->error("Package '$pkg_alias' does not exist on the repository '$repo_alias'");
             return null;
         } elseif ($res['exists'] !== true) { 
@@ -124,7 +125,7 @@ class PackageHelper
                 $this->account = $this->acct_helper->get();
             }
             $this->network->setAuth($this->account);
-            $res = $this->network->post($repo, 'repos/check', ['pkg_serial' => $pkg_serial]);
+            $res = $this->network->post($repo, 'repos/check', ['pkg_serial' => $pkg_serial, 'is_install' => $is_install]);
         }
 
         // Check access

@@ -23,7 +23,7 @@ class Add implements CliCommandInterface
     {
 
         // Initialize
-        list($args, $info) = $cli->getArgs(['host','port','user','password']);
+        $info = $cli->getArgs(['host','port','user','password']);
         $info['is_ssl'] = 1;
         $alias = $args[0] ?? '';
 
