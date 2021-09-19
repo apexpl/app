@@ -5,6 +5,7 @@ namespace Apex\App\Pkg\Helpers;
 
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\Svn\SvnFileConverter;
+use Apex\App\Sys\Utils\Io;
 
 /**
  * Registry cleaner
@@ -14,6 +15,9 @@ class RegistryCleaner
 
     #[Inject(SvnFileConverter::class)]
     private SvnFileConverter $file_converter;
+
+    #[Inject(Io::class)]
+    private Io $io;
 
     // Properties
     private LocalPackage $pkg;
@@ -45,7 +49,7 @@ class RegistryCleaner
         // Http Controllers
         $http_controllers = $this->registry['http_controllers'] ?? [];
         foreach ($http_controllers as $controller) {
-            $this->checkHttpController($http_controller);
+            $this->checkHttpController($controller);
         }
 
         // External files
@@ -126,7 +130,7 @@ class RegistryCleaner
     {
 
         // Check svn file
-        $svn_file = $this->file_converter->toSvn($pkg, $local_file, $is_registry);
+        $svn_file = $this->file_converter->toSvn($this->pkg, $local_file, $is_registry);
         if (file_exists("$this->svn_dir/$svn_file")) {
 
             // Check for link

@@ -60,7 +60,7 @@ class SvnCommit
         }
 
         // Clean registry
-        $this->cleaner->clean($pkg);
+        //$this->cleaner->clean($pkg);
 
         // Compile the package
         $this->cli->send("Compiling package... ");

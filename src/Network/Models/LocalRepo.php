@@ -87,7 +87,7 @@ class LocalRepo
         if (preg_match("/^(.+)\:443/", $this->host, $match)) { 
             $url = 'https://' . $match[1] . '/api/enduro/';
         } else { 
-            $url = 'http://' . $this->host . '/api/enduro/';
+            $url = 'https://' . $this->host . '/api/enduro/';
         }
         $url .= trim($path, '/');
 
