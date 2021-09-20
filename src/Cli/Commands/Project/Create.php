@@ -11,6 +11,7 @@ use Apex\App\Network\Stores\{PackagesStore, ReposStore};
 use Apex\App\Pkg\ProjectManager;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use redis;
 
 /**
  * Create project
@@ -41,6 +42,9 @@ class Create implements CliCommandInterface
 
     #[Inject(Installer::class)]
     private Installer $installer;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     /**
      * Process
@@ -112,6 +116,12 @@ class Create implements CliCommandInterface
         }
         $pkg_serial = $pkg->getSerial();
 
+        // Start project info
+        $project_info = [
+            'pkg_alias' => $pkg->getAlias(),
+            'is_staging' => $is_staging === true ? 1 : 0
+        ];
+
         // Success message
         $cli->sendHeader('Successfully Created Project');
         $cli->send("The new project '" . $pkg->getSerial() . "' has been successfully created.  The entire Apex directory is now under version control, and its repository may be found at:\r\n\r\n");
@@ -123,6 +133,14 @@ class Create implements CliCommandInterface
             $staging_url = "https://" . $pkg->getAlias() . '.' . $pkg->getAuthor() . '.' . $repo->getStagingHost() . '/';
             $dbname = str_replace('-', '_', ($pkg->getAuthor() . '_' . $pkg->getAlias()));
 
+            // Add to project info
+            $project_info['dbname'] = $dbinfo['dbname'];
+            $project_info['user'] = $dbinfo['user'];
+            $project_info['password'] = $dbinfo['password'];
+            $project_info['host'] = $dbinfo['host'];
+            $project_info['port'] = $dbinfo['port']; 
+
+            // Send message
             $cli->send("A new staging environment has also been created, which may be accessed at:\r\n\r\n");
             $cli->send("    $staging_url\r\n\r\n");
             $cli->send("Information to remotely connect to the SQL database is as follows:\r\n\r\n");
@@ -133,8 +151,8 @@ class Create implements CliCommandInterface
             $cli->send("    Port:  $dbinfo[port]\r\n\r\n");
         }
 
-
-    
+        // Add project info to redis
+        $this->redis->hmset('config:project', $project_info);
     }
 
     /**

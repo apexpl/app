@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Apex\App\Cli\Commands\Sys;
+namespace Apex\App\Cli\Commands\Project;
 
 use Apex\Svc\Db;
 use Apex\App\Cli\{Cli, CliHelpScreen};
@@ -33,7 +33,7 @@ class Sql Implements CliCommandInterface
 
         // Check
         if ($file == '' && !isset($args[0])) { 
-            $this->connect();
+            $this->connect($cli);
             return;
         } elseif ($file != '' && !file_exists($file)) { 
             $cli->error("No file exists at the location, $file");
@@ -79,7 +79,7 @@ class Sql Implements CliCommandInterface
     /**
      * Connect
      */
-    public function connect():void
+    public function connect(Cli $cli):void
     {
 
         // Get db driver
@@ -94,7 +94,10 @@ class Sql Implements CliCommandInterface
         };
 
         // Get dbinfo
-        $dbinfo = $this->redis->hgetall('config:db.master');
+        if (!$dbinfo = $this->redis->hgetall('config:project')) {
+            $cli->error("There is currently no active project checked out on this system.");
+            return;
+        }
 
         // Set args
         if ($driver == 'SQLite') {
@@ -118,7 +121,7 @@ class Sql Implements CliCommandInterface
         $help = new CliHelpScreen(
             title: 'Execute SQL Statement',
             usage: 'sql ]<SQL>] [--file=<FILENAME>]',
-            description: 'Execute a single SQL statement against the database, or a SQL file.  If run with no argument, you will be connected to the SQL database and given its prompt.'
+            description: 'Execute a single SQL statement against the database, or a SQL file.'
         );
 
         $help->addParam('sql', 'The SQL statement to execute against the database.');

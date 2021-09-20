@@ -124,6 +124,7 @@ class SvnClient
 
         // Run process
         $process = new Process($args);
+        $process->setTimeout(600);
         if ($this->t_local === true && $this->pkg->getType() == 'project') { 
             $rootdir = SITE_PATH;
             $process->setWorkingDirectory(SITE_PATH);

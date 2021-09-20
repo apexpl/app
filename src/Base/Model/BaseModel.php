@@ -237,6 +237,15 @@ class BaseModel implements BaseModelInterface
         return $vars;
     }
 
+    /**
+     * Purge
+     */
+    public static function purge():void
+    {
+        $db = Di::get(Db::class);
+        $db->truncate(static::$dbtable);
+    }
+
 }
 
 
