@@ -127,9 +127,7 @@ class DatabaseInstaller
         }
 
         // Delete tables
-        foreach ($tables as $table_name) { 
-            $db->query("DROP TABLE $table_name");
-        }
+        $db->dropAllTables();
     }
 
 }

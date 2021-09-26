@@ -104,7 +104,7 @@ class RegistryCleaner
     {
 
         // Check for directory
-        if (is_dir("$this->svn_dir/ext/$file") && is_link("SITE_PATH . '/' . $file)) {
+        if (is_dir("$this->svn_dir/ext/$file") && is_link(SITE_PATH . '/' . $file)) {
             return;
         } elseif (is_dir("$this->svn_dir/ext/$file")) {
             symlink("$this->svn_dir/ext/$file", SITE_PATH . '/' . $file);
