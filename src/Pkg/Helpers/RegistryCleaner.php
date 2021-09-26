@@ -103,24 +103,27 @@ class RegistryCleaner
     private function checkExternalFile(string $file):void
     {
 
+        // Check for directory
+        if (is_dir("$this->svn_dir/ext/$file") && is_link("SITE_PATH . '/' . $file)) {
+            return;
+        } elseif (is_dir("$this->svn_dir/ext/$file")) {
+            symlink("$this->svn_dir/ext/$file", SITE_PATH . '/' . $file);
+            return;
+        } elseif (is_dir(SITE_PATH . '/' . $file)) {
+
+            // Create parent dir, if needed
+            if (!is_dir(dirname("$this->svn_dir/ext/$file"))) {
+                mkdir(dirname("$this->svn_dir/ext/$file"), 0755, true);
+            }
+
+            // Transfer
+            rename(SITE_PATH . '/' . $file, "$this->svn_dir/ext/$file");
+            symlink("$this->svn_dir/ext/$file", SITE_PATH . '/' . $file);
+            return;
+        }
+
         // Check file
-        if ($this->checkFile($file) === true) {
-            return;
-        } elseif (is_dir("$this->svn_dir/$file")) {
-            return;
-        } elseif (!is_dir(SITE_PATH . '/' . $file)) {
-            return;
-        }
-
-        // Create parent directory, if needed
-        $svn_file = "$this->svn_dir/ext/$file";
-        if (!is_dir(dirname($svn_file))) {
-            mkdir(dirname($svn_file), 0755, true);
-        }
-
-        // rename, and create symlink
-        rename(SITE_APTH . '/' . $file, $svn_file);
-        symlink($svn_file, SITE_PATH . '/' . $file);
+        $this->checkFile($file) === true;
     }
 
     /**

@@ -30,6 +30,12 @@ class Compiler
     public function compile(LocalPackage $pkg, string $handle_diff = 'use_local', bool $verbose = false):void
     {
 
+        // Check for project
+        if ($pkg->getType() == 'project') {
+            return;
+        }
+
+
         // Set variables
         $pkg_alias = $pkg->getAlias();
         $alias = $pkg->getAliasTitle();

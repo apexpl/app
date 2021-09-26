@@ -7,6 +7,7 @@ use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use redis;
 
 /**
  * Update
@@ -20,6 +21,9 @@ class Pull implements CliCommandInterface
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
 
+    #[Inject(redis::class)]
+    private redis $redis;
+
     /**
      * Process
  */
@@ -28,6 +32,9 @@ class Pull implements CliCommandInterface
 
         // Initialize
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
+        if ($info = $this->redis->hgetall('config:project')) {
+            $pkg_alias = $info['pkg_alias'];
+        }
 
         // Get package
         if (!$pkg = $this->pkg_store->get($pkg_alias)) { 

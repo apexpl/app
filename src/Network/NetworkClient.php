@@ -105,8 +105,10 @@ class NetworkClient
         // Decode response
         if (!$json = json_decode($res->getBody()->getContents(), true)) { 
             throw new ApexApiClientException("Did not receive valid JSON object from repository, got instead: " . $res->getBody());
-        } elseif ($res->getStatusCode() != 200) { 
-            throw new ApexApiClientException("Received a " . $res->getStatusCode() . " from API with message, $json[message]");
+        } elseif ($res->getStatusCode() != 200) {
+            $file = $json['data']['file'];
+            $line = $json['data']['line'];
+            throw new ApexApiClientException("Received a " . $res->getStatusCode() . " from API with message, $json[message] at file $file on line $line");
         }
 
         // Return

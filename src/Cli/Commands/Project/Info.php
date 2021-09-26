@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Apex\App\Cli\Commands\Package;
+namespace Apex\App\Cli\Commands\Project;
 
 use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
@@ -9,6 +9,7 @@ use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use redis;
 
 /**
  * Info
@@ -25,6 +26,9 @@ class Info implements CliCommandInterface
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;
 
+    #[Inject(redis::class)]
+    private redis $redis;
+
     /**
      * Process
      */
@@ -32,27 +36,21 @@ class Info implements CliCommandInterface
     {
 
         // Get package
-        if (!$pkg = $this->pkg_helper->get(($args[0] ?? ''))) { 
+        if (!$info = $this->redis->hgetall('config:project')) {
+            $cli->error("There is no project checked out on this system.");
             return;
-        } elseif (null === ($repo = $pkg->getRepo())) { 
-            $this->showUnpublished($cli, $pkg);
+        } elseif (!$pkg = $this->pkg_helper->get(($info['pkg_alias']))) { 
             return;
         }
 
         // Get info
+        $repo = $pkg->getRepo();
         $res = $this->network->post($pkg->getRepo(), 'repos/check', ['pkg_serial' => $pkg->getSerial()]);
-
-        // Set variables
         $svn = $pkg->getSvnRepo();
 
         // Get current branch
-        if (is_dir(SITE_PATH . '/.apex/svn/' . $pkg->getAlias())) { 
         $branch = $svn->getCurrentBranch() ?? 'trunk';
-            $svn_dir = $branch == 'trunk' ? 'trunk' : $branch;
-        } else { 
-            $branch = 'N/A'; 
-            $svn_dir = 'trunk';
-        }
+        $svn_dir = $branch == 'trunk' ? 'trunk' : $branch;
         $svn_url = $svn->getSvnUrl($svn_dir, true);
 
         // Get repo url
@@ -95,34 +93,20 @@ class Info implements CliCommandInterface
     }
 
     /**
-     * Show unpublished info
-     */
-    private function showUnpublished(Cli $cli, LocalPackage $pkg):void
-    {
-        $cli->sendHeader($pkg->getAlias() . ' Package Info');
-        $cli->send("Alias:      " . $pkg->getAlias() . "\r\n");
-        $cli->send("Status:      Unpublished\r\n");
-        $cli->send("Created:    " . $pkg->getInstalledAt()->format('M-d-Y H:i') . "\r\n");
-    }
-
-    /**
      * Help
      */
     public function help(Cli $cli):CliHelpScreen
     {
 
         $help = new CliHelpScreen(
-            title: 'Get Package Info',
-            usage: 'package info <PKG_ALIAS>',
-            description: 'View basic information on a locally installed package.'
+            title: 'Project Info',
+            usage: 'project info',
+            description: 'View basic summary information regarding the checked out project on the system.'
         );
-
-        $help->addParam('pkg_alias', 'The alias of the package to display info about.');
-        $help->addExample('./apex package info my-shop');
+        $help->addExample('./apex project info');
 
         // Return
         return $help;
-    }
     }
 
 }

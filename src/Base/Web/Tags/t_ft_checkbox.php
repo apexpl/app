@@ -36,7 +36,7 @@ class t_ft_checkbox implements TagInterface
         if (($data_source = $e->getAttr('data_source')) !== null) { 
             $options = $this->hashes->parseDataSource($data_source, $value, 'checkbox', $attr['name']);
         } else { 
-            $options .= $e->getBody();
+            $options = $e->getBody();
         }
 
         // Return

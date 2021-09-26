@@ -338,7 +338,8 @@ class LocalPackage
             'price' => $general['price'] ?? 0, 
             'price_recurring' => $general['price_recurring'] ?? 0, 
             'price_interval' => $general['price_interval'] ?? '', 
-            'name' => $general['name'] ?? ''
+            'description' => $general['description'] ?? '',
+            'web_hooks' => $yaml['web_hooks'] ?? []
         ];
 
         // Check for ACLs

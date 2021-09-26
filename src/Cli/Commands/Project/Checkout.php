@@ -4,10 +4,9 @@ declare(strict_types = 1);
 namespace Apex\App\Cli\Commands\Project;
 
 use Apex\App\Cli\{Cli, CliHelpScreen};
-use Apex\App\Cli\Helpers\PackageHelper;
+use Apex\App\Cli\Helpers\{AccountHelper, PackageHelper};
 use Apex\App\Network\Stores\ReposStore;
-use Apex\App\Sys\Utils\Io;
-use Apex\App\Pkg\Helpers\Migration;
+use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use redis;
 
@@ -20,14 +19,14 @@ class Checkout implements CliCommandInterface
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
 
+    #[Inject(AccountHelper::class)]
+    private AccountHelper $acct_helper;
+
     #[Inject(ReposStore::class)]
     private ReposStore $repo_store;
 
-    #[Inject(Io::class)]
-    private Io $io;
-
-    #[Inject(Migration::class)]
-    private Migration $migration;
+    #[Inject(NetworkClient::class)]
+    private NetworkClient $network;
 
     #[Inject(redis::class)]
     private redis $redis;
@@ -54,11 +53,58 @@ class Checkout implements CliCommandInterface
             return;
         }
 
+        // Get account
+        $acct = $this->acct_helper->get();
 
+        // Check if user has write access to package
+        $this->network->setAuth($acct);
+        $this->network->post($repo, 'repos/check', [
+            'pkg_serial' => $pkg_serial,
+            'is_install' => 1
+        ]);
 
+        // Check response
+        if ($res['exists'] === false) {
+            $cli->error("The package does not exist on the repository, $pkg_serial");
+            return;
+        } elseif ($res['can_write'] === false) {
+            $this->cli->error("You do not have write access to the package, $pkg_serial hence can not check it out.");
+            return;
+        }
 
+        // Confirm checkout
+        $cli->send("WARNING:  This operation will permanently delete all code and database tables currently installed on this system, and replace it will the contents of the project.\r\n\r\n");
+        if (!$cli->getConfirm("Are you sure you want to continue?")) {
+            $cli->send("Ok, goodbye.\r\n\r\n");
+            return;
+        }
 
+        // Checkout the project
+        $this->svn_checkout->process($pkg, (bool) $res['has_staging'], $res['dbinfo']);
 
+        // Success
+        $cli->send("Successfully checked out the project '$pkg_serial', and the entire Apex installation directory is now under version control.\r\n\r\n");
+    }
 
+    /**
+     * Help
+     */
+    public function help(Cli $cli):CliHelpScreen
+    {
+
+        $help = new CliHelpScreen(
+            title: 'Checkout Project',
+            usage: 'project checkout <PKG_ALIAS>',
+            description: 'Checkout a project for development.  This will delete all code and database tables currently installed, and replace them with the contents of the project.'
+        );
+
+        $help->addParam('pkg_alias', 'The alias of the package / project to checkout.');
+        $help->addExample('./apex project checkout my-project');
+
+        // Return
+        return $help;
+    }
+
+}
 
 

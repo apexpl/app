@@ -239,8 +239,8 @@ class FormField
     {
 
         // Validate
-        if ($this->field != 'select') { 
-            throw new ApexFormValidationException("The options() method is only available for 'select' form fields.");
+        if (!in_array($this->field, ['select','checkbox','radio'])) {
+            throw new ApexFormValidationException("The options() method is only available for 'select', 'checkbox', and 'radio' form fields.");
         }
 
         // Return

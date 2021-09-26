@@ -83,6 +83,11 @@ interface BaseModelInterface
      */
     public function getChildren(string $foreign_key, string $class_name, string $sort_by = 'id', string $sort_dir = 'asc', int $limit = 0, int $offset = 0):ModelIterator;
 
+    /**
+     * Delete many
+     */
+    public static function deleteMany(string $where_sql, ...$args):int;
+
 
     /**
      * Purge

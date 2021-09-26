@@ -12,9 +12,11 @@ use Apex\Mercury\Interfaces\{EmailerInterface, SmsClientInterface, FirebaseClien
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\SimpleCache\CacheInterface;
 use Psr\Http\Client\ClientInterface as HttpClientInterface;
 use Apex\Mercury\SMS\NexmoConfig;
 use Apex\App\Adapters\ClusterAdapter;
+use Apex\Syrus\Interfaces\TagInterface;
 use redis;
 
 /**
@@ -137,9 +139,13 @@ class Container
         ];
 
         // Add packages with tags registered
-        $tag_packages = $redis->lrange('config:syrus_tag_packages', 0, -1) ?? [];
-        foreach ($tag_packages as $package) { 
-            $tag_namespaces[] = "App\\" . $package . "\\Opus\\Tags";
+        $tag_packages = [];
+        $tag_classes = $redis->smembers('config:interfaces:' . TagInterface::class) ?? [];
+        foreach ($tag_classes as $class_name) {
+            $parts = explode("\\", $class_name);
+            if (isset($parts[3]) && $parts[2] == 'Opus' && $parts[3] == 'Tags' && !in_array($parts[1], $tag_packages)) {
+                $tag_namespaces[] = "App\\" . $parts[1] . "\\Opus\\Tags";
+            }
         }
 
         // Return
@@ -158,6 +164,7 @@ class Container
             RouterInterface::class, 
             LoggerInterface::class,
             CacheItemPoolInterface::class, 
+            CacheInterface::class,
             BrokerInterface::class, 
             HttpClientInterface::class, 
             DebuggerInterface::class, 
@@ -208,6 +215,8 @@ class Container
             \Apex\Svc\Logger::class => LoggerInterface::class, 
             \Apex\Svc\Debugger::class => DebuggerInterface::class,
             \Apex\Svc\Filesystem::class => \League\Flysystem\Filesystem::class,
+            \Apex\Svc\Cache::class => CacheInterface::class,
+            \Apex\Svc\Psr6Cache::class => CacheItemPoolInterface::class,
             \Apex\Svc\Emailer::class => EmailerInterface::class,
             \Apex\Svc\Firebase::class => FirebaseClientInterface::class, 
             \Apex\Svc\HttpClient::class => HttpClientInterface::class, 

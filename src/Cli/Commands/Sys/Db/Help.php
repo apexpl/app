@@ -33,6 +33,7 @@ class Help
         $help->addParam('set-readonly', 'Set / add a read-only database connection.');
         $help->addParam('del-readonly', 'Delete a read-only database connection.');
         $help->addParam('purge-readonly', 'Delete all read-only database connections.');
+        $help->addParam('dump', 'Dump the SQL database to a text file.');
 
         // Examples
         $help->addExample('./apex sys db set-master');

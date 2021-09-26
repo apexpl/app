@@ -9,7 +9,7 @@ use Apex\App\Interfaces\BaseModelInterface;
 use Apex\App\Exceptions\ApexForeignKeyNotExistsException;
 
 /**
- * Base model
+ * Create, manage and retrieve records from the assigned model class that implements this class.
  */
 class BaseModel implements BaseModelInterface
 {
@@ -18,7 +18,7 @@ class BaseModel implements BaseModelInterface
     protected Convert $convert;
 
     /**
-     * Get first
+     * Get a model instance of the first record found for a given where clause.
      */
     public static function whereFirst(string $where_sql, ...$args):?static
     {
@@ -28,7 +28,7 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Where
+     * Select multiple records from the database table that is assigned to the model class.
      */
     public static function where(string $where_sql, ...$args):ModelIterator
     {
@@ -39,7 +39,7 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Get id
+     * Select a single model instance based on the value of the primary key / id column.
      */
     public static function whereId(string | int $id):?static
     {
@@ -48,7 +48,7 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Get all
+     * Get all records from the database table assigned to the model class.
      */
     public static function all(string $sort_by = 'id', string $sort_dir = 'asc', int $limit = 0, int $offset = 0):ModelIterator
     {
@@ -56,7 +56,7 @@ class BaseModel implements BaseModelInterface
         // Initialize
         $db = Di::get(Db::class);
         if ($sort_by == '') { 
-            $sort_by = $db->getPrimaryColumn(static::$dbtable);
+            $sort_by = $db->getPrimaryKey(static::$dbtable);
         }
 
         // Start SQL
@@ -81,7 +81,7 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Get all
+     * Get child records based on a foreign key constraint.
      */
     public function getChildren(string $foreign_key, string $class_name, string $sort_by = 'id', string $sort_dir = 'asc', int $limit = 0, int $offset = 0):ModelIterator
     {
@@ -127,7 +127,7 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Count
+     * Get the number of records within the database table with optional where clause.
      */
     public static function count(string $where_sql = '', ...$args):int
     {
@@ -141,7 +141,7 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Insert
+     * Insert a new record into the database table assigned to the model class.
      */
     public static function insert(array $values):?static
     {
@@ -152,7 +152,7 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Insert or update
+     * Insert or update a record within the database table assigned to the model class.
      */
     public static function insertOrUpdate(array $criteria, array $values):?static
     {
@@ -176,7 +176,7 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Update
+     * Update multiple records within the database table assigned to the model class.
      */
     public static function update(array $values, string $where_sql = '', ...$args):void
     {
@@ -185,14 +185,25 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Save
+     * Save and  update an individual model instance.
      */
     public function save(array $values = []):void
     {
 
         // Update properties, if any passed
         foreach ($values as $key => $value) { 
-            $this->$key = $value;
+
+            // Check
+            if (is_bool($this->$key) && $value == 1) {
+                $this->$key = true;
+            } elseif (is_bool($this->$key) && $value == 0) {
+                $this->$key = false;
+            } elseif (is_integer($this->$key) && is_string($value) && preg_match("/^\d+$/", $value)) {
+            $this->$key = (int) $value;
+            } else { 
+                $this->$key = $value;
+            }
+
         }
 
         // Add updated_at, if available
@@ -206,7 +217,7 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * Delete
+     * Delete a single model instance from the database table.
      */
     public function delete():void
     {
@@ -215,7 +226,27 @@ class BaseModel implements BaseModelInterface
     }
 
     /**
-     * toArray
+     * Delete multiple records from the database table assigned to the model class.
+     */
+    public static function deleteMany(string $where_sql, ...$args):int
+    {
+        $dbtable = static::$dbtable;
+        $db = Di::get(Db::class);
+        $stmt = $db->query("DELETE FROM $dbtable WHERE $where_sql", ...$args);
+        return $db->numRows($stmt);
+    }
+
+    /**
+     * Purge and delete all records within the database table assigned to the model class.
+     */
+    public static function purge():void
+    {
+        $db = Di::get(Db::class);
+        $db->truncate(static::$dbtable);
+    }
+
+    /**
+     * Get all properties of the model instance returned in an array.
      */
     public function toArray():array
     {
@@ -237,15 +268,5 @@ class BaseModel implements BaseModelInterface
         return $vars;
     }
 
-    /**
-     * Purge
-     */
-    public static function purge():void
-    {
-        $db = Di::get(Db::class);
-        $db->truncate(static::$dbtable);
-    }
-
 }
-
 

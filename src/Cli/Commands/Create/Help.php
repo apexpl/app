@@ -33,6 +33,7 @@ class Help
         $help->addParam('form', 'Create new HTML form.');
         $help->addParam('graph', 'Create new graph');
         $help->addParam('html-function', 'Create new HTML tag function.');
+        $help->addParam('html-tag', 'Create new HTML tag class allowing <s:tag> to work within templates.');
         $help->addParam('http-controller', 'Create new PSR-15 compliant HTTP controller.');
         $help->addParam('listener', 'Create new listener for event dispatcher.');
         $help->addParam('modal', 'Create new popup modal box.');

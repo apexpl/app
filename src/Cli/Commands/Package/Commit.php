@@ -10,6 +10,7 @@ use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\Svn\SvnCommit;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use redis;
 
 /**
  * Commit
@@ -31,6 +32,9 @@ class Commit implements CliCommandInterface
 
     #[Inject(SvnCommit::class)]
     private SvnCommit $svn_commit;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     /**
      * Process
@@ -65,6 +69,11 @@ class Commit implements CliCommandInterface
      */
     public function initPackage(string $pkg_alias, Cli $cli):?LocalPackage
     {
+
+        // Check for project
+        if ($info = $this->redis->hgetall('config:project')) {
+            $pkg_alias = $info['pkg_alias'];
+        }
 
         // Load package
         if (!$pkg = $this->pkg_store->get($pkg_alias)) { 

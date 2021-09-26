@@ -72,7 +72,9 @@ class MerkleTreeBuilder
     {
 
         // Initialize
-        if ($rootdir == '') { 
+        if ($pkg->getType() == 'project') {
+            $rootdir = SITE_PATH;
+        } elseif ($rootdir == '') { 
             $rootdir = SITE_PATH . '/.apex/svn/' . $pkg->getAlias();
         }
         $filelist = $this->io->parseDir($rootdir);
@@ -81,7 +83,7 @@ class MerkleTreeBuilder
         // Create hashes
         $files = [];
         foreach ($filelist as $file) { 
-            if (preg_match("/^\.svn/", $file)) { 
+            if (preg_match("/^(\.svn|\.apex|\.env|vendor)/", $file)) { 
                 continue;
             }
             $files[$file] = sha1_file($rootdir . '/' . $file);

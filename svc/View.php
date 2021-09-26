@@ -82,7 +82,8 @@ final class View extends \Apex\Syrus\Syrus
             'theme_uri' => '/themes/' . $this->getTheme(), 
             'is_auth' => $this->app->isAuth() === true ? 1 : 0, 
             'user_type' => $user_type,
-            'current_year' => date('Y') 
+            'current_year' => date('Y'),
+            'path' => $this->app->getPath()
         ];
 
         // Add vars

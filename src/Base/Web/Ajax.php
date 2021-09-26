@@ -40,7 +40,7 @@ class Ajax
      * Clear table rows
      */
     final public function clearTable(string $divid):void
-    { 
+    {
         $this->add('clear_table', array('divid' => $divid));
     }
 

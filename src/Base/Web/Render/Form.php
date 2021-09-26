@@ -68,9 +68,9 @@ class Form
             // Add to HTML
             $html .= "    <s:ft_" . $vars['field'] . " $attr_string>\n";
 
-                    // Add select options or textarea value
-            if ($vars['field'] == 'select' && isset($vars['options']) && $vars['options'] != '') { 
-                $html .= $vars['options'] . "\n</s:ft_select>\n";
+            // Add select options or textarea value
+            if (in_array($vars['field'], ['select','checkbox','radio']) && isset($vars['options']) && $vars['options'] != '') { 
+                $html .= $vars['options'] . "\n</s:ft_" . $vars['field'] . ">\n";
             } elseif ($vars['field'] == 'textarea' && isset($vars['value']) && $vars['value'] != '') { 
                 $html .= $vars['value'] . "\n</s:ft_textarea>\n";
             }

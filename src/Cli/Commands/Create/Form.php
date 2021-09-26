@@ -44,6 +44,13 @@ class Form implements CliCommandInterface
         $pkg_alias = $pkg->getAlias();
         $alias = $this->convert->case(($args[1] ?? ''), 'title');
 
+        // Get dbtable
+        $opt = $cli->getArgs(['dbtable']);
+        $dbtable = $opt['dbtable'] ?? '';
+        if ($dbtable == '') {
+            $dbtable = $pkg_alias . '_' . $this->convert->case($alias, 'lower');
+        }
+
         // Check
         if ($alias == '' || !preg_match("/^[a-zA-Z0-9_-]+$/", $alias)) { 
             $cli->error("Invalid alias specified, $alias");
@@ -56,7 +63,8 @@ class Form implements CliCommandInterface
         // Build
         list($dirs, $files) = $this->opus->build('form', SITE_PATH, [
             'package' => $pkg_alias,
-            'alias' => $alias
+            'alias' => $alias,
+            'dbtable' => $dbtable
         ]);
 
         // Add to redis
@@ -75,13 +83,14 @@ class Form implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'Create Form',
-            usage: 'create form <PKG_ALIAS> <ALIAS>',
+            usage: 'create form <PKG_ALIAS> <ALIAS> [--dbtable <TABLE>]',
             description: 'Create a new form component.'
         );
 
         // Params
         $help->addParam('pkg_alias', 'The alias of the package to create component within.');
         $help->addParam('alias', 'The alias / filename of the component to create');
+        $help->addFlag('--dbtable', 'Optional database table name, and if defined will dynamically generate the necessary form code using the columns of the table.'); 
         $help->addExample('./apex create form my-shop products');
 
         // Return

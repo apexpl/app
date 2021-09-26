@@ -28,8 +28,8 @@ class Help
         $help->addParam('admin-settings', 'Generate views within the admin panel to define settings for a package.');
         $help->addParam('api-endpoint', 'Generate a new REST API endpoint class.');
         $help->addParam('collection', 'Generate full collection with array and iterator functionality constrained to a single model class.');
+        $help->addParam('crud', 'Generate controller class and necessary components for CRUD operations of a table.');
         $help->addParam('email-controller', 'Create new e-mail notification controller class.');
-        $help->addParam('html-tag', 'Create new HTML tag class allowing <s:tag> to work within templates.');
         $help->addParam('iterator', 'Create a new iterator class constrained to a single model class.');
         $help->addParam('model', 'Create a new model class from existing database table.');
         $help->addParam('stack', 'Create a new stack class.');

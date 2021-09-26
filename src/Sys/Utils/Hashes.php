@@ -51,7 +51,7 @@ class Hashes
 
             // Checkbox
             } elseif ($form_field == 'checkbox') { 
-                $chk = (is_array($value) && in_array($hvalue, $value)) || ($value == $hvalue) ? 'checked="checked"' : '';
+                $chk = (is_array($value) && in_array($hkey, $value)) || ($value == $hkey) ? 'checked="checked"' : '';
                 $html .= "<input type=\"checkbox\" name=\"" . $form_name . "[]\" value=\"$hkey\" $chk> $hvalue<br />";
             // Readio list
             } elseif ($form_field == 'radio') { 

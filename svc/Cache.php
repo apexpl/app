@@ -2,11 +2,12 @@
 
 namespace Apex\Svc;
 
+use Psr\SimpleCache\CacheInterface;
 
 /**
  * CacheItemPoolInterface
  */
-interface Cache extends \Psr\Cache\CacheItemPoolInterface
+interface Cache extends CacheInterface
 {
 
 

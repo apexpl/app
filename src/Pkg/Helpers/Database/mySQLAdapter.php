@@ -65,6 +65,25 @@ class mySQLAdapter
 
     }
 
+    /**
+     * Transfer staging server to local database
+     */
+    public function transferStageToLocal(LocalPackage $pkg, string $db_password, string $dbhost, int $dbport):void
+    {
+
+        // Drop all database tables
+        $this->db->dropAllTables();
+
+        $dbinfo = $this->redis->hgetall('config:db.master');
+        $dbname = str_replace('-', '_', ($pkg->getAuthor() . '_' . $pkg->getAlias()));
+
+        // Set cmd
+        $cmd = "mysqldump -u$dbname -p$db_password -h$dbhost -P$dbport $dbname | sed -e 's|^/[*]!50001 CREATE ALGORITHM=UNDEFINED [*]/|/*!50001 CREATE */|' -e '/^[/][*]!50013 DEFINER=/d' | mysql -u$dbinfo[user] -p$dbinfo[password] -h$dbinfo[host] -P$dbinfo[port] $dbinfo[dbname]";
+        shell_exec($cmd);
+        return;
+
+    }
+
 }
 
 

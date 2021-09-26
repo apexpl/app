@@ -47,7 +47,7 @@ class SvnCommit
         $svn = $pkg->getSvnRepo();
 
         // Check repo exists, if needed
-        if (!is_dir(SITE_PATH . '/.apex/svn/' . $pkg->getAlias())) {
+        if ($pkg->getType() != 'project' && !is_dir(SITE_PATH . '/.apex/svn/' . $pkg->getAlias())) {
             if (!$this->checkRepoExists($svn)) { 
                 return;
             }
@@ -60,7 +60,7 @@ class SvnCommit
         }
 
         // Clean registry
-        //$this->cleaner->clean($pkg);
+        $this->cleaner->clean($pkg);
 
         // Compile the package
         $this->cli->send("Compiling package... ");
@@ -116,6 +116,11 @@ class SvnCommit
     private function compareMerkleRoots(SvnRepo $svn):bool
     {
 
+        // Check for project
+        if ($svn->getPackage()->getType() == 'project') {
+            return true;
+        }
+
         // Get current branch
         if (is_dir(SITE_PATH . '/.apex/svn/' . $svn->getPackage()->getAlias())) { 
             $dir_name = $svn->getCurrentBranch();
@@ -169,6 +174,11 @@ class SvnCommit
                 continue;
             }
             $file = trim($m[2]);
+
+            // Skip, if needed
+            if (preg_match("/^(\.apex|vendor|\.env)/", $file)) {
+                continue;
+            }
 
             if ($m[1] == '?') { 
                 $svn->add($file);

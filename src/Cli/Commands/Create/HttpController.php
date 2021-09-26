@@ -53,11 +53,15 @@ class HttpController implements CliCommandInterface
 
         // Get args
         $opt = $cli->getArgs(['route']);
-        $alias = $this->convert->case(($args[1] ?? ''), 'title');
+        $alias = $args[1] ?? '';
         $route = $opt['route'] ?? '';
 
+        // Convert alias
+        $parts = array_map( fn ($part) => $this->convert->case($part, 'title'), explode('/', $alias));
+        $alias = implode('/', $parts);
+
         // Check
-        if ($alias == '' || !preg_match("/^[a-zA-Z0-9_-]+$/", $alias)) { 
+        if ($alias == '' || !preg_match("/^[a-zA-Z0-9\/_\-]+$/", $alias)) { 
             $cli->error("Invalid alias specified, $alias");
             return;
         } elseif (file_exists(SITE_PATH . "/src/HttpControllers/$alias.php")) { 
@@ -65,8 +69,14 @@ class HttpController implements CliCommandInterface
             return;
         }
 
+        // Format filename
+        $filename = 'src/HttpControllers/' . $alias;
+        if (!str_ends_with($filename, '.php')) {
+            $filename .= '.php';
+        }
+
         // Create
-        list($dirs, $files) = $this->opus->build('http_controller', SITE_PATH, ['alias' => $alias]);
+        $file = $this->opus->buildClass('http_controller', $filename, '', SITE_PATH);
 
         // Add to components
         $registry = $this->cntr->make(Registry::class, ['pkg_alias' => $pkg->getAlias()]);
@@ -74,16 +84,17 @@ class HttpController implements CliCommandInterface
 
         // Add route definition, if route defined
         if ($route != '') { 
+            $alias = str_replace("/", "\\", $alias);
             $this->router_config->addRoute($route, $alias);
             $registry->add('routes', $route, $alias);
         }
 
         // Add to redis
-        $class_name = $this->opus_helper->pathToNamespace($files[0]);
+        $class_name = $this->opus_helper->pathToNamespace($file);
         $this->redis->sadd('config:interfaces:' . MiddlewareInterface::class, $class_name);
 
         // Success message
-        $cli->success("Successfully created new HTTP controller, which is now available at:", $files);
+        $cli->success("Successfully created new HTTP controller, which is now available at:", [$file]);
     }
 
     /**
