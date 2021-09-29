@@ -23,7 +23,7 @@ class SetMaster extends AbstractDbCommand implements CliCommandInterface
     {
 
         // Get database info
-        list($args, $opt) = $cli->getArgs(['dbname','user','password','host','port']);
+        $opt = $cli->getArgs(['dbname','user','password','host','port']);
         $dbinfo = $this->getDatabaseInfo($cli, $opt);
 
         // Add connection

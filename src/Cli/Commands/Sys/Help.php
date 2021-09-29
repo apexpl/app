@@ -32,6 +32,7 @@ class Help
         $help->addParam('crontab', 'Execute one or all pending crontab jobs.');
         $help->addParam('get-config', 'View one or more configuration variables.');
         $help->addParam('list', 'List all developer defined services or crontab jobs on system.');
+        $help->addParam('listen', 'Used for horizontal scaling, and will begin listening on RabbitMQ or other message broker for incoming RPC calls.');
         $help->addParam('reset-redis', 'Reset the redis keys for one or all packages.');
         $help->addParam('scan-classes', 'Scan all lisenters and index all listeners, child classes, and implementors.');
         $help->addParam('set-config', 'Set the value of a configuration variable.');

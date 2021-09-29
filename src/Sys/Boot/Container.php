@@ -96,7 +96,7 @@ class Container
             ReceiverInterface::class => \Apex\Cluster\Receiver::class, 
             \Apex\Syrus\Interfaces\LoaderInterface::class => \Apex\App\Adapters\SyrusAdapter::class, 
             \Apex\Syrus\Syrus::class => [\Apex\Syrus\Syrus::class, ['container_file' => null]], 
-            \Apex\Cluster\Cluster::class => [\Apex\Cluster\Cluster::class, ['container_file' => null, 'redis' => $redis, 'router_file' => '']],  
+            \Apex\Cluster\Cluster::class => [\Apex\Cluster\Cluster::class, ['container_file' => null, 'redis' => $redis, 'router_file' => SITE_PATH . '/boot/cluster.yml']],  
             \Apex\Svc\View::class => [\Apex\Svc\View::class, []], 
             \Apex\Migrations\Migrations::class => [\Apex\Migrations\Migrations::class, ['container_file' => null]], 
             NexmoConfig::class => [NexmoConfig::class, [
