@@ -61,6 +61,8 @@ class Import implements CliCommandInterface
         }
 
         // Get login credentials
+        $cli->sendHeader('Import Account');
+        $cli->send("To import your existing Apex account, please enter your login credentials below:\r\n\r\n");
         $this->username = $cli->getInput('Account Username: ');
         $this->password = $cli->getInput('Account Password: ', '', true);
 
@@ -102,16 +104,11 @@ class Import implements CliCommandInterface
             return;
         }
 
-        // Save the key
-        if (!$this->rsa_store->save($rsa->getAlias(), $rsa)) { 
-            $cli->error("Unable to save key, as a key with the alias '" . $rsa->getAlias() . "' already exists on this machine.");
-            return;
-        }
-
         // Check SSH key
         $ssh_alias = in_array($rsa->getSha256(), $allowed_hashes) ? $rsa->getAlias() : null;
         if ($ssh_alias === null) { 
             $hashes = $this->rsa_store->getSha256Hashes();
+
             foreach ($hashes as $chk_alias => $hash) { 
 
                 if (in_array($hash, $allowed_hashes)) { 
@@ -136,10 +133,10 @@ class Import implements CliCommandInterface
             'sign_key' => $rsa->getAlias(),
             'ssh_key' => $ssh_alias
         ]);
-
+echo "Created account\n";
         // Save account
         $this->acct_store->save($acct);
-
+echo "Saved account\n";
         // Send message
         $cli->send("Successfully imported the account $this->username with e-mail address $this->email, and you may begin using it as normal.\r\n\r\n");
     }
@@ -150,19 +147,17 @@ class Import implements CliCommandInterface
     private function requestKeyFile(Cli $cli, string $type):?RsaKey
     {
 
-        $pem_file = $cli->getInput("Location of " . $this->username . "'s $type File: ");
-        if (!file_exists($pem_file)) { 
-            $cli->error("No file exists at, $pem_file");
-            return null;
-        }
-        $private_key = file_get_contents($pem_file);
+        // Get file location
+        do {
 
-        // Get alias to save key as
-        $alias = $cli->getInput('Alias to save key as [default]: ', 'default');
-        if (!preg_match("/^[a-zA-Z0-9_-]+$/", $alias)) { 
-            $cli->error("Invalid alias specified, can not contain spaces or special characters.");
-            return null;
-        }
+            $pem_file = $cli->getInput("Location of " . $this->username . "'s $type File: ");
+            if (!file_exists($pem_file)) { 
+                $cli->error("No file exists at, $pem_file.  Please try again, or enter 'quit' to exit.\r\n\r\n");
+                continue;
+            }
+            break;
+        } while (true);
+        $private_key = file_get_contents($pem_file);
 
         // Unlock private key
         $password = null;
@@ -178,6 +173,20 @@ class Import implements CliCommandInterface
             } while (true);
         }
 
+        // Get alias to save key as
+            $filename = $type == 'PEM' ? $this->username : $this->username . '-ssh';
+        do {
+            $alias = $cli->getInput("Alias to save key as [$filename]: ", $filename);
+            if (!preg_match("/^[a-zA-Z0-9_-]+$/", $alias)) { 
+                $cli->error("Invalid alias specified, can not contain spaces or special characters.\r\n\r\n");
+                continue;
+            } elseif ($this->rsa_store->get($alias)) {
+            $cli->send("A key already exists with the alias, '$alias'.  Please choose another alias.\r\n\r\n");
+                continue;
+            }
+            break;
+        } while (true);
+
         // Create RSA key
         $rsa = $this->cntr->make(RsaKey::class, [
             'alias' => $alias,
@@ -186,10 +195,15 @@ class Import implements CliCommandInterface
             'private_key' => $private_key
         ]);
 
+        // Save the key
+        if (!$this->rsa_store->save($rsa->getAlias(), $rsa)) { 
+            $cli->error("Unable to save key, as a key with the alias '" . $rsa->getAlias() . "' already exists on this machine.\r\n\r\n");
+            return null;
+        }
+
         // Return
         return $rsa;
     }
-
 
     /**
      * Generate crt

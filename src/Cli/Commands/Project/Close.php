@@ -23,7 +23,7 @@ class Close implements CliCommandInterface
     /**
      * Process
      */
-    public function process(Cli $cli, array $args():void
+    public function process(Cli $cli, array $args):void
     {
 
         // Checks
@@ -46,7 +46,7 @@ class Close implements CliCommandInterface
         $this->redis->del('config:project');
 
         // Send message
-        $cli->send("Successfully closed the project, $info[$pkg_alias] and it is no longer under version control.\r\n\r\n");
+        $cli->send("Successfully closed the project, $info[pkg_alias] and it is no longer under version control.\r\n\r\n");
     }
 
     /**

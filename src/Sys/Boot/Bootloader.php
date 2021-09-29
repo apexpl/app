@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Sys\Boot;
 
-use Apex\App\Sys\ClientInfo;
+use Apex\App\Base\Client\ClientInfo;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Apex\Container\Interfaces\ApexContainerInterface;
 use Psr\Http\Message\{ServerRequestInterface, UriInterface};
@@ -12,7 +12,6 @@ use Apex\Db\Interfaces\DbInterface;
 use Apex\Armor\Auth\AuthSession;
 use Apex\Armor\Interfaces\ArmorUserInterface;
 use redis;
-
 
 /**
  * Boot loader for Apex, helps initialize the request, sanitize inputs, et tal.
@@ -111,14 +110,11 @@ class Bootloader extends RequestInputs
 
         // Sanitize inputs
         $this->inputs = [
-            //'get' => filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING) ?? [], 
-            //'post' => filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING) ?? [], 
-            //'cookie' => filter_input_array(INPUT_COOKIE, FILTER_SANITIZE_STRING) ?? [], 
             'get' => $_GET,
             'post' => $_POST,
             'cookie' => $_COOKIE,
             'files' => $_FILES,
-            'server' => filter_input_array(INPUT_SERVER, FILTER_SANITIZE_STRING) ?? [], 
+            'server' => $_SERVER,
             'path_params' => []
         ];
         $http_headers = function_exists('getAllHeaders') ? getAllHeaders() : [];

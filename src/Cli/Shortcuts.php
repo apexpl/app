@@ -22,6 +22,7 @@ class Shortcuts
         'search' => ['package', 'search'],
         'set-config' => ['sys', 'set-config'],
         'switch' => ['branch', 'sw'],
+        'pull' => ['package', 'pull'],
         'rm' => ['package', 'rm'],
             'test' => ['package', 'test'],
         'upgrade' => ['package', 'upgrade'],

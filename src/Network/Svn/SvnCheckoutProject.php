@@ -4,11 +4,10 @@ declare(strict_types = 1);
 namespace Apex\App\Network\Svn;
 
 use Apex\Svc\{Db, Container};
-use Apex\App\Cli\Cli;
-use Apex\App\Cli\Commands\Sys\ResetRedis;
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Sys\Utils\Io;
+use Symfony\Component\Process\Process;
 use redis;
 
 /**
@@ -28,9 +27,6 @@ class SvnCheckoutProject
 
     #[Inject(Io::class)]
     private Io $io;
-
-    #[Inject(ResetRedis::class)]
-    private ResetRedis $reset_redis;
 
     #[Inject(redis::class)]
     private redis $redis;
@@ -59,7 +55,7 @@ class SvnCheckoutProject
         // Transfer site_path files to prev_fs directory
         $files = scandir(SITE_PATH);
         foreach ($files as $file) {
-            if (in_array($file, ['.', '..', '.apex', '.svn'])) { 
+            if (in_array($file, ['.', '..', '.apex', '.svn', '.env', 'vendor'])) { 
                 continue;
             }
             rename(SITE_PATH . '/' . $file, "$prev_dir/$file");
@@ -68,7 +64,7 @@ class SvnCheckoutProject
         // Copy tmp_dir over to site_path
     $files = scandir($tmp_dir);
         foreach ($files as $file) {
-            if (in_array($file, ['.', '..'])) {
+            if (in_array($file, ['.', '..', 'vendor'])) {
                 continue;
             }
             rename("$tmp_dir/$file", SITE_PATH . '/' . $file);
@@ -83,7 +79,14 @@ class SvnCheckoutProject
         $db_adapter->transferStageToLocal($pkg, $dbinfo['password'], $dbinfo['host'], (int) $dbinfo['port']);
 
         // Reset redis
-        $this->reset_redis->process($this->cli, []);
+        $process = new Process(['./apex', 'sys', 'reset-redis']);
+        $process->setWorkingDirectory(SITE_PATH);
+        $process->run();
+
+        // Update composer
+        $process = new Process(['composer', 'update', '-n']);
+        $process->setWorkingDirectory(SITE_PATH);
+        $process->run();
 
         // Save to redis
         $dbinfo['pkg_alias'] = $pkg->getAlias();

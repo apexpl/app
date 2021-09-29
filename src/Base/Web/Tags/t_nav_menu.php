@@ -37,13 +37,16 @@ public function __construct(
 
         // Get menus
         $area = $this->app->getArea();
+        $prefix_links = $this->app->getClient()->getPrefixMenuLinks();
         if (!$menus = $this->getArea($area)) { 
-            return "<b>ERROR:</b> Unable to retrieve menu configuration from redis.  Please run 'apex reset_redis' from terminal to resolve.";
+            return '';
         }
 
         // Go through menus
         $html = '';
         foreach ($menus as $alias => $row) { 
+
+            // Check if viewable
             if (!$this->isViewable($row)) 
                 { continue; 
             }
@@ -51,12 +54,24 @@ public function __construct(
             // Get sub-menu html
             $sub_html = '';
             $sub_menus = $row['menus'] ?? [];
-            foreach ($sub_menus as $sub_alias => $sub_name) { 
-                $url = $area == 'public' ? "/$alias/$sub_alias" : "/$area/$alias/$sub_alias";
+                foreach ($sub_menus as $sub_alias => $srow) { 
+
+                // Check if viewable
+                if (!$this->isViewable($srow)) 
+                    { continue; 
+                }
+
+            // Get url
+                $url = $prefix_links === false ? "/$alias/$sub_alias" : "/$area/$alias/$sub_alias";
+                if ($srow['type'] == 'external') { 
+                    $url = $srow['url'];
+                }
+
+                // Add to html
                 $sub_html .= $this->tags->getSnippet('nav.menu', '', [
                     'url' => $url, 
-                    'icon' => '', 
-                    'name' => $sub_name
+                    'icon' => $srow['icon'], 
+                    'name' => $srow['name']
                 ]);
             }
 
@@ -64,7 +79,7 @@ public function __construct(
             $url = match($row['type']) { 
                 'parent' => '#', 
                 'external' => $row['url'], 
-                default => ($area == 'public' ? "/$alias" : "/$area/$alias")
+                default => ($prefix_links === false ? "/$alias" : "/$area/$alias")
             }; 
 
             // Set variables
@@ -76,7 +91,7 @@ public function __construct(
             ];
 
             // Add to html
-            $tag_name = $row['type'] == 'internal' ? 'nav.menu' : 'nav.' . $row['type'];
+            $tag_name = in_array($row['type'], ['internal', 'external']) ? 'nav.menu' : 'nav.' . $row['type'];
             $html .= $this->tags->getSnippet($tag_name, '', $vars);
         }
 

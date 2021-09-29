@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Network\Stores;
 
-use Apex\App\Exceptions\ApexYamlException;
+use Apex\App\Exceptions\{ApexYamlException, ApexAccountsStoreException};
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
 
@@ -22,7 +22,7 @@ class AbstractStore
         // Get dir
         if ($dir = GetEnv('APEX_CONFDIR')) { 
             return rtrim($dir, '/');
-        } elseif ($dir = GetEnv('apex.confdir')) { 
+        } elseif ($dir = GetEnv('apex_confdir')) { 
             return rtrim($dir, '/');
         } elseif (isset($_SERVER['HOME']) && is_dir($_SERVER['HOME'])) { 
             return rtrim($_SERVER['HOME'], '/') . '/.config/apex';

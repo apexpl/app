@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Sys\Install;
 
 use Apex\App\App;
+use Apex\Svc\Di;
 use Apex\App\Cli\Cli;
 use Apex\App\Cli\Helpers\{NetworkHelper, PackageHelper};
 use Apex\App\Network\Stores\ReposStore;
@@ -31,6 +32,10 @@ class YamlInstaller
         $file = file_exists(SITE_PATH . '/install.yml') ? 'install.yml' : 'install.yaml';
         $cli = new Cli();
         $cli->orig_argv = $argv;
+
+        // Check for import
+        $opt = $cli->getArgs();
+        $import = $opt['import'] ?? false;
 
         // Parse file
         try {
@@ -64,6 +69,12 @@ class YamlInstaller
 
         // Install any necessary repos
         self::installRepos($yaml, $app);
+
+        // Import account, if needed
+        if ($import === true) {
+            $cmd = Di::make(\Apex\App\Cli\Commands\Account\Import::class);
+            $cmd->process($cli, []);
+        }
 
         // Install packages
         self::installPackages($yaml, $app, $cli);

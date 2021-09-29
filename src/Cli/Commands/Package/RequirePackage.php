@@ -67,6 +67,7 @@ class RequirePackage implements CliCommandInterface
         if ($version != '') { 
             $args[] = $version;
         }
+        $args[] = '-n';
 
         // Execute process
         $process = new Process($args);

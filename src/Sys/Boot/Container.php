@@ -74,9 +74,17 @@ class Container
         \Apex\Container\Di::setContainer($cntr);
 
         // Get config variables
-        $debug_level = (int) ($redis->hget('config', 'core:debug_level') ?? 3);
-        if (!$reserved_usernames = $redis->hget('config', 'core:reserved_usernames') ?? '') { 
+        $debug_level = (int) ($redis->hget('config', 'core.debug_level') ?? 3);
+        $debug_level = 0;
+        if (!$reserved_usernames = $redis->hget('config', 'core.reserved_usernames') ?? '') { 
             $reserved_usernames = '';
+        }
+
+        // Check cache
+        $cache = $redis->hget('config', 'core.cache') ?? 0;
+        if ($cache != 1) {
+            $cntr->set(CacheItemPoolInterface::class, null);
+            $cntr->set(CacheInterface::class, null);
         }
 
         // Define items

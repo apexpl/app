@@ -111,7 +111,7 @@ class SvnInstall
 
         // Update composer, if needed
         if ($this->update_composer === true) { 
-            shell_exec("composer update");
+            shell_exec("composer update -n");
         }
 
         // Success

@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App;
 
 use Apex\App\Sys\Boot\Bootloader;
-use Apex\App\Sys\ClientInfo;
+use Apex\App\Base\Client\ClientInfo;
 use Apex\App\Interfaces\RouterInterface;
 use Apex\Armor\Interfaces\ArmorUserInterface;
 use Psr\Http\Message\{ServerRequestInterface, ResponseInterface, UriInterface};
@@ -261,9 +261,10 @@ class App extends Bootloader implements RequestHandlerInterface
     /**
      * Set area
      */
-    public function setArea(string $area):void
+    public function setArea(string $area, bool $prefix_menu_links = false):void
     {
         $this->client->setArea($area);
+        $this->client->setPrefixMenuLinks($prefix_menu_links);
     }
 
     /**

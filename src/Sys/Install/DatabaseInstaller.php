@@ -87,7 +87,14 @@ class DatabaseInstaller
         }
 
         // Get user input
-        if (!isset($opt['dbname'])) { 
+        if ($db_driver == 'SQLite' && !isset($opt['dbname'])) { 
+            $dbname = $cli->getInput('SQLite Filepath [./storage/apex.db]: ', './storage/apex.db');
+            if (!str_starts_with($dbname, '/')) {
+                $dbname = SITE_PATH . '/' . ltrim($dbname, './');
+            }
+            $info['dbname'] = $dbname;
+
+        } elseif (!isset($opt['dbname'])) {
             $info['dbname'] = $cli->getInput('Database Name: ');
             $info['user'] = $cli->getInput('Database Username: ');
             $info['password'] = $cli->getInput('Database Password: ');

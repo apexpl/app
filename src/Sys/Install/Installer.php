@@ -19,10 +19,16 @@ class Installer
     {
 
 
-        // Intialize Cli class
+        // Initialize Cli class
         global $argv;
         $cli = new Cli;
         $cli->orig_argv = $argv;
+
+        // Get args
+        $opt = $cli->getArgs(['image', 'project']);
+        $import = $opt['import'] ?? false;
+        $image = $opt['image'] ?? '';
+        $project = $opt['project'] ?? '';
 
         // Environment checks
         EnvChecks::check($cli);
@@ -45,10 +51,20 @@ class Installer
         // Complete install
         $app = ApexInstaller::complete($cli, $redis);
 
+        // Import account, if needed
+        if ($import === true) {
+            $cmd = $app->getContainer()->make(\Apex\App\Cli\Commands\Account\Import::class);
+            $cmd->process($cli, []);
+        }
+
         // Check for installation image
-        $opt = $cli->getArgs(['image']);
-        if (isset($opt['image']) && $opt['image'] != '') { 
-            ImageInstaller::install($opt['image'], $app, $cli);
+        if ($image != '') {
+            ImageInstaller::install($image, $app, $cli);
+
+        // Install project
+        } elseif ($project != '') {
+            $cmd = $app->getContainer()->make(\Apex\App\Cli\Commands\Project\Checkout::class, ['auto_confirm' => true]);
+            $cmd->process($cli, [$project]);
         }
 
         // Welcome message

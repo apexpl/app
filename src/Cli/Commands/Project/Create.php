@@ -149,6 +149,8 @@ class Create implements CliCommandInterface
             $cli->send("    Pass:  $dbinfo[password]\r\n");
             $cli->send("    Host:  $dbinfo[host]\r\n");
             $cli->send("    Port:  $dbinfo[port]\r\n\r\n");
+            $cli->send("Alternatively, you may easily connect to the remote SQL database anytime by running the following command without any arguments:\r\n\r\n");
+            $cli->send("    apex project sql\r\n\r\n");
         }
 
         // Add project info to redis

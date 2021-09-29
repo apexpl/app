@@ -106,8 +106,8 @@ class NetworkClient
         if (!$json = json_decode($res->getBody()->getContents(), true)) { 
             throw new ApexApiClientException("Did not receive valid JSON object from repository, got instead: " . $res->getBody());
         } elseif ($res->getStatusCode() != 200) {
-            $file = $json['data']['file'];
-            $line = $json['data']['line'];
+            $file = $json['data']['file'] ?? '';
+            $line = $json['data']['line'] ?? 0;
             throw new ApexApiClientException("Received a " . $res->getStatusCode() . " from API with message, $json[message] at file $file on line $line");
         }
 
@@ -122,6 +122,15 @@ class NetworkClient
     {
         $this->has_auth = true;
         $this->account = $account;
+        $this->signature = null;
+    }
+
+    /**
+     * Reset auth
+     */
+    public function resetAuth():void
+    {
+        $this->signature = null;
     }
 
 }

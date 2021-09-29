@@ -6,7 +6,10 @@ namespace Apex\App\Cli\Commands\Project;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\{AccountHelper, PackageHelper};
 use Apex\App\Network\Stores\ReposStore;
+use Apex\App\Network\Svn\SvnCheckoutProject;
+use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\NetworkClient;
+use Apex\Db\Mapper\ToInstance;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use redis;
 
@@ -28,8 +31,20 @@ class Checkout implements CliCommandInterface
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;
 
+    #[Inject(SvnCheckoutProject::class)]
+    private SvnCheckoutProject $svn_checkout;
+
     #[Inject(redis::class)]
     private redis $redis;
+
+    /**
+     * Construcotr
+     */
+    public function __construct(
+        private bool $auto_confirm = false
+    ) {
+
+    }
 
     /**
      * Process
@@ -43,8 +58,12 @@ class Checkout implements CliCommandInterface
         $repo_alias = $opt['repo'] ?? 'apex';
 
         // Perform checks
-        if ($project_alias = $redis->redis->hget('config:project', 'pkg_alias')) {
+        if ($project_alias = $this->redis->hget('config:project', 'pkg_alias')) {
             $cli->error("The project $project_alias is already created on this system.  You can only work with one project at a time.");
+            return;
+        } elseif ($pkg_serial == '' || !preg_match("/^[a-zA-Z0-9\-_]+\/[a-zA-Z0-9\-_]+$/", $pkg_serial)) {
+            $cli->error("Invalid project alias defined, $pkg_serial.  Must be formatted as author/project.");
+            return;
         }
 
         // Get repo
@@ -58,7 +77,7 @@ class Checkout implements CliCommandInterface
 
         // Check if user has write access to package
         $this->network->setAuth($acct);
-        $this->network->post($repo, 'repos/check', [
+        $res = $this->network->post($repo, 'repos/check', [
             'pkg_serial' => $pkg_serial,
             'is_install' => 1
         ]);
@@ -73,11 +92,18 @@ class Checkout implements CliCommandInterface
         }
 
         // Confirm checkout
-        $cli->send("WARNING:  This operation will permanently delete all code and database tables currently installed on this system, and replace it will the contents of the project.\r\n\r\n");
-        if (!$cli->getConfirm("Are you sure you want to continue?")) {
-            $cli->send("Ok, goodbye.\r\n\r\n");
-            return;
+        if ($this->auto_confirm === false) {
+            $cli->send("WARNING:  This operation will permanently delete all code and database tables currently installed on this system, and replace it will the contents of the project.\r\n\r\n");
+            if (!$cli->getConfirm("Are you sure you want to continue?")) {
+                $cli->send("Ok, goodbye.\r\n\r\n");
+                return;
+            }
         }
+
+        // Get package object
+        $res['repo_alias'] = $repo->getAlias();
+        $res['local_user'] = $acct->getUsername();
+        $pkg = ToInstance::map(LocalPackage::class, $res);
 
         // Checkout the project
         $this->svn_checkout->process($pkg, (bool) $res['has_staging'], $res['dbinfo']);

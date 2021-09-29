@@ -6,7 +6,7 @@ namespace Apex\App\Cli\Commands\Sys;
 use Apex\Svc\{Container, Convert, Db};
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Network\Stores\PackagesStore;
-use Apex\App\Sys\Utils\ResetRedis;
+use Apex\App\Sys\Utils\ScanClasses as ScanClassesCmd;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use redis;
 
@@ -31,8 +31,8 @@ class ResetRedis implements CliCommandInterface
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
 
-    #[Inject(ScanClasses::class)]
-    private ScanClasses $scanner;
+    #[Inject(ScanClassesCmd::class)]
+    private ScanClassesCmd $scanner;
 
     /**
      * Process

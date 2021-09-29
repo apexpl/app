@@ -1,10 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Apex\App\Sys;
+namespace Apex\App\Base\Client;
 
 use Apex\Armor\Auth\Operations\LookupIP;
-use Apex\App\Sys\Lists\CountryList;
+use Apex\App\Base\Lists\CountryList;
 
 /**
  * Geo IP address

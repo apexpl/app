@@ -212,8 +212,9 @@ class RsaKeyStore extends AbstractStore
         // Get keys
         $hashes = [];
         foreach ($this->list() as $alias) { 
-            $rsa = $this->get($alias);
-            $hashes[$alias] = $rsa->getSha256();
+            if (null !== ($rsa = $this->get($alias))) {
+                $hashes[$alias] = $rsa->getSha256();
+            }
         }
 
         // Return

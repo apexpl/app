@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Apex\App\Sys;
+namespace Apex\App\Base\Client;
 
 use Apex\App\Base\Lists\{CountryList, CurrencyList, TimezoneList, LanguageList};
 use Apex\App\Exceptions\ApexInvalidArgumentException;
@@ -25,6 +25,7 @@ class ClientInfo extends GeoIpAddress
         string $ip_address = '', 
         private string $user_agent = '', 
         private string $area = 'public', 
+        private bool $prefix_menu_links = false,
         private string $currency = 'USD', 
         private string $timezone = 'PST', 
         private string $language = 'en'
@@ -62,6 +63,14 @@ class ClientInfo extends GeoIpAddress
     public function getArea():string
     {
         return $this->area;
+    }
+
+    /**
+     * Get prefix menu links
+     */
+    public function getPrefixMenuLinks():bool
+    {
+        return $this->prefix_menu_links;
     }
 
     /**
@@ -197,6 +206,14 @@ class ClientInfo extends GeoIpAddress
     public function setArea(string $area):void
     {
         $this->area = $area;
+    }
+
+    /**
+     * Set prefix menu links
+     */
+    public function setPrefixMenuLinks(bool $prefix):void
+    {
+        $this->prefix_menu_links = $prefix;
     }
 
     /**

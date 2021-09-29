@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Pkg;
 
 use Apex\Svc\{Convert, Container, Db};
+use Apex\App\Cli\Cli;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\Models\{LocalAccount, LocalPackage, LocalRepo};
 use Apex\App\Network\NetworkClient;
@@ -11,6 +12,7 @@ use Apex\App\Network\Svn\SvnCommit;
 use Apex\App\Pkg\Helpers\Database\{mySQLAdapter, PostgreSQLAdapter};
 use Apex\Opus\Opus;
 use Apex\App\Sys\Utils\Io;
+use redis;
 
 /**
  * Project manager
@@ -27,6 +29,9 @@ class ProjectManager
     #[Inject(Db::class)]
     private Db $db;
 
+    #[Inject(Cli::class)]
+    private Cli $cli;
+
     #[Inject(Opus::class)]
     private Opus $opus;
 
@@ -41,6 +46,9 @@ class ProjectManager
 
     #[Inject(SvnCommit::class)]
     private SvnCommit $svn_commit;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     /**
      * Create
@@ -102,8 +110,9 @@ class ProjectManager
         }
 
         // Initial commit
-        $svn->setTarget('', 0, true, false, SITE_PATH);
-        $svn->exec(['commit'], ['-m', 'Initial commit'], true);
+        $this->cli->send("\r\n");
+        $this->cli->send("Performing initial commit, please be patient this may take a few minutes... \r\n");
+        $this->svn_commit->process($pkg, ['-m', 'Initial commit']);
 
         // Create staging environment, if needed
         if ($is_staging === true) {
@@ -120,11 +129,15 @@ class ProjectManager
     public function createStagingEnvironment(LocalPackage $pkg):array
     {
 
+        // Send message
+        $this->cli->send("Creating new staging environment, please be patient as this may take a few minutes...\r\n");
+
         // Get database driver
         $parts = explode("\\", $this->db::class);
         $db_driver = strtolower(array_pop($parts));
 
         // Send api call
+        $this->network->resetAuth();
         $res = $this->network->post($pkg->getRepo(), 'stage/create', [
             'pkg_serial' => $pkg->getSerial(),
             'db_driver' => $db_driver
@@ -157,6 +170,19 @@ class ProjectManager
 
         // Return
         return $res;
+    }
+
+    /**
+     * Delete
+     */
+    public function delete(LocalPackage $pkg):void
+    {
+
+        // Wipe from redis
+        $this->redis->del('config:project');
+
+        // Remove .svn directory
+        $this->io->removeDir(SITE_PATH . '/.svn');
     }
 
 }

@@ -26,7 +26,7 @@ class Pull implements CliCommandInterface
 
     /**
      * Process
- */
+     */
     public function process(Cli $cli, array $args):void
     {
 

@@ -135,7 +135,7 @@ class BaseModel implements BaseModelInterface
         if ($where_sql == '') { 
             $count = $db->getField("SELECT count(*) FROM " . static::$dbtable);
     } else { 
-        $count = $db->getField("SELECT * FROM " . static::$dbtable . " WHERE $where_sql", ...$args);
+        $count = $db->getField("SELECT count(*) FROM " . static::$dbtable . " WHERE $where_sql", ...$args);
     }
         return (int) $count;
     }

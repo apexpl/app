@@ -29,7 +29,6 @@ class Help
         $help->addParam('close', 'Close the existing project, and remove version control.');
         $help->addParam('create', 'Create a new project and optional staging environment.');
         $help->addParam('info', 'View basic information regarding the open project.');
-        $help->addParam('scan', 'Scan a package on the staging environment.');
         $help->addParam('sql', 'Execute a single SQL or connect to the staging environment database.');
         $help->addParam('sync', 'Activate / deactivate the SVN Sync feature, so this system will be automatically synced with all commits made to the project repository.');
 

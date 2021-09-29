@@ -68,7 +68,9 @@ class Convert
         $dst = $this->app->getClient()->getTimezoneDst();
 
         // Format date
-        $format = $this->app->config('core.date_format');
+        if (!$format = $this->app->config('core.date_format')) {
+            $format = 'F j, Y';
+        }
         $new_date = date($format, ($date->getTimestamp() + $offset));
 
         // Add time, if needed

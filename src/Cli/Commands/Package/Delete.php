@@ -5,7 +5,7 @@ namespace Apex\App\Cli\Commands\Package;
 
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
-use Apex\App\Pkg\PackageManager;
+use Apex\App\Pkg\{PackageManager, ProjectManager};
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 
@@ -20,6 +20,9 @@ class Delete implements CliCommandInterface
 
     #[Inject(PackageManager::class)]
     private PackageManager $pkg_manager;
+
+    #[Inject(ProjectManager::class)]
+    private ProjectManager $project_manager;
 
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;
@@ -52,6 +55,11 @@ class Delete implements CliCommandInterface
                 $cli->error("Unable to delete repository from SVN repository, aborting process.");
                 return;
             }
+        }
+
+        // Delete project, if needed
+        if ($pkg->getType() == 'project') { 
+            $this->project_manager->delete($pkg);
         }
 
         // Delete package

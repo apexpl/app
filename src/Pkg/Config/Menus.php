@@ -274,7 +274,7 @@ class Menus
 
         // Go through parent menus
         $menus = [];
-        $rows = $this->db->query("SELECT * FROM cms_menus WHERE area = %s AND is_active = 1 AND parent = '' ORDER BY order_num", $area);
+        $rows = $this->db->query("SELECT * FROM cms_menus WHERE area = %s AND is_active = %b AND parent = '' ORDER BY order_num", $area, true);
         foreach ($rows as $row) { 
 
             // Set vars
@@ -288,12 +288,20 @@ class Menus
             ];
 
             // Add sub-menus, if needed
-            $sub_rows = $this->db->getHash("SELECT alias,name FROM cms_menus WHERE area = %s AND parent = %s AND is_active = 1 ORDER BY order_num", $area, $row['alias']);
-            foreach ($sub_rows as $alias => $name) { 
+            $sub_rows = $this->db->query("SELECT * FROM cms_menus WHERE area = %s AND parent = %s AND is_active = %b ORDER BY order_num", $area, $row['alias'], true);
+            foreach ($sub_rows as $srow) {
                 if (!isset($vars['menus'])) {
                     $vars['menus'] = []; 
                 }
-                $vars['menus'][$alias] = $name;
+
+                $vars['menus'][$srow['alias']] = [
+                    'type' => $srow['type'], 
+                    'icon' => $srow['icon'],  
+                    'require_login' => (int) $srow['require_login'], 
+                    'require_nologin' => (int) $srow['require_nologin'], 
+                    'name' => $srow['name'], 
+                    'url' => $srow['url']
+                ];
             }
 
             // Add to menus

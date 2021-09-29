@@ -41,7 +41,12 @@ class Create implements CliCommandInterface
         // Get package
         if (!$pkg = $this->pkg_helper->get(($args[0] ?? ''))) { 
             return;
+        } elseif (!$pkg->isVersionController()) {
+            $cli->error("The package is not currently under version control, hence a release can not be added.  Please see 'apex help package checkout' for details.");
+            return;
         }
+
+        // Set variables
         $pkg_alias = $pkg->getAlias();
         $commit_args = $cli->getCommitArgs();
 
