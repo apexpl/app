@@ -148,7 +148,7 @@ class Installer
             }
 
             // Remove dir
-            rmdir($parent_dir);
+            //rmdir($parent_dir);
             $parent_dir = dirname($parent_dir);
         } while (true);
 
