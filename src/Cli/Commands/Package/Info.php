@@ -123,7 +123,6 @@ class Info implements CliCommandInterface
         // Return
         return $help;
     }
-    }
 
 }
 

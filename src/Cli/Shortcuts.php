@@ -11,24 +11,27 @@ class Shortcuts
 
     // Skip top level
     public static array $skip_top_level = [
+        'register' => ['account', 'register'],
         'add' => ['package', 'add'],
         'checkout' => ['package', 'checkout'],
         'commit' => ['package', 'commit'],
-        'crontab' => ['sys', 'crontab'],
-        'get-config' => ['sys', 'get-config'],
         'install' => ['package', 'install'],
-        'scan' => ['package', 'scan'],
-        'scan-listeners' => ['sys', 'scan-listeners'],
-        'search' => ['package', 'search'],
-        'set-config' => ['sys', 'set-config'],
-        'switch' => ['branch', 'sw'],
         'pull' => ['package', 'pull'],
+        'scan' => ['package', 'scan'],
+        'search' => ['package', 'search'],
         'rm' => ['package', 'rm'],
-            'test' => ['package', 'test'],
+        'test' => ['package', 'test'],
         'upgrade' => ['package', 'upgrade'],
+        'switch' => ['branch', 'switch'],
         'sql' => ['sys', 'sql'],
-        'svn' => ['sys', 'svn']
+        'svn' => ['sys', 'svn'],
+        'get-config' => ['sys', 'get-config'],
+        'set-config' => ['sys', 'set-config'],
+        'crontab' => ['sys', 'crontab'],
+        'listen' => ['sys', 'listen'],
+        'scan-classes' => ['sys', 'scan-classes']
     ];
+
     // Top-level shortcuts
     public static array $top_level = [
         'acct' => 'account',
@@ -46,7 +49,7 @@ class Shortcuts
         'account' => [
             'del' => 'delete',
             'list' => 'ls',
-            'ref' => 'register'
+            'reg' => 'register'
         ],
 
         'acl' => [
@@ -132,6 +135,43 @@ class Shortcuts
 
         // Return
         return $args;
+    }
+
+    /**
+     8 Get shortcuts
+     */
+    public static function get(string $first, string $second):array
+    {
+
+        // Check
+        $shortcuts = [];
+        $commands = self::$second_level[$first] ?? [];
+        $commands = array_flip($commands);
+
+        // Check if command exists
+        if (isset($commands[$second])) {
+
+            // Replace first argumant, if possible.
+            $top = array_flip(self::$top_level);
+            $tmp_first = $top[$first] ?? $first;
+
+            // Add to shortcuts
+            $shortcuts[] = $tmp_first . ' ' . $commands[$second];
+        }
+
+
+        // Check ship top level
+        foreach (self::$skip_top_level as $source => $dest) {
+
+            // Check
+            if ($dest[0] != $first || $dest[1] != $second) {
+                continue;
+            }
+            $shortcuts[] = $source;
+        }
+
+        // Return
+        return $shortcuts;
     }
 
 }

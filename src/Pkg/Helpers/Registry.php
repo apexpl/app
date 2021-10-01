@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Pkg\Helpers;
 
 use Apex\Svc\Convert;
+use Apex\App\Sys\Utils\Io;
 use Apex\App\Exceptions\ApexYamlException;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -16,6 +17,9 @@ class Registry
 
     #[Inject(Convert::class)]
     private Convert $convert;
+
+    #[Inject(Io::class)]
+    private Io $io;
 
     /**
      * Constructor
@@ -166,7 +170,7 @@ class Registry
         }
 
         // Rename and create symlink
-        rename($local_file, $svn_file);
+        $this->io->rename($local_file, $svn_file);
         symlink($svn_file, $local_file);
     }
 

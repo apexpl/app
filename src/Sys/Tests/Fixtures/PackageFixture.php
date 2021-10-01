@@ -9,6 +9,7 @@ use Apex\App\Pkg\PackageManager;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Sys\Tests\Fixtures\AccountFixture;
 use Apex\App\Sys\Tests\ApexTestCase;
+use Apex\App\Sys\Utils\Io;
 
 /**
  * Package fixture
@@ -27,6 +28,9 @@ class PackageFixture extends ApexTestCase
 
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
+
+    #[Inject(Io::class)]
+    private Io $io;
 
     /**
      * Create package
@@ -76,7 +80,7 @@ class PackageFixture extends ApexTestCase
         if (is_dir($svn_dir)) { 
             $local_dir = SITE_PATH . '/etc/' . $this->convert->case($pkg_alias, 'title');
             unlink($local_dir);
-            rename($svn_dir, $local_dir);
+            $this->io->rename($svn_dir, $local_dir);
         }
 
         // Delete

@@ -91,7 +91,7 @@ class ProjectManager
         $svn->exec(['checkout'], [$tmp_dir]); 
 
         // Rename local SVN directory
-        rename($tmp_dir . '/.svn', SITE_PATH . '/.svn');
+        $this->io->rename($tmp_dir . '/.svn', SITE_PATH . '/.svn');
         $this->io->removeDir($tmp_dir);
 
         // Save .svnignore file

@@ -54,7 +54,7 @@ class Installer
 
             // Rename directory, as needed
             if (is_dir("$svn_dir/$dir")) { 
-                rename("$svn_dir/$dir", $local_dir);
+                $this->io->rename("$svn_dir/$dir", $local_dir);
             } elseif (!is_dir($local_dir)) { 
                 mkdir($local_dir, 0755, true);
             }
@@ -136,7 +136,7 @@ class Installer
         }
 
         // Rename
-        rename($svn_file, $local_file);
+        $this->io->rename($svn_file, $local_file);
 
 // Check for and delete blank parent dirs
         $parent_dir = dirname($svn_file);

@@ -89,7 +89,9 @@ class ArmorAdapter implements AdapterInterface
         }
 
         // Get sender
-        $sender = $this->getUuid($this->db, $email->sender);
+        if (!$sender = $this->getUuid($this->db, $email->sender)) {
+            return;
+        }
 
         // Create e-mail message
         $msg = $this->cntr->make(EmailMessage::class, [

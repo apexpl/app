@@ -5,6 +5,7 @@ namespace Apex\App\Sys\Utils;
 
 use Apex\Svc\Debugger;
 use Apex\App\Exceptions\ApexIoException;
+use Symfony\Component\Process\Process;
 use ZipArchive;
 
 /**
@@ -150,6 +151,35 @@ class Io
 
         // Return
         return $dest;
+    }
+
+    /**
+     * Rename
+     */
+    public function rename(string $source, string $dest):void
+    {
+
+        // Create parent directory, if needed
+        if (!is_dir(dirname($dest))) {
+            mkdir(dirname($dest), 0755, true);
+        }
+
+        // Set args
+        $args = [
+            'mv',
+            $source,
+            $dest
+        ];
+
+        // Rename
+        $process = new Process($args);
+        $process->run();
+
+        // Check status
+        if ($process->isSuccessful() !== true) {
+            throw new ApexIoException("Unable to rename $source to $dest, error: " . $process->getErrorOutput());
+        }
+
     }
 
 }

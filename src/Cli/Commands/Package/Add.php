@@ -7,6 +7,7 @@ use Apex\Svc\Container;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Pkg\Helpers\Registry;
+use Apex\App\Sys\Utils\Io;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 
 /**
@@ -20,6 +21,9 @@ class Add implements CliCommandInterface
 
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
+
+    #[Inject(Io::class)]
+    private Io $io;
 
     /**
      * Process
@@ -60,7 +64,7 @@ class Add implements CliCommandInterface
             }
 
             // Rename
-            rename(SITE_PATH . '/' . $file, "$svn_dir/$file");
+            $this->io->rename(SITE_PATH . '/' . $file, "$svn_dir/$file");
             symlink("$svn_dir/$file", SITE_PATH . '/' . $file);
 
             // Add to registry

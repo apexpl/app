@@ -60,13 +60,8 @@ class Compiler
         }
         $svn_file = $this->rollback_dir . '/' . $svn_file;
 
-        // Create parent dir, if needed
-        if (!is_dir(dirname($svn_file))) { 
-            mkdir(dirname($svn_file), 0755, true);
-        }
-
         // Move file
-        rename($local_file, $svn_file);
+        $this->io->rename($local_file, $svn_file);
     }
 
     /**

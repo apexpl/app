@@ -172,7 +172,7 @@ class YamlInstaller
         $repo = $repo_store->get('apex');
 
         // Generate installation queue
-        foreach ($packages as $pkg_alias => $version) { 
+        foreach ($packages as $pkg_alias) { 
             $pkg_alias = $pkg_helper->getSerial($pkg_alias);
             if (!$pkg = $pkg_helper->checkPackageAccess($repo, $pkg_alias, 'can_read', true)) { 
                 $cli->error("You do not have access to download the package '$pkg_alias'");

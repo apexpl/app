@@ -296,7 +296,7 @@ class SvnUpgrade
             $this->rollback->addFile($pkg, $local_file, $file, $latest_version);
 
             // Rename file
-            rename($tmp_dir . '/' . $file, $local_file);
+            $this->io->rename($tmp_dir . '/' . $file, $local_file);
         }
 
         // Delete needed files

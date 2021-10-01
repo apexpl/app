@@ -117,18 +117,13 @@ class Rollback
             $local_file = $this->file_converter->toLocal($pkg, $file);
             $local_file = SITE_PATH . '/' . $local_file;
 
-            // Create parent directory, if needed
-            if (!is_dir(dirname($local_file))) { 
-                mkdir(dirname($local_file));
-            }
-
             // Delete existing file, if exists
             if (file_exists($local_file)) { 
                 unlink($local_file);
             }
 
             // Rename
-            rename("$rollback_dir/$file", $local_file);
+            $this->io->rename("$rollback_dir/$file", $local_file);
         }
 
         // Delete needed files

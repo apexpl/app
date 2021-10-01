@@ -41,7 +41,7 @@ class Create implements CliCommandInterface
         // Get package
         if (!$pkg = $this->pkg_helper->get(($args[0] ?? ''))) { 
             return;
-        } elseif (!$pkg->isVersionController()) {
+        } elseif (!$pkg->isVersionControlled()) {
             $cli->error("The package is not currently under version control, hence a release can not be added.  Please see 'apex help package checkout' for details.");
             return;
         }
@@ -74,14 +74,17 @@ class Create implements CliCommandInterface
         }
 
         // Check if release exists
+        $cli->send("Checking previous releases... ");
         $svn->setTarget('tags/' . $version);
         if ($svn->info() !== null) {
             $cli->error("The release already exists, v$version");
             return;
         }
+        $cli->send("done.\r\nScanning classes... ");
 
         // Scan classes
         $this->scan_classes->scan();
+        $cli->send("done.\r\nVerifying access... ");
 
         // Send API call
         $this->network->setAuth($pkg->getLocalAccount());
@@ -90,6 +93,7 @@ class Create implements CliCommandInterface
             'version' => $version,
             'is_breaking' => $is_breaking === true ? 1 : 0
         ]);
+        $cli->send("done.  Creating release, please wait a moment...\r\n\r\n");
 
         // Create release
         $old_dir = $svn->getCurrentBranch();

@@ -91,7 +91,7 @@ class RegistryCleaner
         }
 
         // Remove from registry
-        if (false === (array_search($http_controller, $this->registry['http_controllers']))) {
+        if (false === ($key = array_search($http_controller, $this->registry['http_controllers']))) {
             return;
         }
         array_splice($this->registry['http_controllers'], $key, 1);
@@ -111,14 +111,7 @@ class RegistryCleaner
             symlink("$this->svn_dir/ext/$file", SITE_PATH . '/' . $file);
             return;
         } elseif (is_dir(SITE_PATH . '/' . $file)) {
-
-            // Create parent dir, if needed
-            if (!is_dir(dirname("$this->svn_dir/ext/$file"))) {
-                mkdir(dirname("$this->svn_dir/ext/$file"), 0755, true);
-            }
-
-            // Transfer
-            rename(SITE_PATH . '/' . $file, "$this->svn_dir/ext/$file");
+            $this->io->rename(SITE_PATH . '/' . $file, "$this->svn_dir/ext/$file");
             symlink("$this->svn_dir/ext/$file", SITE_PATH . '/' . $file);
             return;
         }
@@ -154,13 +147,8 @@ class RegistryCleaner
                 return false;
             }
 
-            // Create parent svn directory, if needed
-            if (!is_dir(dirname("$this->svn_dir/$svn_file"))) {
-                mkdir(dirname("$this->svn_dir/$svn_file"), 0755, true);
-            }
-
             // Rename file, create link
-            rename(SITE_PATH . '/' . $local_file, "$this->svn_dir/$svn_file");
+            $this->io->rename(SITE_PATH . '/' . $local_file, "$this->svn_dir/$svn_file");
             symlink("$this->svn_dir/$svn_file", SITE_PATH . '/' . $local_file);
             return true;
         }

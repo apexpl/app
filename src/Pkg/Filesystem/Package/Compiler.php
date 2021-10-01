@@ -134,7 +134,7 @@ class Compiler
         } elseif (file_exists($svn_file)) { 
             unlink($local_file);
         } else { 
-            rename($local_file, $svn_file);
+            $this->io->rename($local_file, $svn_file);
         }
         symlink($svn_file, $local_file);
     }
@@ -152,13 +152,8 @@ class Compiler
             unlink($svn_file);
         }
 
-        // Ensure parent directory exists
-        if (!is_dir(dirname($svn_file))) { 
-            mkdir(dirname($svn_file), 0755, true);
-        }
-
         // Rename
-        rename($local_file, $svn_file);
+        $this->io->rename($local_file, $svn_file);
     }
 
     /**
@@ -186,7 +181,7 @@ class Compiler
         } while (true);
 
         // Rename
-        rename($local_file, $backup_file);
+        $this->io->rename($local_file, $backup_file);
 
     }
 

@@ -58,7 +58,7 @@ class SvnCheckoutProject
             if (in_array($file, ['.', '..', '.apex', '.svn', '.env', 'vendor'])) { 
                 continue;
             }
-            rename(SITE_PATH . '/' . $file, "$prev_dir/$file");
+            $this->io->rename(SITE_PATH . '/' . $file, "$prev_dir/$file");
         }
 
         // Copy tmp_dir over to site_path
@@ -67,7 +67,7 @@ class SvnCheckoutProject
             if (in_array($file, ['.', '..', 'vendor'])) {
                 continue;
             }
-            rename("$tmp_dir/$file", SITE_PATH . '/' . $file);
+            $this->io->rename("$tmp_dir/$file", SITE_PATH . '/' . $file);
         }
 
         // Get database adapter

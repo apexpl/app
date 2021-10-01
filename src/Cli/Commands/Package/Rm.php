@@ -7,6 +7,7 @@ use Apex\Svc\{Convert, Container};
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Pkg\Helpers\Registry;
+use Apex\App\Sys\Utils\Io;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 
 /**
@@ -20,6 +21,9 @@ class Rm implements CliCommandInterface
 
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
+
+    #[Inject(Io::class)]
+    private Io $io;
 
     /**
      * Process
@@ -72,7 +76,7 @@ class Rm implements CliCommandInterface
             if (is_link(SITE_PATH . '/' . $file)) { 
                 unlink(SITE_PATH . '/' . $file);
             }
-            rename("$svn_dir/$file", SITE_PATH . '/' . $file);
+            $this->io->rename("$svn_dir/$file", SITE_PATH . '/' . $file);
 
             $cli->send("Removed $file\r\n");
         }
