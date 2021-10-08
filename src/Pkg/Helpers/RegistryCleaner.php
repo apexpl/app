@@ -22,7 +22,6 @@ class RegistryCleaner
     // Properties
     private LocalPackage $pkg;
     private array $registry;
-    private string $svn_dir;
 
     /**
      * Clearn registry
@@ -30,14 +29,8 @@ class RegistryCleaner
     public function clean(LocalPackage $pkg):void
     {
 
-        // Check for SVN directory
-        if (!is_dir(SITE_PATH . '/.apex/svn/' . $pkg->getAlias())) {
-            return;
-        }
-
         // Get registry
         $this->registry = $pkg->getRegistry();
-        $this->svn_dir = SITE_PATH . '/.apex/svn/' . $pkg->getAlias();
         $this->pkg = $pkg;
 
         // Go through views
@@ -66,16 +59,21 @@ class RegistryCleaner
     private function checkView(string $view):void
     {
 
-        // Check files
-        if ($this->checkFile('views/html' . $view . '.html', true) === true || $this->checkFile('views/php/' . $view . '.php', true)) {
-                return;
-            }
+        // Initialize 
+        $html_file = SITE_PATH . '/views/html/' . $view . '/.html';
+        $php_file = SITE_PATH . '/views/php/' . $view . '.php';
+
+        // Check if files exist
+        if (file_exists($html_file) || file_exists($php_file)) {
+            return;
+        }
 
         // Remove from registry
         if (false === ($key = array_search($view, $this->registry['views']))) {
                 return;
         }
         array_splice($this->registry['views'], $key, 1);
+        $this->modified = true;
     }
 
     /**
@@ -85,8 +83,8 @@ class RegistryCleaner
     {
 
             // Check file
-        $local_file = 'src/HttpControllers/' . $http_controller . '.php';
-        if ($this->checkFile($local_file) === true) {
+        $local_file = SITE_PATH . '/src/HttpControllers/' . $http_controller . '.php';
+        if (file_exists($local_file)) {
             return;
         }
 
@@ -95,6 +93,7 @@ class RegistryCleaner
             return;
         }
         array_splice($this->registry['http_controllers'], $key, 1);
+        $this->modified = true;
     }
 
     /**
@@ -103,59 +102,20 @@ class RegistryCleaner
     private function checkExternalFile(string $file):void
     {
 
-        // Check for directory
-        $file = rtrim($file, '/');
-        if (is_dir("$this->svn_dir/ext/$file") && is_link(SITE_PATH . '/' . $file)) {
-            return;
-        } elseif (is_dir("$this->svn_dir/ext/$file")) {
-            symlink("$this->svn_dir/ext/$file", SITE_PATH . '/' . $file);
-            return;
-        } elseif (is_dir(SITE_PATH . '/' . $file)) {
-            $this->io->rename(SITE_PATH . '/' . $file, "$this->svn_dir/ext/$file");
-            symlink("$this->svn_dir/ext/$file", SITE_PATH . '/' . $file);
+        // Check if exists
+        $filepath = SITE_PATH . '/' . rtrim($file, '/');
+        if (file_exists($filepath) || is_dir($filepath)) {
             return;
         }
 
-        // Check file
-        $this->checkFile($file) === true;
-    }
-
-    /**
-     * Check file
-     */
-    private function checkFile(string $local_file, bool $is_registry = false):bool
-    {
-
-        // Check svn file
-        $svn_file = $this->file_converter->toSvn($this->pkg, $local_file, $is_registry);
-        if (file_exists("$this->svn_dir/$svn_file")) {
-
-            // Check for link
-            if (!is_link(SITE_PATH . '/' . $local_file)) { 
-                $this->io->removeFile("$this->svn_dir/$svn_file", true);
-                return false;
-            }
-            return true;
+        // Remove from registry
+        if (false === ($key = array_search($file, $this->registry['ext_files']))) {
+            return;
         }
-
-        // Check for local file
-        if (file_exists(SITE_PATH . '/' . $local_file)) { 
-
-            // Check for link
-            if (is_link(SITE_PATH . '/' . $local_file)) {
-                $this->io->removeFile(SITE_PATH . '/' . $local_file, true);
-                return false;
-            }
-
-            // Rename file, create link
-            $this->io->rename(SITE_PATH . '/' . $local_file, "$this->svn_dir/$svn_file");
-            symlink("$this->svn_dir/$svn_file", SITE_PATH . '/' . $local_file);
-            return true;
-        }
-
-        // Return false
-        return false;
+        array_splice($this->registry['ext_files'], $key, 1);
+        $this->modified = true;
     }
 
 }
+
 

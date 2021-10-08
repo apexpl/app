@@ -5,7 +5,7 @@ namespace Apex\App\Network\Svn;
 
 use Apex\App\Cli\Cli;
 use Apex\App\Network\Svn\{SvnRepo, SvnInventory};
-use Apex\App\Pkg\Filesystem\Package\{Compiler, Inventory};
+use Apex\App\Pkg\Filesystem\Package\{Compiler, Inventory, Diff};
 use Apex\App\Network\Sign\MerkleTreeBuilder;
 
 /**
@@ -25,6 +25,9 @@ class SvnCheckout
 
     #[Inject(Compiler::class)]
     private Compiler $compiler;
+
+    #[Inject(Diff::class)]
+    private Diff $diff;
 
     #[Inject(Cli::class)]
     private Cli $cli;
@@ -65,6 +68,14 @@ class SvnCheckout
         $num = substr_count($res, "\nA");
         $this->cli->send("done ($num files / directories).\r\n");
 
+        // Handle diff, as needed
+        $diff = $this->svn_inventory->getDiffFiles();
+        if ($handle_diff == 'use_remote') {
+            $this->diff->processRemote($pkg, $diff);
+        } elseif ($handle_diff == 'rename') {
+            $this->diff->processRename($pkg, $diff);
+        }
+
         // Compile package
         $this->compiler->compile($pkg, $handle_diff, true);
         return true;
@@ -104,9 +115,5 @@ class SvnCheckout
     }
 
 }
-
-
-
-
 
 

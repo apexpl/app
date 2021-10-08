@@ -46,7 +46,7 @@ class Sync implements CliCommandInterface
 
         // Greeting
         $cli->sendHeader('SVN Sync Configuration');
-        $this->send("By enabling the SVN Sync feature, this system will be open to API calls so when successful commits with passed unit tests are performed against the project's repository, this system will be automatically updated with the commits and always in-sync with the repository.  Please use this feature with caution, as it will do a 'pull' for every successful commit to the repository.\r\n\r\n");
+        $cli->send("By enabling the SVN Sync feature, this system will be open to API calls so when successful commits with passed unit tests are performed against the project's repository, this system will be automatically updated with the commits and always in-sync with the repository.  Please use this feature with caution, as it will do a 'pull' for every successful commit to the repository.\r\n\r\n");
 
         // Check to enable
         $enabled = $cli->getConfirm('Enable SVN Sync on this system?') === true ? 1 : 0;

@@ -235,27 +235,30 @@ class App extends Bootloader implements RequestHandlerInterface
     /**
      * Set uuid
      */
-    public function setUuid(string $uuid):void
+    public function setUuid(?string $uuid):void
     {
+        if ($uuid === null) {
+            $uuid = '';
+        }
         $this->client->setUuid($uuid);
     }
 
     /**
      * Set auth session
      */
-    public function setSession(AuthSession $session):void
+    public function setSession(?AuthSession $session):void
     {
         $this->session = $session;
-        $this->setUuid($session->getUuid());
+        $this->setUuid($session?->getUuid());
     }
 
     /**
      * Set user
      */
-    public function setUser(ArmorUserInterface $user):void
+    public function setUser(?ArmorUserInterface $user):void
     {
         $this->user = $user;
-        $this->setUuid($user->getUuid());
+        $this->setUuid($user?->getUuid());
     }
 
     /**

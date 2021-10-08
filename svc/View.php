@@ -3,9 +3,10 @@ declare(strict_types = 1);
 
 namespace Apex\Svc;
 
-use Apex\Svc\{App, Container};
+use Apex\Svc\{App, Container, Db};
 use Apex\Syrus\Render\Templates;
 use Apex\Syrus\Parser\{Parser, VarContainer, Common};
+use Apex\Syrus\Render\Tags;
 use Psr\Http\Message\UriInterface;
 use Apex\Syrus\Exceptions\SyrusTemplateNotFoundException;
 
@@ -20,6 +21,9 @@ final class View extends \Apex\Syrus\Syrus
 
     #[Inject(Container::class)]
     private Container $cntr;
+
+    #[Inject(Db::class)]
+    private Db  $db;
 
     // Properties
     private string $javascript = '';
@@ -86,9 +90,65 @@ final class View extends \Apex\Syrus\Syrus
             'path' => $this->app->getPath()
         ];
 
-        // Add vars
+        // Set site variables
+        $site = [
+            'name' => $this->app->config('core.site_name'),
+            'address' => $this->app->config('core.site_address'),
+            'address2' => $this->app->config('core.site_address2'),
+            'email' => $this->app->config('core.site_email'),
+            'phone' => $this->app->config('core.site_phone'),
+            'tagline' => $this->app->config('core.site_tagline'),
+            'about' => $this->app->config('core.site_about'),
+            'facebook' => $this->app->config('core.site_facebook'),
+            'twitter' => $this->app->config('core.site_twitter'),
+            'instagram' => $this->app->config('core.site_instagram'),
+            'linkedin' => $this->app->config('core.site_linkedin'),
+            'youtube' => $this->app->config('core.site_youtube'),
+            'reddit' => $this->app->config('core.site_reddit'),
+            'github' => $this->app->config('core.site_github')
+        ];
+
+        // Assign vars
         $this->assign('', $vars);
+        $this->assign('site', $site);
         $this->assign('config', $this->app->getAllConfig());
+
+        // Get message counters
+        $this->getMessageCounters();
+    }
+
+    /**
+     * Get message counters
+     */
+    private function getMessageCounters():void
+    {
+
+        // Set initial vars
+        $counters = [
+            'total_alerts' => 0,
+            'unread_alerts' => 0,
+            'total_messages' => 0,
+            'unread_messages' => 0
+        ];
+
+        // Check if authenticated
+        if (!$this->app->isAuth()) {
+            $this->assign('', $counters);
+            return;
+        }
+
+        // Go through totals
+        $rows = $this->db->query("SELECT is_read,type,count(*) total FROM alerts WHERE uuid = %s GROUP BY type,is_read", $this->app->getUuid());
+        foreach ($rows as $row) {
+            $type = $row['type'] . 's';
+            $counters['total_' . $type] += $row['total'];
+            if ((bool) $row['is_read'] === false) {
+                $counters['unread_' . $type] += $row['total'];
+            }
+        }
+
+        // Assign
+        $this->assign('', $counters);
     }
 
     /**
@@ -120,8 +180,9 @@ final class View extends \Apex\Syrus\Syrus
         $html = str_replace("</head>", $js, $html);
 
         // Add modal HTML
-        //$modal = $this->html_tags->get_tag('modal');
-        //$html = str_replace("<body>", "<body>\n\n$modal\n", $html);
+        $tags = $this->cntr->make(Tags::class);
+        $modal = $tags->getSnippet('modal', '', []);
+        $html = str_replace("<body>", "<body>\n\n$modal\n", $html);
 
         // Return
         return $html;

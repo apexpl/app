@@ -35,17 +35,24 @@ class Compiler
             return;
         }
 
-
         // Set variables
         $pkg_alias = $pkg->getAlias();
         $alias = $pkg->getAliasTitle();
-        $this->handle_diff = $handle_diff;
         $this->verbose = $verbose;
 
         // Check local dir
         $svn_dir = SITE_PATH . '/.apex/svn/' . $pkg_alias;
         if (!is_dir($svn_dir)) { 
             throw new ApexCompilerException("Unable to complete initial compile of package '$pkg_alias', as the local SVN directory does not exist.  Please checkout the package first.");
+        }
+
+        // Delete existing
+        $files = scandir($svn_dir);
+        foreach ($files as $file) {
+            if (in_array($file, ['.', '..', '.svn'])) {
+                continue;
+            }
+            $this->io->rm("$svn_dir/$file");
         }
 
         // Move base dirs
@@ -111,11 +118,7 @@ class Compiler
         $svn_file = rtrim($svn_file, '/');
 
         // Skip, if needed
-        if (is_link($local_file) && readlink($local_file) == $svn_file) { 
-            return;
-        } elseif (is_link($local_file)) { 
-            throw new ApexCompilerException("Found invalid link upon compiling package.  The link $local_file links to " . readlink($local_file) . ", but should be linking to $svn_file");
-        } elseif ( (!file_exists($local_file)) && (!is_dir($local_file)) ) { 
+        if ( (!file_exists($local_file)) && (!is_dir($local_file)) ) { 
             return;
         }
 
@@ -124,65 +127,8 @@ class Compiler
             mkdir(dirname($svn_file), 0755, true);
         }
 
-        // Handle diffs, if needed
-        if ($this->handle_diff == 'use_local') { 
-            $this->renameLocalToSvn($local_file, $svn_file);
-        } elseif ($this->handle_diff == 'rename') { 
-            $this->backupLocalFile($local_file);
-        } elseif (is_dir($svn_file)) { 
-            $this->io->removeDir($local_file);
-        } elseif (file_exists($svn_file)) { 
-            unlink($local_file);
-        } else { 
-            $this->io->rename($local_file, $svn_file);
-        }
-        symlink($svn_file, $local_file);
-    }
-
-    /**
-     * Rename local to SVN
-     */
-    private function renameLocalToSvn(string $local_file, string $svn_file):void
-    {
-
-        // Delete from SVN, if needed
-        if (is_dir($local_file) && is_dir($svn_file)) { 
-            $this->io->removeDir($svn_file);
-        } elseif (file_exists($local_file) && file_exists($svn_file)) { 
-            unlink($svn_file);
-        }
-
-        // Rename
-        $this->io->rename($local_file, $svn_file);
-    }
-
-    /**
-     * Backup local file
-     */
-    private function backupLocalFile(string $local_file):void
-    {
-
-
-        // Get filename
-        $x=1;
-        $backup_file = $local_file . '.bak';
-        do { 
-
-            if (is_dir($local_file) && is_dir($backup_file)) { 
-                $x++;
-                $backup_file = $local_file . '.bak' . $x;
-            } elseif (file_exists($local_file) && file_exists($backup_file)) { 
-                $x++;
-                $backup_file = $local_file . '.bak' . $x;
-            } else { 
-                break;
-            }
-
-        } while (true);
-
-        // Rename
-        $this->io->rename($local_file, $backup_file);
-
+        // Copy
+        $this->io->copy($local_file, $svn_file);
     }
 
 }

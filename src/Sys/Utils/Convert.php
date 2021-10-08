@@ -150,9 +150,37 @@ class Convert
         return (string) $word;
     }
 
+    /**
+     * Last seen
+     */
+    public function lastSeen(int $secs):string
+    {
+
+        // Initialize
+        $seen = 'Unknown';
+        $orig_secs = $secs;
+        $secs = (time() - $secs);
+
+        // Check last seen
+        if ($secs < 20) {
+            $seen = 'Just Now';
+        } elseif ($secs < 60) {
+            $seen = $secs . ' secs ago';
+        } elseif ($secs < 3600) {
+            $mins = floor($secs / 60);
+            $seen = $mins . ' mins ' . ($secs - ($mins * 60)) . ' secs ago';
+        } elseif ($secs < 86400) { 
+            $hours = floor($secs / 3600);
+            $mins = floor(($secs - ($hours * 3600)) / 60);
+            $seen = $hours . ' hours ' . $mins . ' mins ago';
+        } else { 
+            $seen = date('D M dS H:i', $orig_secs);
+        }
+
+        // Return
+        return $seen;
+    }
 
 }
-
-
 
 

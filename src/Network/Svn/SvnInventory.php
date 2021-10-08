@@ -16,6 +16,8 @@ class SvnInventory extends SvnClient
     #[Inject(Cli::class)]
     protected Cli $cli;
 
+    // Properties
+    private array $diff = [];
 
     /**
      * Get inventory
@@ -44,17 +46,17 @@ class SvnInventory extends SvnClient
 
         // Get difference
         $inv = $this->get($pkg);
-        $diff = array_diff_assoc($inv, $inv_c);
+        $this->diff = array_diff_assoc($inv, $inv_c);
 
         // Check diff
-        if (count($diff) == 0) { 
-            return 'use_remote';
+        if (count($this->diff) == 0) { 
+            return 'use_local';
         }
 
         // List differences
         $this->cli->send("\r\n");
         $this->cli->send("The following files are out of sync between the repository and local machine:\r\n\r\n");
-        foreach ($diff as $file => $hash) { 
+        foreach ($this->diff as $file => $hash) { 
             $this->cli->send("    $file\r\n");
         }
         $this->cli->send("\r\n");
@@ -73,6 +75,14 @@ class SvnInventory extends SvnClient
             $this->cli->send("Ok, goodbye.\r\n\r\n");
         }
         return $option;
+    }
+
+    /**
+     * Get diff files
+     */
+    public function getDiffFiles():array
+    {
+        return $this->diff;
     }
 
 }

@@ -55,7 +55,7 @@ class t_boxlist implements TagInterface
         $rows = $this->db->query("SELECT * FROM internal_boxlists WHERE alias = %s ORDER BY order_num", $alias);
         foreach ($rows as $row) { 
             $item_html .= $this->tags->getSnippet('boxlist.item', $row['description'], [
-                'href' => $row['href'],
+                'href' => '/' . ltrim($row['href'], '/'),
                 'title' => $row['title']
             ]);
         }

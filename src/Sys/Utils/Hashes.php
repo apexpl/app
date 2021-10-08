@@ -99,7 +99,10 @@ class Hashes
         $html = '';
 
         // Hash
-        if ($source[0] == 'hash') { 
+        if ($source[0] == 'hash') {
+            if (count($source) < 3) {
+                throw new \Exception("Invalid data source, $data_source");
+            }
             $hash_alias = $source[1] . '.' . $source[2];
             $html = $this->createOptions($hash_alias, $value, $form_field, $form_name);
 

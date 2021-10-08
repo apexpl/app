@@ -75,6 +75,12 @@ class HttpController implements CliCommandInterface
             $filename .= '.php';
         }
 
+        // Create parent directory, if needed
+        $filepath = SITE_PATH . '/' . $filename;
+        if (!is_dir(dirname($filepath))) {
+            mkdir(dirname($filepath), 0755, true);
+        }
+
         // Create
         $file = $this->opus->buildClass('http_controller', $filename, '', SITE_PATH);
 

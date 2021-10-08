@@ -53,9 +53,6 @@ class Registry
 
         // Save yaml file
         $this->save($yaml);
-
-        // Check version control, add to global registry
-        $this->checkVersionControl($type, $key, $value);
     }
 
     /**
@@ -122,56 +119,6 @@ class Registry
         // Save file
         $header = "\n##########\n# Components Registry\n#\n# This file is auto-generated, and please do not modify unless you know what you are doing.\n##########\n\n";
         file_put_contents($yaml_file, $header . Yaml::dump($yaml));
-    }
-
-    /**
-     * Check version control
-     */
-    private function checkVersionControl(string $type, string $key, ?string $value = null):void
-    {
-
-        // Check svn dir
-        $svn_dir = SITE_PATH . '/.apex/svn/' . $this->pkg_alias;
-        if (!is_dir($svn_dir)) { 
-            return;
-        }
-
-        // View
-        if ($type == 'views') { 
-            $this->doSvnFile(SITE_PATH . '/views/html/' . $key . '.html', "$svn_dir/views/html/$key.html");
-            $this->doSvnFile(SITE_PATH . '/views/php/' . $key . '.php', "$svn_dir/views/php/$key.php");
-        } elseif ($type == 'http_controllers') { 
-            $this->doSvnFile(SITE_PATH . '/src/HttpControllers/' . $key . '.php', "$svn_dir/share/HttpControllers/$key.php");
-        }
-
-    }
-
-    /**
-     * Check and transfer SVN file as needed
-     */
-    private function doSvnFile(string $local_file, string $svn_file):void
-    {
-
-        // Initial checks
-        if (!file_exists($local_file)) { 
-            return;
-        }
-
-        // Create parent dir, if needed
-        if (!is_dir(dirname($svn_file))) { 
-            mkdir(dirname($svn_file), 0755, true);
-        }
-
-        // Process, as needed
-        if (is_link($local_file) && readlink($local_file) == $svn_file) { 
-            return;
-        } elseif (file_exists($svn_file)) { 
-            unlink($svn_file);
-        }
-
-        // Rename and create symlink
-        $this->io->rename($local_file, $svn_file);
-        symlink($svn_file, $local_file);
     }
 
 }

@@ -182,6 +182,60 @@ class Io
 
     }
 
+    /**
+     * Copy
+     */
+    public function copy(string $source, string $dest):void
+    {
+
+        // Create parent directory, if needed
+        if (!is_dir(dirname($dest))) {
+            mkdir(dirname($dest), 0755, true);
+        }
+
+        // Set args
+        $args = [
+            'cp',
+            '-R',
+            $source,
+            $dest
+        ];
+
+        // Copy
+        $process = new Process($args);
+        $process->run();
+
+        // Check status
+        if ($process->isSuccessful() !== true) {
+            throw new ApexIoException("Unable to copy $source to $dest, error: " . $process->getErrorOutput());
+        }
+
+    }
+
+    /**
+     * rm
+     */
+    public function rm(string $source):void
+    {
+
+        // Set args
+        $args = [
+            'rm',
+            '-rf',
+            $source
+        ];
+
+        // Copy
+        $process = new Process($args);
+        $process->run();
+
+        // Check status
+        if ($process->isSuccessful() !== true) {
+            throw new ApexIoException("Unable to remove $source, error: " . $process->getErrorOutput());
+        }
+
+    }
+
 }
 
 

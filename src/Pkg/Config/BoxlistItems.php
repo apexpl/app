@@ -48,7 +48,7 @@ class BoxlistItems
                     'position' => $position,
                     'title' => $vars['title'],
                     'description' => $vars['description']
-                ]);
+                ], 'id = %i', $row['id']);
                 continue;
             }
 

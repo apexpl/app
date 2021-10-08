@@ -63,10 +63,6 @@ class Add implements CliCommandInterface
                 mkdir(dirname("$svn_dir/$file"), 0755, true);
             }
 
-            // Rename
-            $this->io->rename(SITE_PATH . '/' . $file, "$svn_dir/$file");
-            symlink("$svn_dir/$file", SITE_PATH . '/' . $file);
-
             // Add to registry
             $registry->add('ext_files', $file);
             $cli->send("Added $file\r\n");
