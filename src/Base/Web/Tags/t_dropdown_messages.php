@@ -36,6 +36,8 @@ class t_dropdown_messages implements TagInterface
         // Check if authenticated
         if (!$this->app->isAuth()) {
             return '';
+        } elseif (null === ($user = $this->app->getUser())) {
+            return null;
         }
 
         // Get alerts

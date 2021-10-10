@@ -36,7 +36,10 @@ class t_dropdown_alerts implements TagInterface
         // Check if authenticated
         if (!$this->app->isAuth()) {
             return '';
+        } elseif (null === ($user = $this->app->getUser())) {
+            return '';
         }
+
 
         // Get alerts
         $rows = $this->alerts->list($this->app->getUser());
