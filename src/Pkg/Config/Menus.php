@@ -39,6 +39,12 @@ class Menus
             return;
         }
 
+        // Clear necessary menus
+        $clear_menus = $yaml['clear_menus'] ?? [];
+        foreach ($clear_menus as $area) {
+            $this->db->query("DELETE FROM cms_menus WHERE area = %s", $area);
+        }
+
         // Initialize
         $menus = $yaml['menus'] ?? [];
         list($done, $reorder) = [[], []];
