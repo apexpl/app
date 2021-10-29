@@ -162,7 +162,7 @@ class YamlInstaller
     {
 
         // Initialize
-        $install_queue = [];
+        list($install_queue, $versions) = [[], []];
         $packages = $yaml['packages'] ?? [];
         $pkg_helper = $app->getContainer()->make(PackageHelper::class);
         $svn_install = $app->getContainer()->make(SvnInstall::class);
@@ -172,21 +172,27 @@ class YamlInstaller
         $repo = $repo_store->get('apex');
 
         // Generate installation queue
-        foreach ($packages as $pkg_alias) { 
+        foreach ($packages as $pkg_alias => $version) { 
             $pkg_alias = $pkg_helper->getSerial($pkg_alias);
             if (!$pkg = $pkg_helper->checkPackageAccess($repo, $pkg_alias, 'can_read', true)) { 
                 $cli->error("You do not have access to download the package '$pkg_alias'");
                 continue;
             }
             $install_queue[] = $pkg;
+            if (in_array($version, ['*', 'latest'])) {
+                $versions[$pkg_alias] = '';
+            } else {
+                $versions[$pkg_alias] = $version;
+            }
         }
 
         // Go through install queue
         foreach ($install_queue as $pkg) { 
+            $version = $versions[$pkg->getAlias()] ?? '';
 
             // Install
             $svn = $pkg->getSvnRepo();
-            $svn_install->process($svn);
+            $svn_install->process($svn, $version);
 
             // Success message
             $cli->send("Successfully installed the package, " . $pkg->getAlias() . ".\r\n\r\n");

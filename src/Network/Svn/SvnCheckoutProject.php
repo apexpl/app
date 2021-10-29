@@ -70,6 +70,11 @@ class SvnCheckoutProject
             $this->io->rename("$tmp_dir/$file", SITE_PATH . '/' . $file);
         }
 
+        // Create /storage/ directory, if needed
+        if (!is_dir(SITE_PATH . '/storage/logs')) {
+            mkdir(SITE_PATH . '/storage/logs', 0755, true);
+        }
+
         // Get database adapter
         $parts = explode("\\", $this->db::class);
         $adapter_class = "Apex\\App\\Pkg\\Helpers\\Database\\" . array_pop($parts) . "Adapter";

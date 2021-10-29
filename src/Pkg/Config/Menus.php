@@ -251,7 +251,7 @@ class Menus
     /**
      * Sync redis 
      */
-    private function syncRedis():void
+    public function syncRedis():void
     {
 
         // Delete existing from redis

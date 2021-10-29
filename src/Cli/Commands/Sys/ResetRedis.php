@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Commands\Sys;
 use Apex\Svc\{Container, Convert, Db};
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Network\Stores\PackagesStore;
+use Apex\App\Pkg\Config\Menus;
 use Apex\App\Sys\Utils\ScanClasses as ScanClassesCmd;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use redis;
@@ -68,6 +69,10 @@ class ResetRedis implements CliCommandInterface
 
         // Scan classes
         $this->scanner->scan();
+
+        // Sync menus with redis
+        $menus = $this->cntr->make(Menus::class, ['pkg_alias' => 'core']);
+        $menus->syncRedis();
 
         // Success
         $cli->send("Successfully reset redis on all necessary packages.\r\n\r\n");

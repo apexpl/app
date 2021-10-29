@@ -95,7 +95,7 @@ class ProjectManager
         $this->io->removeDir($tmp_dir);
 
         // Save .svnignore file
-        file_put_contents(SITE_PATH . '/.svnignore', "vendor\n.apex\n.env\n");
+        file_put_contents(SITE_PATH . '/.svnignore', "vendor\n.apex\n.env\nstorage\n");
         $svn->setTarget('trunk', 0, true, false, SITE_PATH);
 
         // Add necessary files / dirs
@@ -154,6 +154,7 @@ class ProjectManager
         $dbadapter->transferLocalToStage($pkg, $res['db_password'], $res['db_host'], (int) $res['db_port']);
 
         // Finalize
+        $this->network->resetAuth();
         $this->network->post($pkg->getRepo(), 'stage/finalize', [
             'pkg_serial' => $pkg->getSerial()
         ]);
