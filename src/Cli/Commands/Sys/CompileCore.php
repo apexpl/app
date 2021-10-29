@@ -82,6 +82,7 @@ class CompileCore implements CliCommandInterface
             'public/.htaccess',
             'public/robots.txt',
             'public/themes/default',
+            'tests/Readme.md',
             'src/HttpControllers/PublicSite.php',
             'views/html/index.html',
             'views/html/404.html',
