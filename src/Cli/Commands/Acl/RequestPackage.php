@@ -40,7 +40,7 @@ class RequestPackage implements CliCommandInterface
         // Initialize
         $opt = $cli->getArgs(['repo']);
         $pkg_serial = $args[0] ?? '';
-        $role = $args[1] ?? '';
+        $role = $args[1] ?? 'team';
         $repo_alias = $opt['repo'] ?? 'apex';
 
         // Perform checks

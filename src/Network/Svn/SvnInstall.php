@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Network\Svn;
 
-use Apex\Svc\Container;
+use Apex\Svc\{App, Container};
 use Apex\App\Cli\Cli;
 use Apex\App\Sys\Utils\{Io, SiteConfig, ScanClasses};
 use Apex\App\Network\Svn\SvnExport;
@@ -24,6 +24,9 @@ class SvnInstall
 
     #[Inject(Cli::class)]
     private Cli $cli;
+
+    #[Inject(App::class)]
+    private App $app;
 
     #[Inject(Container::class)]
     private Container $cntr;
@@ -96,8 +99,10 @@ class SvnInstall
         $this->pkg_store->save($pkg);
 
         // Initial migration
-        $this->cli->send("Performing initial migration... ");
+        if ($this->app->isSlave() !== true) {
+            $this->cli->send("Performing initial migration... ");
             $this->migration->install($pkg);
+        }
 
         // Install dependencies
         $this->cli->send("done.\r\nInstalling any needed dependencies... ");
@@ -176,11 +181,15 @@ class SvnInstall
         $registry = $pkg->getRegistry();
         $yaml = $pkg->getConfig();
 
-        // Install e-mail notifications
-        $this->email_notifications->install($yaml);
+        // Check for slave server
+        if ($this->app->isSlave() !== true) {
 
-        // Install dashboard items
-        $this->dashboard_items->install($pkg->getAlias());
+            // Install e-mail notifications
+            $this->email_notifications->install($yaml);
+
+            // Install dashboard items
+            $this->dashboard_items->install($pkg->getAlias());
+        }
 
         // Go through routes
         $routes = $registry['routes'] ?? [];

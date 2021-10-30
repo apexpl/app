@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Network\Svn;
 
+use Apex\Svc\App;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Cli\Cli;
 use Apex\App\Network\Svn\{SvnChangelog, SvnFileConverter};
@@ -20,6 +21,9 @@ use Apex\Migrations\Handlers\Installer;
  */
 class SvnUpgrade
 {
+
+    #[Inject(App::class)]
+    private App $app;
 
     #[Inject(Cli::class)]
     private Cli $cli;
@@ -326,15 +330,20 @@ class SvnUpgrade
     {
 
         // Perform migrations
-        $this->cli->send("Performing migrations... ");
-    $installed = $this->migrations->migratePackage($pkg->getAlias()) ?? [];
-        $this->cli->send("done.\r\nCleaning up... ");
+        if ($this->app->isSlave() !== true) {
+            $this->cli->send("Performing migrations... ");
+        $installed = $this->migrations->migratePackage($pkg->getAlias()) ?? [];
+            $this->cli->send("done.\r\n");
+        }
+        $this->cli->send("Cleaning up... ");
 
         // Save rollback
         $this->rollback->save(array_keys($installed));
 
         // Install configuration
-        $this->pkg_config->install($pkg->getAlias());
+        if ($this->app->isSlave() !== true) {
+            $this->pkg_config->install($pkg->getAlias());
+        }
 
         // Save package to registry
         $pkg->setVersion($latest_version);

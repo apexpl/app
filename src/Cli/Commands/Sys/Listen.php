@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Cli\Commands\Sys;
 
+use Apex\Svc\{App, Container};
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\Cluster\Listener;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
@@ -13,8 +14,11 @@ use Apex\App\Interfaces\Opus\CliCommandInterface;
 class Listen implements CliCommandInterface
 {
 
-    #[Inject(Listener::class)]
-    private Listener $listener;
+    #[Inject(App::class)]
+    private App $app;
+
+    #[Inject(Container::class)]
+    private Container $cntr;
 
     /**
      * Process
@@ -22,9 +26,13 @@ class Listen implements CliCommandInterface
     public function process(Cli $cli, array $args):void
     {
 
+        // Instantiate listener
+        $instance_name = $this->app->getInstanceName();
+        $listener = $this->cntr->make('Listener::class, ['instance_name' => $instance_name]);
+
         // Listen
         $cli->send("Listening for RPC calls...\r\n\r\n");
-        $this->listener->listen();
+        $listener->listen();
 
     }
 

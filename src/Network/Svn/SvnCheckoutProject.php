@@ -6,7 +6,6 @@ namespace Apex\App\Network\Svn;
 use Apex\Svc\{Db, Container};
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Network\Models\LocalPackage;
-use Apex\App\Pkg\Helpers\PackageConfig;
 use Apex\App\Sys\Utils\Io;
 use Symfony\Component\Process\Process;
 use redis;
@@ -25,9 +24,6 @@ class SvnCheckoutProject
 
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
-
-    #[Inject(PackageConfig::class)]
-    private PackageConfig $pkg_config;
 
     #[Inject(Io::class)]
     private Io $io;
@@ -88,12 +84,9 @@ class SvnCheckoutProject
         $db_adapter->transferStageToLocal($pkg, $dbinfo['password'], $dbinfo['host'], (int) $dbinfo['port']);
 
         // Reset redis
-        $process = new Process(['./apex', 'sys', 'reset-redis']);
+        $process = new Process(['./apex', 'sys', 'reset-redis', '--full']);
         $process->setWorkingDirectory(SITE_PATH);
         $process->run();
-
-        // Scan project alias
-        $this->pkg_config->install($pkg->getAlias());
 
         // Update composer
         $process = new Process(['composer', 'update', '-n']);

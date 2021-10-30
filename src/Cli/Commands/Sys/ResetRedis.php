@@ -7,6 +7,7 @@ use Apex\Svc\{Container, Convert, Db};
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Pkg\Config\Menus;
+use Apex\App\Pkg\Helpers\PackageConfig;
 use Apex\App\Sys\Utils\ScanClasses as ScanClassesCmd;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use redis;
@@ -32,6 +33,9 @@ class ResetRedis implements CliCommandInterface
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
 
+    #[Inject(PackageConfig::class)]
+    private PackageConfig $pkg_config;
+
     #[Inject(ScanClassesCmd::class)]
     private ScanClassesCmd $scanner;
 
@@ -48,8 +52,17 @@ class ResetRedis implements CliCommandInterface
             $packages = array_keys($this->pkg_store->list());
         }
 
+        // Check for full reset
+        $opt = $cli->getArgs();
+        $is_full = $opt['full'] ?? false;
+
         // Go through packages
         foreach ($packages as $pkg_alias) { 
+
+            // Load config, if needed
+            if ($is_full === true) {
+                $this->pkg_config->install($pkg_alias);
+            }
 
             // Check for migrate class
             $class_name = "Etc\\" . $this->convert->case($pkg_alias, 'title') . "\\migrate";
@@ -91,6 +104,7 @@ class ResetRedis implements CliCommandInterface
         );
 
         $help->addParam('pkg_alias', 'Optional package alias to reset redis for.  If not defined, all packages will be reset.');
+        $help->addFlag('--full', "If present, on top of the resetRedis() method within each package's migrate.php file, this will also re-scan the package.yml file for each.");
         $help->addExample('./apex sys reset-redis');
 
         // Return

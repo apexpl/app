@@ -27,7 +27,7 @@ class SvnFileConverter
             (in_array($type, ['src','etc','docs','tests'])) ? true : false => $type . '/' . $pkg->getAliasTitle() . '/' . implode('/', $parts), 
             ($type == 'views') ? true : false => $svn_file, 
             ($type == 'ext') ? true : false => implode('/', $parts), 
-            ($type == 'share' && $parts[0] == 'HttpControllers') ? true : false => 'src/HttpControllers/' . $parts[1], 
+            ($type == 'share' && $parts[0] == 'HttpControllers') ? true : false => 'src/HttpControllers/' . implode('/', array_splice($parts, 1)), 
             default => null
         };
 

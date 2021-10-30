@@ -50,6 +50,24 @@ class App extends Bootloader implements RequestHandlerInterface
     }
 
     /**
+     * Get instance name
+     */
+    public function getInstanceName():string
+    {
+        $name = GetEnv('instance_name') ?? 'main';
+        return $name;
+    }
+
+    /**
+     * Is slave server?
+     */
+    public function isSlave():bool
+    {
+        $type = GetEnv('server_type') ?? 'main';
+        return $type == 'slave' ? true : false;
+    }
+
+    /**
      * Get client
      */
     public function getClient():ClientInfo

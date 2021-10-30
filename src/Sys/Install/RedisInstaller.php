@@ -126,7 +126,7 @@ class RedisInstaller
 
         // Check if slave
         $opt = $cli->getArgs();
-        $is_slave = $opt['save'] ?? false;
+        $is_slave = $opt['slave'] ?? false;
         if ($is_slave === true) { 
             return;
         }

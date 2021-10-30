@@ -18,7 +18,7 @@ class ApexInstaller
 
     // Properties
     public static string $domain_name = 'localhost';
-    public static string $server_type = 'all';
+    public static string $server_type = 'main';
     public static string $instance_name = 'main';
     public static int $enable_admin = 1;
     public static int $enable_javascript = 1;
@@ -44,24 +44,16 @@ class ApexInstaller
             return;
         }
 
-        // Get server type
-        $server_types = [
-            'app' => 'Back-End Application Server',
-            'web' => 'Front-End HTTP Server',
-            'misc' => 'Other / Miscellanous'
-        ];
-        self::$server_type = $cli->getOption('Please specify the type of server instance this is:', 'web', true);
-
         // Get and check instance name
-        self::$instance_name = strtolower($cli->get_input('Instance Name: '));
+        self::$instance_name = strtolower($cli->getInput('Instance Name: '));
         if (self::$instance_name == '' || !preg_match("/^[a-zA-Z0-9_-]+$/", self::$instance_name)) {
             $cli->error('Invalid instance name specified, which is required for slave servers.  This may be anything you wish such as app1, backend1, etc.');
             exit(0);
         }
 
-        // Enable admin panel?
-        $ok = $cli->getConfirm('Enable admin panel?', 'y');
-        self::$enable_admin = $ok === true ? 1 : 0;
+        // Set variables
+        self::$server_type = 'slave';
+        self::$enable_admin = 0;
     }
 
     /**
@@ -128,12 +120,12 @@ class ApexInstaller
             '~redis_host~' => getenv('redis_host'),
             '~redis_port~' => getenv('redis_port'),  
             '~redis_password~' => getenv('redis_password'),
-        '~redis_password_prefix~' => getenv('redis_password') == '' ? '#' : '',
-            '~redis_dbindex~' => getenv('redis_dbindex')
+            '~redis_password_prefix~' => getenv('redis_password') == '' ? '#' : '',
+                '~redis_dbindex~' => getenv('redis_dbindex')
         ];
 
         // Get .env file contents
-        $contents = base64_decode('CiMKIyBBcGV4IC5lbnYgZmlsZS4KIwojIEluIG1vc3QgY2FzZXMsIHlvdSBzaG91bGQgbmV2ZXIgbmVlZCB0byBtb2RpZnkgdGhpcyBmaWxlIGFzaWRlIGZyb20gdGhlIAojIHJlZGlzIGNvbm5lY3Rpb24gaW5mb3JtYXRpb24uICBUaGUgZXhjZXB0aW9uIGlzIGlmIHlvdSdyZSBydW5uaW5nIEFwZXggb24gIAojIGEgY2x1c3RlciBvZiBzZXJ2ZXJzLiAgVGhpcyBmaWxlIGFsbG93cyB5b3UgdG8gb3ZlcnJpZGUgdmFyaW91cyAKIyBzeXN0ZW0gY29uZmlndXJhdGlvbiB2YXJpYWJsZXMgZm9yIHRoaXMgc3BlY2lmaWMgc2VydmVyIGluc3RhbmNlLCBzdWNoIGFzIGxvZ2dpbmcgYW5kIGRlYnVnZ2luZyBsZXZlbHMuCiMKCiMgUmVkaXMgY29ubmVjdGlvbiBpbmZvcm1hdGlvbgpyZWRpc19ob3N0PX5yZWRpc19ob3N0fgpyZWRpc19wb3J0PX5yZWRpc19wb3J0fgp+cmVkaXNfcGFzc3dvcmRfcHJlZml4fnJlZGlzX3Bhc3N3b3JkPX5yZWRpc19wYXNzd29yZH4KcmVkaXNfZGJpbmRleD1+cmVkaXNfZGJpbmRleH4KCiMgRW5hYmxlIGFkbWluIHBhbmVsPyAoMT1vbiwgMD1vZmYpCmVuYWJsZV9hZG1pbj1+ZW5hYmxlX2FkbWlufgoKIyBUaGUgbmFtZSBvZiB0aGlzIGluc3RhbmNlLiAgQ2FuIGJlIGFueXRoaW5nIHlvdSB3aXNoLCAKIyBidXQgbmVlZHMgdG8gYmUgdW5pcXVlIHRvIHRoZSBjbHVzdGVyLgo7aW5zdGFuY2VfbmFtZT1+aW5zdGFuY2VfbmFtZX4KCiMgVGhlIHR5cGUgb2YgaW5zdGFuY2UsIHdoaWNoIGRldGVybWluZXMgaG93IHRoaXMgaW5zdGFuY2UgCiMgb3BlcmF0ZXMgKGllLiB3aGV0aGVyIGl0IHNlbmRzIG9yIHJlY2VpdmVzIHJlcXVlc3RzIHZpYSBSYWJiaXRNUSkuCiMKIyBTdXBwb3J0ZWQgdmFsdWVzIGFyZToKIyAgICAgYWxsICA9IEFsbC1pbi1PbmUgKGRlZmF1bHQpCiMgICAgIHdlYiAgPSBGcm9udC1lbmQgSFRUUCBzZXJ2ZXIKIyAgICAgYXBwICA9IEJhY2stZW5kIGFwcGxpY2F0aW9uIHNlcnZlcgojICAgICBtaXNjID0gT3RoZXIKIwo7c2VydmVyX3R5cGU9fnNlcnZlcl90eXBlfgoKIyBTZXJ2ZXIgbW9kZSwgY2FuIGJlICdwcm9kJyBvciAnZGV2ZWwnCjttb2RlPWRldmVsCgojIExvZyBsZXZlbC4gIFN1cHBvcnRlZCB2YWx1ZXMgYXJlOgojICAgICBhbGwgPSBBbGwgbG9nIGxldmVscwojICAgICBtb3N0ID0gQWxsIGxldmVscywgZXhjZXB0ICdpbmZvJyBhbmQgJ25vdGljZScuCiMgICAgIGVycm9yX29ubHkgPSBPbmx5IGVycm9yIG1lc3NhZ2VzCiMgICAgIG5vbmUgPSBObyBsb2dnaW5nCjtsb2dfbGV2ZWw9bW9zdAoKIyBEZWJ1ZyBsZXZlbC4gIFN1cHBvcnRlZCB2YWx1ZXMgYXJlOgojICAgICAwID0gT2ZmCiMgICAgIDEgPSBWZXJ5IGxpbWl0ZWQKIyAgICAgMiA9IExpbWl0ZWQKIyAgICAgMyA9IE1vZGVyYXRlCiMgICAgIDQgPSBFeHRlbnNpdmUKIyAgICAgNSA9IFZlcnkgRXh0ZW5zaXZlCjtkZWJ1Z19sZXZlbD0wCgoK');
+        $contents = base64_decode('CiMKIyBBcGV4IC5lbnYgZmlsZS4KIwojIEluIG1vc3QgY2FzZXMsIHlvdSBzaG91bGQgbmV2ZXIgbmVlZCB0byBtb2RpZnkgdGhpcyBmaWxlIGFzaWRlIGZyb20gdGhlIAojIHJlZGlzIGNvbm5lY3Rpb24gaW5mb3JtYXRpb24uICBUaGUgZXhjZXB0aW9uIGlzIGlmIHlvdSdyZSBydW5uaW5nIEFwZXggb24gIAojIGEgY2x1c3RlciBvZiBzZXJ2ZXJzLiAgVGhpcyBmaWxlIGFsbG93cyB5b3UgdG8gb3ZlcnJpZGUgdmFyaW91cyAKIyBzeXN0ZW0gY29uZmlndXJhdGlvbiB2YXJpYWJsZXMgZm9yIHRoaXMgc3BlY2lmaWMgc2VydmVyIGluc3RhbmNlLCBzdWNoIGFzIGxvZ2dpbmcgYW5kIGRlYnVnZ2luZyBsZXZlbHMuCiMKCiMgUmVkaXMgY29ubmVjdGlvbiBpbmZvcm1hdGlvbgpyZWRpc19ob3N0PX5yZWRpc19ob3N0fgpyZWRpc19wb3J0PX5yZWRpc19wb3J0fgp+cmVkaXNfcGFzc3dvcmRfcHJlZml4fnJlZGlzX3Bhc3N3b3JkPX5yZWRpc19wYXNzd29yZH4KcmVkaXNfZGJpbmRleD1+cmVkaXNfZGJpbmRleH4KCiMgRW5hYmxlIGFkbWluIHBhbmVsPyAoMT1vbiwgMD1vZmYpCmVuYWJsZV9hZG1pbj1+ZW5hYmxlX2FkbWlufgoKIyBUaGUgbmFtZSBvZiB0aGlzIGluc3RhbmNlLiAgQ2FuIGJlIGFueXRoaW5nIHlvdSB3aXNoLCAKIyBidXQgbmVlZHMgdG8gYmUgdW5pcXVlIHRvIHRoZSBjbHVzdGVyLgppbnN0YW5jZV9uYW1lPX5pbnN0YW5jZV9uYW1lfgoKIyBUaGUgdHlwZSBvZiBpbnN0YW5jZSwgd2hpY2ggZGVmaW5lcyBob3cgdGhpcyBzeXN0ZW0gb3BlcmF0ZXMuCiMgTXVzdCBiZSBlaXRoZXIgJ21haW4nIG9yICdzbGF2ZScuCnNlcnZlcl90eXBlPX5zZXJ2ZXJfdHlwZX4KCiMgU2VydmVyIG1vZGUsIGNhbiBiZSAncHJvZCcgb3IgJ2RldmVsJwo7bW9kZT1kZXZlbAoKIyBMb2cgbGV2ZWwuICBTdXBwb3J0ZWQgdmFsdWVzIGFyZToKIyAgICAgYWxsID0gQWxsIGxvZyBsZXZlbHMKIyAgICAgbW9zdCA9IEFsbCBsZXZlbHMsIGV4Y2VwdCAnaW5mbycgYW5kICdub3RpY2UnLgojICAgICBlcnJvcl9vbmx5ID0gT25seSBlcnJvciBtZXNzYWdlcwojICAgICBub25lID0gTm8gbG9nZ2luZwo7bG9nX2xldmVsPW1vc3QKCiMgRGVidWcgbGV2ZWwuICBTdXBwb3J0ZWQgdmFsdWVzIGFyZToKIyAgICAgMCA9IE9mZgojICAgICAxID0gVmVyeSBsaW1pdGVkCiMgICAgIDIgPSBMaW1pdGVkCiMgICAgIDMgPSBNb2RlcmF0ZQojICAgICA0ID0gRXh0ZW5zaXZlCiMgICAgIDUgPSBWZXJ5IEV4dGVuc2l2ZQo7ZGVidWdfbGV2ZWw9MAoKCg==');
         $contents = strtr($contents, $replace);
 
         // Save .env file
