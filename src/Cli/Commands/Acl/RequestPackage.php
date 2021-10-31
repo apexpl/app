@@ -4,11 +4,10 @@ declare(strict_types = 1);
 namespace Apex\App\Cli\Commands\Acl;
 
 use Apex\App\Cli\{Cli, CliHelpScreen};
-use Apex\App\Cli\Helpers\{AccountHelper, CertificateHelper};
+use Apex\App\Cli\Helpers\{AccountHelper, AclHelper, PackageHelper};
 use Apex\App\Network\NetworkClient;
-use Apex\App\Network\Stores\{ReposStore, CertificateStore};
+use Apex\App\Network\Stores\ReposStore;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
-use Apex\App\Exceptions\ApexCertificateNotExistsException;
 
 /**
  * Request access to package
@@ -22,11 +21,11 @@ class RequestPackage implements CliCommandInterface
     #[Inject(ReposStore::class)]
     private ReposStore $repo_store;
 
-    #[Inject(CertificateStore::class)]
-    private CertificateStore $cert_store;
+    #[Inject(PackageHelper::class)]
+    private PackageHelper $pkg_helper;
 
-    #[Inject(CertificateHelper::class)]
-    private CertificateHelper $cert_helper;
+    #[Inject(AclHelper::class)]
+    private AclHelper $acl_helper;
 
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;
@@ -39,7 +38,7 @@ class RequestPackage implements CliCommandInterface
 
         // Initialize
         $opt = $cli->getArgs(['repo']);
-        $pkg_serial = $args[0] ?? '';
+        $pkg_serial = $this->pkg_helper->getSerial(($args[0] ?? ''));
         $role = $args[1] ?? 'team';
         $repo_alias = $opt['repo'] ?? 'apex';
 
@@ -61,7 +60,13 @@ class RequestPackage implements CliCommandInterface
 
         // Get account
         $account = $this->acct_helper->get();
-        $crt_name = $account->getUsername() . '.' . $username . '.' . $repo_alias;
+
+        // Ensure package exists
+        $res = $this->network->post($repo, 'repos/check', ['pkg_serial' => $pkg_serial]);
+        if ($res['exists'] != 1) {
+            $cli->error("The package '$pkg_serial' does not exist on the repository.");
+            return;
+        }
 
         // Start request
         $request = [
@@ -71,19 +76,27 @@ class RequestPackage implements CliCommandInterface
             'role' => $role
         ];
 
-        // Try to get certificate
-        try {
-            $crt = $this->cert_store->get($crt_name);
-        } catch (ApexCertificateNotExistsException $e) { 
-            $common_name = $account->getUsername() . '.' . $username . '@' . $repo_alias;
-            $csr = $this->cert_helper->generate($common_name);
+        // Get csr
+        $common_name = $account->getUsername() . '.' . $username . '@' . $repo_alias;
+        if (null !== ($csr = $this->acl_helper->getRequestCsr($account, $common_name))) {
             $request['public_key'] = $csr->getRsaKey()->getPublicKey();
             $request['csr'] = $csr->getCsr();
         }
 
+        // Get account certificate
+        $cert = $account->getCertificate();
+
+        // Send header
+        $cli->sendHeader("Request Access to Package $pkg_serial");
+        $cli->send("You are requesting access to the package '$pkg_serial' with the following certificate:\r\n\r\n");
+        foreach ($cert->getIssuedTo() as $line) {
+            $cli->send("    $line\r\n");
+        }
+        $cli->send("\r\n");
+        $cli->send("    Fingerprint:  " . $cert->getFingerprint() . "\r\n\r\n");
+
         // Get optional message
-        $cli->send("\r\n\r\n");
-        $cli->send("If desired, you may include an optional message to the account holder who will process the access request.\r\n\r\n");
+        $cli->send("If desired, you may include an optional message to the package maintainer who will process the access request.\r\n\r\n");
         $request['message'] = $cli->getInput('Optional Message: ');
 
         // Send request

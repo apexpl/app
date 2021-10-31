@@ -330,6 +330,7 @@ class SvnUpgrade
     {
 
         // Perform migrations
+        $installed = [];
         if ($this->app->isSlave() !== true) {
             $this->cli->send("Performing migrations... ");
         $installed = $this->migrations->migratePackage($pkg->getAlias()) ?? [];

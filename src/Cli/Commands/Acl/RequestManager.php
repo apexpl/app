@@ -4,11 +4,10 @@ declare(strict_types = 1);
 namespace Apex\App\Cli\Commands\Acl;
 
 use Apex\App\Cli\{Cli, CliHelpScreen};
-use Apex\App\Cli\Helpers\{AccountHelper, CertificateHelper};
+use Apex\App\Cli\Helpers\{AccountHelper, AclHelper};
 use Apex\App\Network\NetworkClient;
-use Apex\App\Network\Stores\{ReposStore, CertificateStore};
+use Apex\App\Network\Stores\ReposStore;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
-use Apex\App\Exceptions\ApexCertificateNotExistsException;
 
 /**
  * Grand manager
@@ -22,11 +21,8 @@ class RequestManager implements CliCommandInterface
     #[Inject(ReposStore::class)]
     private ReposStore $repo_store;
 
-    #[Inject(CertificateStore::class)]
-    private CertificateStore $cert_store;
-
-    #[Inject(CertificateHelper::class)]
-    private CertificateHelper $cert_helper;
+    #[Inject(AclHelper::class)]
+    private AclHelper $acl_helper;
 
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;
@@ -39,7 +35,7 @@ class RequestManager implements CliCommandInterface
 
         // Initialize
         $opt = $cli->getArgs(['repo']);
-        $username = $args[0] ?? '';
+        $username = strtolower($args[0] ?? '');
         $repo_alias = $opt['repo'] ?? 'apex';
 
         // Get repo
@@ -50,7 +46,13 @@ class RequestManager implements CliCommandInterface
 
         // Get account
         $account = $this->acct_helper->get();
-        $crt_name = $account->getUsername() . '.' . $username . '.' . $repo_alias;
+        if ($username == '' || !preg_match("/^[a-zA-Z0-9_\-]+$/", $username)) {
+            $cli->error("Invalid username specified, $username");
+            return;
+        } elseif ($account->getUsername() == $username) {
+            $cli->error("You can not request access to your own account!");
+            return;
+        }
 
         // Start request
         $request = [
@@ -58,18 +60,26 @@ class RequestManager implements CliCommandInterface
             'type' => 'manager'
         ];
 
-        // Try to get certificate
-        try {
-            $crt = $this->cert_store->get($crt_name);
-        } catch (ApexCertificateNotExistsException $e) { 
-            $common_name = $account->getUsername() . '.' . $username . '@' . $repo_alias;
-            $csr = $this->cert_helper->generate($common_name);
+        // Get csr
+        $common_name = $account->getUsername() . '.' . $username . '@' . $repo_alias;
+        if (null !== ($csr = $this->acl_helper->getRequestCsr($account, $common_name))) {
             $request['public_key'] = $csr->getRsaKey()->getPublicKey();
             $request['csr'] = $csr->getCsr();
         }
 
+        // Get account certificate
+        $cert = $account->getCertificate();
+
+        // Send header
+        $cli->sendHeader("Request Manager Access to $username");
+        $cli->send("You are requesting manager access to " . $username . "'s account with the following certificate:\r\n\r\n");
+        foreach ($cert->getIssuedTo() as $line) {
+            $cli->send("    $line\r\n");
+        }
+        $cli->send("\r\n");
+        $cli->send("    Fingerprint:  " . $cert->getFingerprint() . "\r\n\r\n");
+
         // Get optional message
-        $cli->send("\r\n\r\n");
         $cli->send("If desired, you may include an optional message to the account holder who will process the access request.\r\n\r\n");
         $request['message'] = $cli->getInput('Optional Message: ');
 

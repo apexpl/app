@@ -28,7 +28,7 @@ class Listen implements CliCommandInterface
 
         // Instantiate listener
         $instance_name = $this->app->getInstanceName();
-        $listener = $this->cntr->make('Listener::class, ['instance_name' => $instance_name]);
+        $listener = $this->cntr->make(Listener::class, ['instance_name' => $instance_name]);
 
         // Listen
         $cli->send("Listening for RPC calls...\r\n\r\n");

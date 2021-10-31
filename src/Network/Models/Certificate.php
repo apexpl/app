@@ -57,6 +57,37 @@ class Certificate
     }
 
     /**
+     * Get fingerprint
+     */
+    public function getFingerprint():string
+    {
+        $crt = openssl_x509_read($this->crt);
+        $fingerprint = openssl_x509_fingerprint($crt, 'sha384');
+        return implode(':', str_split($fingerprint, 4));
+    }
+
+    /**
+     * Get subject
+     */
+    public function getIssuedTo():array
+    {
+
+        // Parse crt
+        $info = openssl_x509_parse($this->crt);
+        $sub = $info['subject'];
+
+        // Set issued to
+        $issued_to = [
+            "$sub[O] ($sub[OU])",
+            "$sub[L], $sub[ST], $sub[C]",
+            $sub['emailAddress']
+        ];
+
+        // Return
+        return $issued_to;
+    }
+
+    /**
      * Set crt
      */
     public function setCrt(string $crt):void

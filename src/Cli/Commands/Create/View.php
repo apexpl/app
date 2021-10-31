@@ -69,7 +69,7 @@ class View implements CliCommandInterface
 
         // Add to registry
         $registry = $this->cntr->make(Registry::class, ['pkg_alias' => $pkg_alias]);
-        $registry->add('views', $uri);
+        $registry->add('views', ltrim($uri, '/'));
 
         // Add route definition, if route defined
         if ($route != '') { 
