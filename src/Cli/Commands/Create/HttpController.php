@@ -11,6 +11,7 @@ use Apex\App\Base\Router\RouterConfig;
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

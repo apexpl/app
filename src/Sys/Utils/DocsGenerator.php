@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Sys\Utils;
 
 use Apex\App\Sys\Utils\Io;
+use Apex\App\Attr\Inject;
 
 /**
  * Documentation Generator

@@ -7,6 +7,7 @@ use Apex\Svc\{App, View};
 use Apex\App\Base\Web\Components;
 use Apex\App\Base\Web\Utils;
 use Apex\App\Exceptions\ApexFormValidationException;
+use Apex\App\Attr\Inject;
 
 /**
  * Form validate

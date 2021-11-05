@@ -6,6 +6,7 @@ namespace Apex\App\Network\Svn;
 use Apex\App\Cli\CLi;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Exceptions\ApexSvnRepoException;
+use Apex\App\Attr\Inject;
 
 /**
  * SVN Inventory

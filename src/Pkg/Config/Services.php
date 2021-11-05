@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Pkg\Config;
 
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

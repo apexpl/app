@@ -7,6 +7,7 @@ use Apex\Svc\Db;
 use Apex\App\Network\Models\LocalPackage;
 use App\Enduro\Exceptions\EnduroRemoteDatabaseException;
 use Symfony\Component\Process\Process;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

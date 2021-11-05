@@ -12,6 +12,7 @@ use Apex\App\Pkg\Filesystem\Package\Remover;
 use Apex\App\Pkg\Helpers\Migration;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\Stores\PackagesStore;
+use Apex\App\Attr\Inject;
 
 /**
  * Package

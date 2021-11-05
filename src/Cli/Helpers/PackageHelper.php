@@ -10,6 +10,7 @@ use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\Models\{LocalRepo, LocalPackage, LocalAccount};
 use Apex\App\Network\NetworkClient;
 use Apex\Db\Mapper\ToInstance;
+use Apex\App\Attr\Inject;
 
 /**
  * Package helper

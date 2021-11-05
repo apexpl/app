@@ -5,6 +5,7 @@ namespace Apex\App\Cli;
 
 use Apex\Svc\{Container, Convert};
 use Apex\Armor\Auth\Operations\Password;
+use Apex\App\Attr\Inject;
 
 /**
  * Handles all CLI functionality for for Apex

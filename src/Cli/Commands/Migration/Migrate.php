@@ -8,6 +8,7 @@ use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Adapters\MigrationsConfig;
 use Apex\Migrations\Handlers\{ClassManager, Installer};
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Migrate

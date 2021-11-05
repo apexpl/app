@@ -12,6 +12,7 @@ use Apex\App\Network\Svn\SvnCommit;
 use Apex\App\Pkg\Helpers\Database\{mySQLAdapter, PostgreSQLAdapter};
 use Apex\Opus\Opus;
 use Apex\App\Sys\Utils\Io;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

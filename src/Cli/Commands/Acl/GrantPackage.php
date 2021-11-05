@@ -9,6 +9,7 @@ use Apex\App\Network\Stores\{ReposStore, CertificateStore};
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Exceptions\ApexCertificateNotExistsException;
+use Apex\App\Attr\Inject;
 
 /**
  * Grant role

@@ -6,6 +6,7 @@ namespace Apex\App\Pkg\Filesystem\Package;
 use Apex\App\Sys\Utils\Io;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\Svn\SvnFileConverter;
+use Apex\App\Attr\Inject;
 
 /**
  * Package inventory

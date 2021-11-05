@@ -8,6 +8,7 @@ use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\{PackageHelper, OpusHelper};
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\Opus\{CliCommandInterface, TabControlInterface};
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

@@ -10,6 +10,7 @@ use Apex\App\Pkg\Config\Menus;
 use Apex\App\Pkg\Helpers\PackageConfig;
 use Apex\App\Sys\Utils\ScanClasses as ScanClassesCmd;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

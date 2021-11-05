@@ -12,6 +12,7 @@ use Apex\App\Network\Stores\ReposStore;
 use Apex\Db\Mapper\ToInstance;
 use Apex\App\Network\Svn\SvnInstall;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Install package

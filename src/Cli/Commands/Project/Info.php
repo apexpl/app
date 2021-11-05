@@ -9,6 +9,7 @@ use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

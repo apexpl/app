@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Base\Web;
 
 use Apex\Svc\{Container, Convert};
+use Apex\App\Attr\Inject;
 
 /**
  * Components

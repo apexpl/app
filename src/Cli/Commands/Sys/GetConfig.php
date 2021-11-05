@@ -5,6 +5,7 @@ namespace Apex\App\Cli\Commands\Sys;
 
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

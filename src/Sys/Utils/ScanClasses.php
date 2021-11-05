@@ -7,6 +7,7 @@ use Apex\Svc\{Convert, Container};
 use Apex\App\Cli\Helpers\OpusHelper;
 use Apex\App\Sys\Utils\Io;
 use Apex\App\Interfaces\ListenerInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

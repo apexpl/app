@@ -9,6 +9,7 @@ use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\Migrations\Handlers\ClassManager;
 use Apex\Migrations\Adapters\DoctrineAdapter;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Create new migration

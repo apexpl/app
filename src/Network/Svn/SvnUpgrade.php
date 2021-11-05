@@ -15,6 +15,7 @@ use Apex\App\Pkg\Filesystem\Package\Inventory;
 use Apex\App\Pkg\Filesystem\Rollback\Compiler;
 use Apex\App\Sys\Utils\Io;
 use Apex\Migrations\Handlers\Installer;
+use Apex\App\Attr\Inject;
 
 /**
  * Svn Upgrade

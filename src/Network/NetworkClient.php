@@ -9,6 +9,7 @@ use Apex\App\Network\Models\{LocalRepo, LocalAccount};
 use Apex\App\Network\Sign\ApiAuth;
 use Nyholm\Psr7\Request;
 use Apex\App\Exceptions\ApexApiClientException;
+use Apex\App\Attr\Inject;
 
 /**
  * Network client

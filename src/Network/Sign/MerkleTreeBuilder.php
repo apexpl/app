@@ -6,6 +6,7 @@ namespace Apex\App\Network\Sign;
 use Apex\Svc\Container;
 use Apex\App\Sys\Utils\Io;
 use Apex\App\Network\Models\{LocalPackage, MerkleTree};
+use Apex\App\Attr\Inject;
 
 /**
  * Merkel tree

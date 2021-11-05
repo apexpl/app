@@ -9,6 +9,7 @@ use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Adapters\MigrationsConfig;
 use Apex\Migrations\Handlers\Remover;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Rollback

@@ -7,6 +7,7 @@ use Apex\App\Cli\Cli;
 use Apex\App\Sys\Utils\Io;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Exceptions\ApexPackageNotExistsException;
+use Apex\App\Attr\Inject;
 
 /**
  * Close package

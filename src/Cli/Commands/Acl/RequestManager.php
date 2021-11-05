@@ -8,6 +8,7 @@ use Apex\App\Cli\Helpers\{AccountHelper, AclHelper};
 use Apex\App\Network\NetworkClient;
 use Apex\App\Network\Stores\ReposStore;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Grand manager

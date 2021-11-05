@@ -9,6 +9,7 @@ use Apex\App\Network\Stores\PackagesStore;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Apex\Migrations\Exceptions\MigrationsYamlConfigException;
+use Apex\App\Attr\Inject;
 
 /**
  * Migrations config

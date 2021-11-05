@@ -5,6 +5,7 @@ namespace Apex\App\Cli;
 
 use Apex\Svc\Di;
 use Apex\App\Cli\CLi;
+use Apex\App\Attr\Inject;
 
 /**
  * CLI Help Screen

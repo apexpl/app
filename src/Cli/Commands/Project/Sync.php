@@ -8,6 +8,7 @@ use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\Armor\Auth\Operations\RandomString;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

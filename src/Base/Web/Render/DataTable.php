@@ -8,6 +8,7 @@ use Apex\App\Base\Web\Components;
 use Apex\Syrus\Parser\StackElement;
 use Apex\App\Base\Web\Utils\DataTableDetails as TableDetails;
 use Apex\App\Interfaces\Opus\DataTableInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Render data table

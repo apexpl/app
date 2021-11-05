@@ -11,6 +11,7 @@ use Apex\App\Network\Stores\{PackagesStore, ReposStore};
 use Apex\App\Pkg\ProjectManager;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

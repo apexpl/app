@@ -7,6 +7,7 @@ use Apex\App\Cli\Cli;
 use Apex\App\Network\Svn\SvnRepo;
 use Apex\App\Sys\Utils\Io;
 use Apex\App\Exceptions\ApexSvnRepoException;
+use Apex\App\Attr\Inject;
 
 /**
  * Svn Export

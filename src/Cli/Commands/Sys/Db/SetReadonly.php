@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Commands\Sys\Db;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\Db\ConnectionManager;
+use Apex\App\Attr\Inject;
 
 /**
  * Set read only database

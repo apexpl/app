@@ -8,6 +8,7 @@ use Apex\App\Network\Stores\AbstractStore;
 use Apex\App\Network\Models\InstallationImage;
 use Apex\App\Sys\Utils\Io;
 use Symfony\Component\Yaml\Yaml;
+use Apex\App\Attr\Inject;
 
 /**
  * Installation image store

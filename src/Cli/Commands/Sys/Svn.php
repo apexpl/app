@@ -7,6 +7,7 @@ use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Symfony\Component\Process\Process;
+use Apex\App\Attr\Inject;
 
 /**
  * SVN

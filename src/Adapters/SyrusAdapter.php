@@ -7,6 +7,7 @@ use Apex\Svc\{App, View, Container};
 use Apex\Syrus\Parser\StackElement;
 use Apex\Syrus\Interfaces\LoaderInterface;
 use Psr\Http\Message\UriInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Example loader class.  Copy this class, and modify as necessary for your 

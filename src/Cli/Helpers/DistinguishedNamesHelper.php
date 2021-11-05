@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Helpers;
 use Apex\App\Cli\Cli;
 use Apex\App\Network\Stores\DistinguishedNamesStore;
 use Apex\Armor\x509\DistinguishedName;
+use Apex\App\Attr\Inject;
 
 /**
  * x.509 Certificates

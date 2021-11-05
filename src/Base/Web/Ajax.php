@@ -6,6 +6,7 @@ namespace Apex\App\Base\Web;
 use Apex\App\Base\Web\Components;
 use Apex\App\Base\Web\Utils\DataTableDetails;
 use Apex\App\Exceptions\ApexComponentNotExistsException;
+use Apex\App\Attr\Inject;
 
 /**
  * AJAX library

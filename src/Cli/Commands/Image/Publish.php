@@ -10,6 +10,7 @@ use Apex\App\Network\Stores\{InstallationImagesStore, ReposStore};
 use Apex\App\Sys\Utils\Io;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Publish installation image

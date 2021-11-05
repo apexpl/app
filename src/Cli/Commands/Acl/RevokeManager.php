@@ -7,6 +7,7 @@ use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\AccountHelper;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Revoke manager access

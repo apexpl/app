@@ -6,6 +6,7 @@ namespace Apex\App\Base\Web\Render;
 use Apex\Svc\View;
 use Apex\App\Base\Web\Components;
 use Apex\Syrus\Parser\StackElement;
+use Apex\App\Attr\Inject;
 
 /**
  * Render auto complete box

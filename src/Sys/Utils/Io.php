@@ -6,6 +6,7 @@ namespace Apex\App\Sys\Utils;
 use Apex\Svc\Debugger;
 use Apex\App\Exceptions\ApexIoException;
 use Symfony\Component\Process\Process;
+use Apex\App\Attr\Inject;
 use ZipArchive;
 
 /**

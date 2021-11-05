@@ -10,6 +10,7 @@ use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\Svn\SvnCommit;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

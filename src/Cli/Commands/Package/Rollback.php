@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Commands\Package;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Pkg\Filesystem\Rollback\Rollback as Processor;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Rollback

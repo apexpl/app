@@ -7,6 +7,7 @@ use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Base\Implementors;
 use Apex\App\Interfaces\Opus\{CliCommandInterface, CrontabInterface};
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

@@ -5,6 +5,7 @@ namespace Apex\App\Adapters;
 
 use Apex\Cluster\FeHandlers\Generic;
 use Apex\Cluster\Interfaces\FeHandlerInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Front-end handler for the Syrus template engine.

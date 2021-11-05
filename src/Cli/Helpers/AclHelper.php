@@ -9,6 +9,7 @@ use Apex\App\Network\Models\{LocalAccount, Certificate};
 use Apex\App\Network\Sign\AbstractSigner;
 use Apex\Armor\x509\DistinguishedName;
 use Apex\App\Exceptions\ApexCertificateNotExistsException;
+use Apex\App\Attr\Inject;
 
 /**
  * ACL Helper

@@ -9,6 +9,7 @@ use Apex\App\Network\Stores\ReposStore;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Network\Sign\AbstractSigner;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Pending certs

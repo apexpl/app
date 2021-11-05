@@ -11,6 +11,7 @@ use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\NetworkClient;
 use Apex\Db\Mapper\ToInstance;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

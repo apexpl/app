@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Pkg\Config;
 
 use Apex\Svc\{Container, Db, Debugger};
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

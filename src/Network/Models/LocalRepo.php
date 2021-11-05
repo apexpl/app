@@ -5,6 +5,7 @@ namespace Apex\App\Network\Models;
 
 use Apex\Svc\Container;
 use Apex\App\Base\Model\BaseModel;
+use Apex\App\Attr\Inject;
 use DateTime;
 
 /**

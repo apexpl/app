@@ -7,6 +7,7 @@ use Apex\App\Cli\Cli;
 use Apex\App\Network\Models\{LocalPackage, Repo};
 use Apex\App\Network\Stores\RsaKeyStore;
 use Apex\App\Exceptions\ApexSvnRepoException;
+use Apex\App\Attr\Inject;
 
 /**
  * SVN Repo

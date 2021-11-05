@@ -7,6 +7,7 @@ use Apex\Svc\Db;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Symfony\Component\Process\Process;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

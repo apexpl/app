@@ -8,6 +8,7 @@ use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Pkg\{PackageManager, ProjectManager};
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Delete package

@@ -7,6 +7,7 @@ use Apex\Svc\View;
 use Apex\App\Base\Web\Components;
 use Apex\App\Base\Web\Utils\GraphUtils;
 use Apex\Syrus\Parser\StackElement;
+use Apex\App\Attr\Inject;
 
 /**
  * Graph

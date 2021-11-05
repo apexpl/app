@@ -10,6 +10,7 @@ use Apex\App\Network\Stores\{AccountsStore, RsaKeyStore};
 use Apex\App\Network\Models\{LocalRepo, Certificate, LocalAccount, RsaKey};
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Import existing account

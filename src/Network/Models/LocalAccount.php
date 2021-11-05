@@ -5,6 +5,7 @@ namespace Apex\App\Network\Models;
 
 use Apex\App\Network\Models\Certificate;
 use Apex\App\Network\Stores\{ReposStore, CertificateStore, RsaKeyStore};
+use Apex\App\Attr\Inject;
 
 /**
  * Accounts

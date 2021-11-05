@@ -6,6 +6,7 @@ namespace Apex\App\Sys\Utils;
 use Apex\Svc\App;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
+use Apex\App\Attr\Inject;
 
 /**
  * Site config

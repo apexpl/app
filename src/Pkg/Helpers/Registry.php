@@ -8,6 +8,7 @@ use Apex\App\Sys\Utils\Io;
 use Apex\App\Exceptions\ApexYamlException;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
+use Apex\App\Attr\Inject;
 
 /**
  * Component registry

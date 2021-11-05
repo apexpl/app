@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Helpers;
 use Apex\App\Cli\Cli;
 use Apex\App\Cli\Helpers\{DistinguishedNamesHelper, RsaKeysHelper};
 use Apex\App\Network\Models\{Repo, Certificate};
+use Apex\App\Attr\Inject;
 
 /**
  * Certificate helper

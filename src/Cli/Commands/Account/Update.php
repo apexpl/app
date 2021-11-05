@@ -12,6 +12,7 @@ use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Brick\PhoneNumber\PhoneNumber;
 use Brick\PhoneNumber\PhoneNumberParseException;
+use Apex\App\Attr\Inject;
 
 /**
  * Update account

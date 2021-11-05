@@ -7,6 +7,7 @@ use Apex\Svc\{Container, Convert};
 use Apex\App\Base\Web\Components;
 use Apex\Syrus\Parser\StackElement;
 use Apex\Syrus\Interfaces\TagInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Renders a specific template tag.  Please see developer documentation for details.

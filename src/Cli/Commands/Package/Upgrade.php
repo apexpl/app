@@ -8,6 +8,7 @@ use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\Svn\SvnUpgrade;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Upgrade package

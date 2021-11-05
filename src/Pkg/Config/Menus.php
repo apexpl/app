@@ -7,6 +7,7 @@ use Apex\Svc\{Db, Debugger};
 use Apex\App\Exceptions\ApexInvalidArgumentException;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Pkg\Config;
 
 use Apex\Svc\{Convert, Container, Db};
+use Apex\App\Attr\Inject;
 
 /**
  * Dashboard items

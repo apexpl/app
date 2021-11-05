@@ -5,6 +5,7 @@ namespace Apex\App\Base\Router;
 
 use Apex\App\Interfaces\RouterResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Router response

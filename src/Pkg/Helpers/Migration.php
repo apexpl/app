@@ -7,6 +7,7 @@ use Apex\Svc\{Container, Db};
 use Apex\App\Pkg\Helpers\PackageConfig;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\Migrations\Handlers\Installer as MigrationInstaller;
+use Apex\App\Attr\Inject;
 
 /**
  * Initial install / remove migrations

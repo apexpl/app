@@ -6,6 +6,7 @@ namespace Apex\App\Network\Stores;
 use Apex\Svc\Container;
 use Apex\App\Network\Models\LocalRepo;
 use Symfony\Component\Yaml\Yaml;
+use Apex\App\Attr\Inject;
 
 /**
  * Repos store

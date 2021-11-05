@@ -5,6 +5,7 @@ namespace Apex\App\Base\Web\Utils;
 
 use Apex\Svc\App;
 use Apex\App\Interfaces\Opus\DataTableInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Data table

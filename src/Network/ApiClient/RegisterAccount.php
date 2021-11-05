@@ -5,6 +5,7 @@ namespace Apex\App\Network\ApiClient;
 
 use Apex\App\Network\NetworkClient;
 use Apex\App\Network\Models\{LocalRepo, Certificate, RsaKey};
+use Apex\App\Attr\Inject;
 
 /**
  * Account registration

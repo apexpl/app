@@ -8,6 +8,7 @@ use Apex\App\Cli\Helpers\OpusHelper;
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\EmailNotificationControllerInterface;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

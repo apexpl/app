@@ -5,6 +5,7 @@ namespace Apex\App\Network\Svn;
 
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Exceptions\ApexInvalidArgumentException;
+use Apex\App\Attr\Inject;
 
 /**
  * SVN File Converter

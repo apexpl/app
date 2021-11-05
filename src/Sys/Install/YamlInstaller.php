@@ -34,7 +34,7 @@ class YamlInstaller
         $cli->orig_argv = $argv;
 
         // Check for import
-        $opt = $cli->getArgs();
+        $opt = $cli->getArgs(['prject']);
         $import = $opt['import'] ?? false;
 
         // Parse file
@@ -76,16 +76,24 @@ class YamlInstaller
             $cmd->process($cli, []);
         }
 
-        // Install packages
-        self::installPackages($yaml, $app, $cli);
-
-        // Set config vars
-        self::setConfigVars($yaml, $app);
-
         // Check for installation image
-        $opt = $cli->getArgs(['image']);
+        $opt = $cli->getArgs(['image', 'project']);
         if (isset($opt['image']) && $opt['image'] != '') { 
             ImageInstaller::install($opt['image'], $app, $cli);
+
+        // Install project, if needed
+        } elseif (isset($opt['project']) && $opt['project'] != '') {
+            $cmd = $app->getContainer()->make(\Apex\App\Cli\Commands\Project\Checkout::class, ['auto_confirm' => true]);
+            $cmd->process($cli, [$opt['project']]);
+
+        // Standard yaml install
+        } else { 
+
+            // Install packages
+            self::installPackages($yaml, $app, $cli);
+
+            // Set config vars
+            self::setConfigVars($yaml, $app);
         }
 
         // Welcome message

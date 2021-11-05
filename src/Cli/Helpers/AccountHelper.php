@@ -12,6 +12,7 @@ use Apex\App\Network\Stores\{AccountsStore, ReposStore};
 use Apex\App\Network\Sign\VerifyCertificate;
 use Apex\App\Network\ApiClient\RegisterAccount;
 use Apex\App\Network\NetworkClient;
+use Apex\App\Attr\Inject;
 
 /**
  * Account utils

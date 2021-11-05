@@ -9,6 +9,7 @@ use Apex\App\Cli\Helpers\{PackageHelper, OpusHelper};
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Interfaces\ListenerInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

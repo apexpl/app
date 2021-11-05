@@ -139,6 +139,7 @@ class ErrorHandlers
         $view->assign('error_line', (string) $line);
 
         // Parse view
+        $view->setRpcEnabled(false);
         echo $view->render($template_file);
         exit(0);
     }

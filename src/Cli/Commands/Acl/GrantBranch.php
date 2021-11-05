@@ -8,6 +8,7 @@ use Apex\App\Cli\Helpers\AccountHelper;
 use Apex\App\Network\Stores\ReposStore;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Grant access to branch

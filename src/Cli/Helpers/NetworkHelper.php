@@ -9,6 +9,7 @@ use Apex\App\Network\Models\LocalRepo;
 use Apex\App\Network\Stores\ReposStore;
 use Nyholm\Psr7\Request;
 use Apex\App\Exceptions\ApexConfigException;
+use Apex\App\Attr\Inject;
 
 /**
  * Network CLI helper

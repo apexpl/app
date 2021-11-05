@@ -7,6 +7,7 @@ use Apex\Svc\{Db, Di, Convert};
 use Apex\App\Base\Model\ModelIterator;
 use Apex\App\Interfaces\BaseModelInterface;
 use Apex\App\Exceptions\ApexForeignKeyNotExistsException;
+use Apex\App\Attr\Inject;
 
 /**
  * Create, manage and retrieve records from the assigned model class that implements this class.

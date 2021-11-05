@@ -5,6 +5,7 @@ namespace Apex\App\Pkg\Filesystem\Rollback;
 
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Sys\Utils\Io;
+use Apex\App\Attr\Inject;
 
 /**
  * Rollback

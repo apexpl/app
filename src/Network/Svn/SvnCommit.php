@@ -12,6 +12,7 @@ use Apex\App\Pkg\Filesystem\Package\Compiler;
 use Apex\App\Pkg\Helpers\RegistryCleaner;
 use Apex\App\Network\Sign\Signer;
 use Apex\App\Exceptions\{ApexCompilerException, ApexSvnRepoException};
+use Apex\App\Attr\Inject;
 
 /**
  * Commit

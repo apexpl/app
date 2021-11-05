@@ -46,7 +46,7 @@ class Bootloader extends RequestInputs
         $this->loadConfigVars();
 
         // Generate PSR7 compliant http request
-        $this->generateServerRequest();
+        $this->setRequest();
 
         // Get client info
         $this->client = new ClientInfo();
@@ -105,47 +105,30 @@ class Bootloader extends RequestInputs
     /**
      * Generate PSR7 compliant http request
      */
-    private function generateServerRequest():void
+    public function setRequest(?ServerRequestInterface $request = null):void
     {
 
-        // Sanitize inputs
-        $this->inputs = [
-            'get' => $_GET,
-            'post' => $_POST,
-            'cookie' => $_COOKIE,
-            'files' => $_FILES,
-            'server' => $_SERVER,
-            'path_params' => []
-        ];
-        $http_headers = function_exists('getAllHeaders') ? getAllHeaders() : [];
-
-        // Init server request creator
-        $factory = new \Nyholm\Psr7\Factory\Psr17Factory();
-        $creator = new ServerRequestCreator($factory, $factory, $factory, $factory);
-
-        // Check for CLI
-        if (php_sapi_name() == "cli") {
+        // Generate server request, if one not specified
+        if ($request === null) {
+            $factory = new \Nyholm\Psr7\Factory\Psr17Factory();
+            $creator = new ServerRequestCreator($factory, $factory, $factory, $factory);
             $this->request = $creator->fromGlobals();
-
-        } else { 
-
-            // Create server request
-            $this->request = $creator->fromArrays(
-                $this->inputs['server'], 
-                $http_headers,
-                $this->inputs['cookie'], 
-                $this->inputs['get'], 
-                $this->inputs['post'], 
-                $_FILES, 
-                fopen('php://input', 'r')
-            );
+        } else {
+            $this->request = $request;
         }
 
-        // Get content type
-        $content_type = $this->request->getHeader('content-type');
-        $this->content_type = $content_type[0] ?? '';
+        // Set inputs
+        $this->inputs = [
+            'get' => $this->request->getQueryParams() ?? [],
+            'post' => $this->request->getParsedBody() ?? [],
+            'cookie' => $this->request->getCookieParams() ?? [],
+            'files' => $this->request->getUploadedFiles() ?? [],
+            'server' => $this->request->getServerParams() ?? [],
+            'path_params' => []
+        ];
 
         // Set addl properties
+        $this->content_type = $this->request->getHeader('content-type')[0] ?? '';
         $this->cntr->set(UriInterface::class, $this->request->getUri());
         $this->path = $this->request->getUri()->getPath();
     }

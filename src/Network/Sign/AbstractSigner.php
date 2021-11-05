@@ -5,6 +5,7 @@ namespace Apex\App\Network\Sign;
 
 use Apex\App\Cli\Cli;
 use Apex\App\Network\Models\RsaKey;
+use Apex\App\Attr\Inject;
 use OpenSSLAsymmetricKey;
 
 /**

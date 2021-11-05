@@ -7,6 +7,7 @@ use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Symfony\Component\Process\Process;
+use Apex\App\Attr\Inject;
 
 /**
  * Execute unit tests

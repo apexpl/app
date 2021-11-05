@@ -7,6 +7,7 @@ use Apex\Svc\Container;
 use Apex\App\Cli\Cli;
 use Apex\App\Network\Stores\RsaKeyStore;
 use Apex\App\Network\Models\RsaKey;
+use Apex\App\Attr\Inject;
 
 /**
  * RSA / SSH Keys

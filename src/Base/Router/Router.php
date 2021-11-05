@@ -7,6 +7,7 @@ use Apex\Svc\{Container, App};
 use Apex\App\Interfaces\{RouterInterface, RouterResponseInterface};
 use Psr\Http\Message\ServerRequestInterface;
 use Apex\App\Exceptions\{ApexYamlException, ApexRouterException};
+use Apex\App\Attr\Inject;
 
 /**
  * Router

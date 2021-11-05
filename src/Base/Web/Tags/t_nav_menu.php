@@ -10,6 +10,7 @@ use Apex\Syrus\Interfaces\TagInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Apex\App\Exceptions\ApexYamlException;
+use Apex\App\Attr\Inject;
 use redis;
 
 

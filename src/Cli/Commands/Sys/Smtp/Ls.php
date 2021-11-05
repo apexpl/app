@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Commands\Sys\Smtp;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\Mercury\Email\RedisManager;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

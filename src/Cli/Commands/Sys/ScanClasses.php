@@ -7,6 +7,7 @@ use Apex\Svc\Container;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Sys\Utils\ScanListeners as Scanner;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Scan listeners

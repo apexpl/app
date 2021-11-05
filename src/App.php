@@ -240,6 +240,9 @@ class App extends Bootloader implements RequestHandlerInterface
         }
         $this->path = $path;
         $this->path_is_locked = $is_locked;
+
+        // Return
+        return true;
     }
 
     /**

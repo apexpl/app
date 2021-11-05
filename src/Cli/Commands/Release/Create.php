@@ -10,6 +10,7 @@ use Apex\App\Sys\Utils\ScanClasses;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Create release

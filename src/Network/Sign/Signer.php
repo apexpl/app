@@ -8,6 +8,7 @@ use Apex\App\Network\Models\{LocalPackage, RsaKey};
 use Apex\App\Network\Svn\SvnRepo;
 use Apex\App\Network\Stores\{RsaKeyStore, CertificateStore};
 use Apex\App\Exceptions\ApexCertificateNotExistsException;
+use Apex\App\Attr\Inject;
 use OpenSSLAsymmetricKey;
 
 /**

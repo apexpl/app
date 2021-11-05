@@ -6,6 +6,7 @@ namespace Apex\App\Base\Web\Tags;
 use Apex\App\Sys\Utils\Hashes;
 use Apex\Syrus\Parser\StackElement;
 use Apex\Syrus\Interfaces\TagInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Renders a specific template tag.  Please see developer documentation for details.

@@ -12,7 +12,7 @@ use Apex\App\Attr\Inject;
 /**
  * Renders a specific template tag.  Please see developer documentation for details.
  */
-class t_ft_checkbox implements TagInterface
+class t_ft_radio implements TagInterface
 {
 
     #[Inject(Hashes::class)]
@@ -28,14 +28,14 @@ class t_ft_checkbox implements TagInterface
 
         // Initialize
         $attr = $e->getAttrAll();
-        $value = explode(',', ($e->getAttr('value') ?? ''));
+        $value = $e->getAttr('value') ?? '';
         if (!isset($attr['label'])) { 
             $attr['label'] = ucwords(str_replace('_', ' ', $attr['name']));
         }
 
         // Get select options
         if (($data_source = $e->getAttr('data_source')) !== null) { 
-            $options = $this->hashes->parseDataSource($data_source, $value, 'checkbox', $attr['name']);
+            $options = $this->hashes->parseDataSource($data_source, $value, 'radio', $attr['name']);
         } else { 
             $options = $e->getBody();
         }

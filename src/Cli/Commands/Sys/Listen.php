@@ -7,6 +7,7 @@ use Apex\Svc\{App, Container};
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\Cluster\Listener;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Listen

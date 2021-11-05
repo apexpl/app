@@ -10,6 +10,7 @@ use Apex\App\Pkg\Helpers\Registry;
 use Apex\App\Base\Router\RouterConfig;
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Create view

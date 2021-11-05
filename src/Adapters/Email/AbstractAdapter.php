@@ -3,6 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Adapters\Email;
 
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

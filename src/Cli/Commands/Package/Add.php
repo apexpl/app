@@ -9,6 +9,7 @@ use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Pkg\Helpers\Registry;
 use Apex\App\Sys\Utils\Io;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Add file

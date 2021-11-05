@@ -10,6 +10,7 @@ use Apex\Opus\Opus;
 use Apex\Db\Mapper\ToInstance;
 use Apex\App\Exceptions\ApexAccountNotExistsException;
 use Symfony\Component\Yaml\Yaml;
+use Apex\App\Attr\Inject;
 
 /**
  * Accounts store

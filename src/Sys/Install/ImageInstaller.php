@@ -60,7 +60,6 @@ class ImageInstaller
         $http = $app->getContainer()->get(HttpClient::class);
         $io = $app->getContainer()->make(Io::class);
 
-
         // Create request
         $url = 'https://images.apexpl.io/download/' . $name . '.zip';
         $req = new Request('GET', $url);
@@ -148,6 +147,9 @@ class ImageInstaller
         $db = $app->getContainer()->get(Db::class);
         $redis = $app->getContainer()->get(redis::class);
         $obj->install($app, $db, $redis);
+
+        // Set config
+        $app->setConfigVar('core.install_image', $alias);
 
         // Send message
         $cli->send("Successfully installed the image, $name\r\n\r\n");

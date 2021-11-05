@@ -5,6 +5,7 @@ namespace Apex\App\Cli;
 
 use Apex\Svc\{Convert, Container};
 use Apex\App\Cli\{CLi, Shortcuts};
+use Apex\App\Attr\Inject;
 
 /**
  * CLI Router

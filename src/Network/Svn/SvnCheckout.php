@@ -7,6 +7,7 @@ use Apex\App\Cli\Cli;
 use Apex\App\Network\Svn\{SvnRepo, SvnInventory};
 use Apex\App\Pkg\Filesystem\Package\{Compiler, Inventory, Diff};
 use Apex\App\Network\Sign\MerkleTreeBuilder;
+use Apex\App\Attr\Inject;
 
 /**
  * SVN Checkout

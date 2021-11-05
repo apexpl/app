@@ -8,6 +8,7 @@ use Apex\App\Cli\CLi;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\Stores\RsaKeyStore;
 use Symfony\Component\Process\Process;
+use Apex\App\Attr\Inject;
 
 /**
  * SVN Client

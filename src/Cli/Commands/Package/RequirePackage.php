@@ -9,6 +9,7 @@ use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Pkg\Helpers\Registry;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Symfony\Component\Process\Process;
+use Apex\App\Attr\Inject;
 
 /**
  * Require package / dependency

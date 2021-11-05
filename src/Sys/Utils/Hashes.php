@@ -5,6 +5,7 @@ namespace Apex\App\Sys\Utils;
 
 use Apex\Svc\{Db, Debugger};
 use Apex\App\Exceptions\ApexHashesException;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

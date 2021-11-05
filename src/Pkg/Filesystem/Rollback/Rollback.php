@@ -10,6 +10,7 @@ use Apex\App\Network\Svn\SvnFileConverter;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Sys\Utils\Io;
 use Apex\Migrations\Handlers\Remover;
+use Apex\App\Attr\Inject;
 
 /**
  * Rollback

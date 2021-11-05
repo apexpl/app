@@ -15,6 +15,7 @@ use Apex\App\Pkg\Helpers\Migration;
 use Apex\App\Pkg\Filesystem\Package\Installer;
 use Apex\App\Pkg\Config\{EmailNotifications, DashboardItems};
 use Apex\App\Exceptions\ApexSvnRepoException;
+use Apex\App\Attr\Inject;
 
 /**
  * Svn Install

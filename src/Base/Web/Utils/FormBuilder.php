@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Base\Web\Utils;
 
 use Apex\App\Base\Web\Utils\FormField;
+use Apex\App\Attr\Inject;
 
 /**
  * Form fields creator

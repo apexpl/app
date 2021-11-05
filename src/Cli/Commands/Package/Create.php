@@ -10,6 +10,7 @@ use Apex\App\Pkg\PackageManager;
 use Apex\App\Network\Stores\{ReposStore, PackagesStore};
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Create package

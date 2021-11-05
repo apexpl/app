@@ -5,6 +5,7 @@ namespace Apex\App\Adapters;
 
 use Apex\Svc\Convert;
 use Apex\Cluster\Interfaces\{MessageRequestInterface, FeHandlerInterface};
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

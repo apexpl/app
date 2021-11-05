@@ -9,6 +9,7 @@ use Apex\Syrus\Parser\StackElement;
 use Apex\Syrus\Render\Tags;
 use Apex\Syrus\Interfaces\TagInterface;
 use Apex\App\Interfaces\Opus\DashboardItemInterface;
+use Apex\App\Attr\Inject;
 
 /**
  * Renders a specific template tag.  Please see developer documentation for details.

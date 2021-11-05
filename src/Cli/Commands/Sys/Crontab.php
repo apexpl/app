@@ -8,6 +8,7 @@ use Apex\App\CLi\{Cli, CliHelpScreen};
 use Apex\App\Base\Implementors;
 use Apex\App\Interfaces\Opus\{CliCommandInterface, CrontabInterface};
 use Symfony\Component\Process\Process;
+use Apex\App\Attr\Inject;
 
 /**
  * Execute crontab jobs

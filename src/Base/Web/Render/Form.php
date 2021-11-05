@@ -7,6 +7,7 @@ use Apex\Svc\{App, View};
 use Apex\App\Base\Web\Components;
 use Apex\App\Base\Web\Utils\FormField;
 use Apex\Syrus\Parser\StackElement;
+use Apex\App\Attr\Inject;
 
 /**
  * Render form

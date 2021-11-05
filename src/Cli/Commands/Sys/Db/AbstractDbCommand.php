@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Cli\Commands\Sys\Db;
 
 use Apex\App\Cli\Cli;
+use Apex\App\Attr\Inject;
 
 /**
  * Abstract database command

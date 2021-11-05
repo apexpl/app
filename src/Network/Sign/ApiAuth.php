@@ -7,6 +7,7 @@ use Apex\App\Cli\Cli;
 use Apex\App\Network\Models\LocalAccount;
 use Apex\App\Network\Stores\RsaKeyStore;
 use Apex\App\Exceptions\ApexRsaKeyNotExistsException;
+use Apex\App\Attr\Inject;
 
 /**
  * Api Auth

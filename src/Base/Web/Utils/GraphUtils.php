@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Base\Web\Utils;
 
 use Apex\Svc\{Db, Convert, App};
+use Apex\App\Attr\Inject;
 
 /**
  * Graph utils

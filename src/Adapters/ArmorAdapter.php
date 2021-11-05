@@ -13,6 +13,7 @@ use Apex\Armor\Interfaces\{AdapterInterface, ArmorUserInterface};
 use App\Webapp\Notifications\ArmorController;
 use App\Webapp\Models\EmailNotification;
 use Apex\Armor\Exceptions\{ArmorOutOfBoundsException, ArmorNotImplementedException};
+use Apex\App\Attr\Inject;
 
 /**
  * Apex adapter that utilizes the apex/mercury and apex/syrus packages.
@@ -28,6 +29,9 @@ class ArmorAdapter implements AdapterInterface
 
     #[Inject(DbInterface::class)]
     private DbInterface $db;
+
+    #[Inject(View::class)]
+    private View $view;
 
     /**
      * Get user by uuid
@@ -79,11 +83,14 @@ class ArmorAdapter implements AdapterInterface
         $replace = $user->toArray();
         $replace['site_name'] = $this->app->config('core.site_name');
         $replace['domain_name'] = $this->app->config('core.domain_name');
-        $replace['code'] = $armor_code;
+        $replace['armor_code'] = $armor_code;
 
         // Replace as needed in e-mail message
         list($subject, $contents) = [$email->subject, $email->contents];
         foreach ($replace as $key => $value) {
+            if (!is_scalar($value)) {
+                continue;
+            }
             $subject = str_replace("~$key~", (string) $value, $subject);
             $contents = str_replace("~$key~", (string) $value, $contents);
         }
@@ -99,7 +106,7 @@ class ArmorAdapter implements AdapterInterface
             'from_email' => $sender->getEmail(),
             'content_type' => $email->content_type,
             'subject' => $subject,
-            'contents' => $contents
+            'message' => $contents
         ]);
 
         // Send e-mail
@@ -113,13 +120,18 @@ class ArmorAdapter implements AdapterInterface
     public function sendSMS(ArmorUserInterface $user, string $type, string $code, string $new_phone = ''):void
     {
 
+        // Check if Nexmo configured
+        if ($this->app->config('core.nexmo_api_key') == '') {
+            return;
+        }
+
         // Set message
         $message = $this->app->config('core.sms_verification_message');
         $message = str_replace('~code~', $code, $message);
         $phone = $new_phone != '' ? $new_phone : $user->getPhone();
 
         // Send SMS
-        $nexmo = $this->cntr->make(SmsClient::class);
+        $nexmo = $this->cntr->get(SmsClient::class);
         $mid = $nexmo->send($phone, $message);
     }
 
@@ -131,9 +143,9 @@ class ArmorAdapter implements AdapterInterface
 
         // Get template file
         $file = match($status) { 
-            'email' => '/members/2fa_email.html', 
-            'email_otp' => '/members/2fa_email_otp.html', 
-            'phone' => '/members/2fa_phone.html', 
+            'email' => '/members/auth/2fa_email.html', 
+            'email_otp' => '/members/auth/2fa_email_otp.html', 
+            'phone' => '/members/auth/2fa_phone.html', 
             default => '/members/index'
         };
 
@@ -149,13 +161,17 @@ class ArmorAdapter implements AdapterInterface
     public function handleTwoFactorAuthorized(AuthSession $session, ServerRequestInterface $request, bool $is_login = false):void
     {
 
-        // Get POST body from previous request
-        $_POST = $request->getParsedBody();
+        // Set request
+        $this->app->setRequest($request);
+        $_SERVER = $request->getServerParams();
 
-        // Set template
-        $syrus = Di::get(Syrus::class);
-        $syrus->setTemplateFile('/members/twofactor2.html', true);
+        // Check for login
+        if ($is_login === true) {
+            $this->view->setTemplateFile('members/index', true);
+        }
 
+        // Handle request
+        $this->app->handle($request);
     }
 
     /**

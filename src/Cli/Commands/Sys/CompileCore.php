@@ -8,6 +8,7 @@ use Apex\App\Sys\Utils\Io;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Symfony\Component\Yaml\Yaml;
+use Apex\App\Attr\Inject;
 
 /**
  * Compile core

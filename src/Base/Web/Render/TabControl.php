@@ -7,6 +7,7 @@ use Apex\Svc\{Convert, View, Container};
 use Apex\App\Base\Web\Components;
 use Apex\Syrus\Parser\StackElement;
 use Apex\App\Interfaces\Opus\TabControlInterface;
+use Apex\App\Attr\Inject;
 use redis;
 
 /**

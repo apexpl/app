@@ -7,6 +7,7 @@ use Apex\Svc\App;
 use Apex\App\Exceptions\ApexYamlException;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
+use Apex\App\Attr\Inject;
 
 /**
  * Router config
