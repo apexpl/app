@@ -46,8 +46,15 @@ class SvnCheckoutProject
 
         // Checkout package
         $svn = $pkg->getSvnRepo();
-        $svn->setTarget('trunk');
-        $svn->exec(['checkout'], [$tmp_dir], true);
+        $svn->setTarget('trunk', 0, false, false);
+        if (!$svn->exec(['checkout'], [$tmp_dir], true)) {
+            $svn->setTarget('trunk');
+            if (!$svn->exec(['checkout'], [$tmp_dir], true)) {
+                $this->cli->error("Unable to checkout project, aborting.");
+                return;
+            }
+        }
+
 
         // Create prev_fs directory
         $prev_dir = SITE_PATH . '/.apex/prev_fs';

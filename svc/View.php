@@ -36,7 +36,7 @@ final class View extends \Apex\Syrus\Syrus
 
         // Check auto-routing
         if ($file == '' && $this->template_file == '') { 
-            $file = $this->doAutoRouting();
+            $file = $this->doAutoRouting($this->app->getPath());
         }
         if ($file != '') { 
             $this->setTemplateFile($file);

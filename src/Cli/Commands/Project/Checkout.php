@@ -73,11 +73,7 @@ class Checkout implements CliCommandInterface
             return;
         }
 
-        // Get account
-        $acct = $this->acct_helper->get();
-
-        // Check if user has write access to package
-        $this->network->setAuth($acct);
+        // Check if user has read access to package
         $res = $this->network->post($repo, 'repos/check', [
             'pkg_serial' => $pkg_serial,
             'is_install' => 1
@@ -87,7 +83,22 @@ class Checkout implements CliCommandInterface
         if ($res['exists'] === false) {
             $cli->error("The package does not exist on the repository, $pkg_serial");
             return;
-        } elseif ($res['can_write'] === false) {
+        } elseif ($res['can_read'] === false) {
+
+            // Get account
+            $acct = $this->acct_helper->get();
+            $res['local_user'] = $acct->getUsername();
+
+            // Send api call to check access
+            $this->network->setAuth($acct);
+            $res = $this->network->post($repo, 'repos/check', [
+                'pkg_serial' => $pkg_serial,
+                'is_install' => 1
+            ]);
+        }
+
+        // Check user has read access
+        if ($res['can_read'] === false) {
             $this->cli->error("You do not have write access to the package, $pkg_serial hence can not check it out.");
             return;
         }
@@ -103,7 +114,6 @@ class Checkout implements CliCommandInterface
 
         // Get package object
         $res['repo_alias'] = $repo->getAlias();
-        $res['local_user'] = $acct->getUsername();
         $pkg = ToInstance::map(LocalPackage::class, $res);
 
         // Checkout the project

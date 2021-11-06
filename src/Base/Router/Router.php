@@ -33,6 +33,7 @@ class Router implements RouterInterface
         // Initialize Variables
         $http_controller = $routes['default'] ?? 'PublicSite';
         $path = ltrim($request->getUri()->getPath(), '/');
+
         $params = [];
         $match_num = 0;
 

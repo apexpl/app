@@ -83,7 +83,7 @@ class App extends Bootloader implements RequestHandlerInterface
 
         // Get route
         $router = $this->cntr->make(RouterInterface::class);
-        $res = $router->lookup($this->request);
+        $res = $router->lookup($request);
         $this->path = $res->getPathTranslated();
 
         // Set variables

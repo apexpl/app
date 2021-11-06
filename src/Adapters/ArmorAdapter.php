@@ -14,6 +14,7 @@ use App\Webapp\Notifications\ArmorController;
 use App\Webapp\Models\EmailNotification;
 use Apex\Armor\Exceptions\{ArmorOutOfBoundsException, ArmorNotImplementedException};
 use Apex\App\Attr\Inject;
+use Nyholm\Psr7\Response;
 
 /**
  * Apex adapter that utilizes the apex/mercury and apex/syrus packages.
@@ -145,11 +146,17 @@ class ArmorAdapter implements AdapterInterface
         $file = match($status) { 
             'email' => '/members/auth/2fa_email.html', 
             'email_otp' => '/members/auth/2fa_email_otp.html', 
-            'phone' => '/members/auth/2fa_phone.html', 
+            'phone' => '/members/auth/2fa_phone.html',
+            'verify_email' => 'members/auth/verify_email',
+            'verify_email_otp' => 'members/auth/verify_email_otp',
+            'verify_phone' => 'members/auth/verify_phone',
             default => '/members/index'
         };
 
-        // Display template$syrus = Di::get(Syrus::class);
+        // Template variables
+        $this->view->assign('profile', $session->getUser()->toDisplayArray());
+
+        // Display template
         $this->view->setTemplateFile($file);
         echo $this->view->render();
         exit(0);
@@ -163,15 +170,20 @@ class ArmorAdapter implements AdapterInterface
 
         // Set request
         $this->app->setRequest($request);
-        $_SERVER = $request->getServerParams();
+        $this->app->setSession($session);
+        $this->view->setTemplateFile('');
 
         // Check for login
         if ($is_login === true) {
-            $this->view->setTemplateFile('members/index', true);
+            $template_file = $this->app->config('users.redirect_after_login') == 'index' ? 'index' : 'members/index';
+            $this->view->setTemplateFile($template_file, true);
         }
 
         // Handle request
-        $this->app->handle($request);
+        $html = $this->view->render();
+        $response = new Response(00, [], $html);
+        $this->app->outputResponse($response);
+        exit(0);
     }
 
     /**
