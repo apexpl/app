@@ -199,9 +199,7 @@ class ArmorAdapter implements AdapterInterface
      */
     public function requestResetPassword(ArmorUserInterface $user):void
     {
-        // Set template
-        $syrus = Di::get(Syrus::class);
-        $syrus->setTemplateFile('reset_password2.html', true);
+        $this->view->setTemplateFile('forgot_password2.html', true);
     }
 
 

@@ -106,6 +106,8 @@ class ProjectManager
                 continue;
             } elseif (preg_match("/^(\.svn|\.apex|vendor)/", $file)) { 
                 continue;
+            } elseif (str_ends_with($file, '.pem')) {
+                continue;
             }
             $svn->add($file);
         }

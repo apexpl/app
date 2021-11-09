@@ -12,6 +12,7 @@ use Apex\App\Pkg\Helpers\PackageConfig;
 use Apex\App\Exceptions\ApexRepoNotExistsException;
 use Apex\App\Attr\Inject;
 use DateTime;
+use redis;
 
 /**
  * Local package
@@ -33,6 +34,9 @@ class LocalPackage
 
     #[Inject(AccountHelper::class)]
     private AccountHelper $acct_helper;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     // Properties
     private bool $is_modified = false;
@@ -113,6 +117,17 @@ class LocalPackage
             if (in_array($this->author . '.' . $this->repo_alias, $list)) { 
                 $this->local_user = $this->author;
                 $this->is_modified = true;
+            }
+        }
+
+        // Check for project
+        if ($this->type == 'project') {
+            if (!$username = $this->redis->hget('config:project', 'local_user')) {
+                $acct = $this->acct_helper->get();
+                $this->redis->hset('config:project', 'local_user', $acct->getUsername() . '.' . $acct->getRepoAlias());
+                $this->local_user = $acct->getUsername();
+            } else {
+                $this->local_username = $username;
             }
         }
 

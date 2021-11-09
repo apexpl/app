@@ -86,6 +86,8 @@ class MerkleTreeBuilder
         foreach ($filelist as $file) { 
             if (preg_match("/^(\.svn|\.apex|\.env|vendor)/", $file)) { 
                 continue;
+            } elseif (str_ends_with($file, '.pem')) {
+                continue;
             }
             $files[$file] = sha1_file($rootdir . '/' . $file);
         }
