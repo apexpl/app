@@ -119,16 +119,15 @@ class LocalPackage
                 $this->is_modified = true;
             }
         }
+        $this->redis->hdel('config:project', 'local_user');
 
         // Check for project
         if ($this->type == 'project') {
             if (!$username = $this->redis->hget('config:project', 'local_user')) {
-                $acct = $this->acct_helper->get();
-                $this->redis->hset('config:project', 'local_user', $acct->getUsername() . '.' . $acct->getRepoAlias());
-                $this->local_user = $acct->getUsername();
-            } else {
-                $this->local_username = $username;
+                $username = $this->acct_helper->get()->getUsername();
+                $this->redis->hset('config:project', 'local_user', $username);
             }
+            $this->local_user = $username;
         }
 
         // Get account, if we don't have one
