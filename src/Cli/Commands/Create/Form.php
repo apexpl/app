@@ -48,9 +48,6 @@ class Form implements CliCommandInterface
         // Get dbtable
         $opt = $cli->getArgs(['dbtable']);
         $dbtable = $opt['dbtable'] ?? '';
-        if ($dbtable == '') {
-            $dbtable = $pkg_alias . '_' . $this->convert->case($alias, 'lower');
-        }
 
         // Check
         if ($alias == '' || !preg_match("/^[a-zA-Z0-9_-]+$/", $alias)) { 

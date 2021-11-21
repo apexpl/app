@@ -76,7 +76,7 @@ class ErrorHandlers
         }
 
         // Exit
-        exit(0);
+        exit(1);
     }
 
     /**
@@ -91,7 +91,7 @@ class ErrorHandlers
         fputs(STDOUT, "    Line: $line\r\n\r\n");
 
         // Exit
-        exit(0);
+        exit(1);
     }
 
     /**
@@ -114,7 +114,7 @@ class ErrorHandlers
         header("Content-type: application/json");
         http_response_code(500);
         echo json_encode($vars);
-        exit(0);
+        exit(1);
     }
 
     /**
@@ -141,7 +141,7 @@ class ErrorHandlers
         // Parse view
         $view->setRpcEnabled(false);
         echo $view->render($template_file);
-        exit(0);
+        exit(1);
     }
 
 }

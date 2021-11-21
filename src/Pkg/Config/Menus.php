@@ -135,7 +135,9 @@ class Menus
         // Initial checks
         if ((!isset($vars['area'])) || (!isset($vars['alias']))) { 
             throw new ApexInvalidArgumentException("Unable to add menu as either the required 'area' or 'alias' fields are missing.  Please correct this within the package's package.yml file.");
-        } elseif (preg_match("/[\W\s]/", $vars['area']) || preg_match("/[\W\s]/", $vars['alias'])) { 
+        } elseif (!preg_match("/^[a-zA-Z0-9_\-]+$/", $vars['area'])) {
+            throw new ApexInvalidArgumentException("Unable to add menu as either the 'area' or 'alias' fields contain spaces or special characters which are disallowed.");
+        } elseif (!preg_match("/^[a-zA-Z0-9_\-]+$/", $vars['area'])) {
             throw new ApexInvalidArgumentException("Unable to add menu as either the 'area' or 'alias' fields contain spaces or special characters which are disallowed.");
         }
 

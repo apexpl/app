@@ -87,13 +87,14 @@ class ArmorAdapter implements AdapterInterface
         $replace['armor_code'] = $armor_code;
 
         // Replace as needed in e-mail message
-        list($subject, $contents) = [$email->subject, $email->contents];
+        list($subject, $contents, $html_contents) = [$email->subject, $email->text_contents, $email->html_contents];
         foreach ($replace as $key => $value) {
             if (!is_scalar($value)) {
                 continue;
             }
             $subject = str_replace("~$key~", (string) $value, $subject);
             $contents = str_replace("~$key~", (string) $value, $contents);
+            $html_contents = str_replace("~$key~", (string) $value, $html_contents);
         }
 
         // Get sender
@@ -105,9 +106,9 @@ class ArmorAdapter implements AdapterInterface
         $msg = $this->cntr->make(EmailMessage::class, [
             'to_email' => $new_email == '' ? $user->getEmail() : $new_email,
             'from_email' => $sender->getEmail(),
-            'content_type' => $email->content_type,
             'subject' => $subject,
-            'message' => $contents
+            'text_message' => $contents,
+            'html_message' => $html_contents
         ]);
 
         // Send e-mail

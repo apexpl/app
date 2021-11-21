@@ -96,7 +96,9 @@ class Form
                 continue;
             } elseif ($vars['field'] == 'textarea' && $key == 'value') { 
                 continue;
-            }
+            } elseif (is_array($value)) {
+                $value = implode(',', $value);
+        }
             $string .= $key . '="' . $value . '" ';
         }
 

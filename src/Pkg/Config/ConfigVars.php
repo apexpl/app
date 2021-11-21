@@ -38,6 +38,7 @@ class ConfigVars
         // GO through config vars
         foreach ($config_vars as $alias => $value) { 
             $comp_alias = $this->pkg_alias . '.' . $alias;
+            $config_vars[$alias] = $value;
 
             // Skip if exists
             if ($row = $this->db->getRow("SELECT * FROM internal_config WHERE package = %s AND alias = %s", $this->pkg_alias, $alias)) { 
@@ -62,7 +63,7 @@ class ConfigVars
         foreach ($aliases as $alias) { 
 
             // Skip if ok
-            if (isset($config_vars[$alias])) {
+            if (array_key_exists($alias, $config_vars)) {
                 continue;
             }
 

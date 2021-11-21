@@ -38,8 +38,8 @@ class SymfonyAdapter extends AbstractAdapter implements EmailerInterface
         $email = (new Email())->from($msg->getFromEmail())
             ->to($msg->getToEmail())
             ->subject($msg->getSubject())
-            ->text($msg->getMessage())
-            ->html($msg->getMessage());
+            ->text($msg->getTextMessage())
+            ->html($msg->getHtmlMessage());
 
         // Add reply to
         if ($msg->getReplyTo() != '') {

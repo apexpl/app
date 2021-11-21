@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Commands\Sys;
 use Apex\Svc\{Db, Convert, Container};
 use Apex\App\CLi\{Cli, CliHelpScreen};
 use Apex\App\Base\Implementors;
+use Apex\App\Sys\TaskModel;
 use Apex\App\Interfaces\Opus\{CliCommandInterface, CrontabInterface};
 use Symfony\Component\Process\Process;
 use Apex\App\Attr\Inject;
@@ -46,31 +47,50 @@ class Crontab
     public function process(Cli $cli, array $args):void
     {
 
+        // Initialize
+        $opt = $cli->getArgs(['task-id']);
+        $task_id = (int) ($opt['task-id'] ?? 0);
+
         // Process queue, if needed
-        if (count($args) < 2) { 
+        if (count($args) < 2 && $task_id == 0) { 
             $this->processQueue($cli);
             $cli->send("Successfully processed all necessary crontab jobs.\r\n\r\n");
             return;
         }
 
         // Get class name
-        $class_name = "App\\" . $this->convert->case($args[0], 'title') . "\\Opus\\Crontabs\\" . $this->convert->case($args[1], 'title');
-        if (!class_exists($class_name)) { 
-            $cli->error("Class does not exist at, $class_name");
-            return;
+        if ($task_id > 0) { 
+
+            if (!$task = $this->db->getIdObject(TaskModel::class, 'internal_tasks', $task_id)) {
+                $cli->error("No task exists with the id# $task_id");
+                exit(1);
+            }
+            $class_name = $task->class_name;
+
+        } else {
+            $class_name = "App\\" . $this->convert->case($args[0], 'title') . "\\Opus\\Crontabs\\" . $this->convert->case($args[1], 'title');
         }
 
         // Load class
+        if (!class_exists($class_name)) { 
+            $cli->error("Class does not exist at, $class_name");
+            exit(1);
+        }
         $obj = $this->cntr->make($class_name);
 
         // Check for 'process' method
         if (!method_exists($obj, 'process')) { 
             $cli->error("No process() method exists within the class, $class_name");
-            return;
+            exit(1);
         }
 
         // Process
-        $obj->process();
+        if ($task_id > 0) {
+            $data = json_decode($task->data, true);
+            $obj->process($task, $data);
+        } else {
+            $obj->process();
+        }
 
         // Send message
         $cli->send("Successfully processed the crontab job at, $class_name\r\n\r\n");
@@ -86,23 +106,19 @@ class Crontab
         $this->scanCrontabClasses();
 
         // Go through queue
-        $queue = $this->db->getColumn("SELECT class_name FROM internal_tasks WHERE execute_time < now()");
-        foreach ($queue as $class_name) {
+        $rows = $this->db->query("SELECT * FROM internal_tasks WHERE execute_time < now() AND in_progress = %b", false);
+        foreach ($rows as $row) {
 
-            // Parse class name
-            $parts = explode("\\", $class_name);
-            if (count($parts) < 4) { 
-                $this->db->query("DELETE FROM internal_tasks WHERE class_name = %s", $class_name);
-                continue;
-            }
+            // Set task in progress
+            $this->db->query("UPDATE internal_tasks SET in_progress = %b WHERE id = %i", true, $row['id']);
 
             // Set args to process crontab job
             $args = [
                 SITE_PATH . '/apex',
                 'sys',
                 'crontab',
-                $parts[2],
-                $parts[5]
+                '--task-id',
+                $row['id']
             ];
 
             // Process
@@ -112,29 +128,36 @@ class Crontab
 
             // Check for error
             if ($process->isSuccessful() !== true) {
-                $this->addFailed($class_name);
+                $this->addFailed($row);
+                $cli->send("An error occured while processing the task at, $row[class_name]\r\n\r\n");
+                $cli->send("ERROR: " . $process->getErrorOutput() . "\r\n\r\n");
                 continue;
             }
 
             // Load class
-            $obj = $this->cntr->make($class_name);
+            $obj = $this->cntr->make($row['class_name']);
 
-            // Check auto run
+            // Check if we should delete task
             $auto_run = $obj->auto_run ?? false;
-            if ($auto_run !== true) { 
-                $this->db->query("DELETE FROM internal_tasks WHERE class_name = %s", $class_name);
-                continue;
-            } elseif (!isset($obj->interval)) { 
-                $this->db->query("DELETE FROM internal_tasks WHERE class_name = %s", $class_name);
-                continue;
-            } elseif (!$execute_time = $this->addInterval($obj->interval)) { 
-                $this->db->query("DELETE FROM internal_tasks WHERE class_name = %s", $class_name);
-                continue;
+            $delete_task = match(true) {
+                (bool) $row['is_onetime'] => true,
+                $auto_run === false ? true : false => true,
+                (!isset($obj->interval)) ? true : false => true,
+                default => false
+            };
+
+            // Add interval, if needed
+            if ($delete_task === false && !$execute_time = $this->addInterval($obj->interval)) { 
+                $delete_task = true;
             }
 
-            // Update database
-            $this->db->query("UPDATE internal_tasks SET last_execute_time = now(), execute_time = %s WHERE class_name = %s", $execute_time, $class_name);
-            $cli->send("Successfully executed the crontab job, $class_name\r\n\r\n");
+            // Delete, if needed
+            if ($delete_task === true) {
+                $this->db->query("DELETE FROM internal_tasks WHERE id = %i", $row['id']);
+            } else {
+                $this->db->query("UPDATE internal_tasks SET last_execute_time = now(), execute_time = %s, in_progress = %b WHERE id = %i", $execute_time, false, $row['id']);
+            }
+            $cli->send("Successfully executed the task at, $row[class_name]\r\n\r\n");
         }
 
     }
@@ -142,19 +165,16 @@ class Crontab
     /**
      * Add failed
      */
-    private function addFailed(string $class_name):void
+    private function addFailed(array $row):void
     {
 
         // Update failed
-        $this->db->query("UPDATE internal_tasks SET failed = failed + 1 WHERE class_name = %s", $class_name);
-        if (!$row = $this->db->getRow("SELECT * FROM internal_tasks WHERE class_name = %s", $class_name)) { 
-            return;
-        }
+        $this->db->query("UPDATE internal_tasks SET failed = failed + 1, in_progress = %b WHERE id = %i", false, $row['id']);
 
         // Add one hour, if failed 5+ times
         if ($row['failed'] >= 5) {
             $execute_time = $this->db->addTime('hour', 1);
-            $this->db->query("UPDATE internal_tasks SET execute_time = %s WHERE class_name = %s", $execute_time, $class_name);
+            $this->db->query("UPDATE internal_tasks SET execute_time = %s WHERE id = %i", $execute_time, $row['id']);
         }
 
     }

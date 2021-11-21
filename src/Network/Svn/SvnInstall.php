@@ -6,7 +6,7 @@ namespace Apex\App\Network\Svn;
 use Apex\Svc\{App, Container};
 use Apex\App\Cli\Cli;
 use Apex\App\Sys\Utils\{Io, SiteConfig, ScanClasses};
-use Apex\App\Network\Svn\SvnExport;
+use Apex\App\Network\Svn\{SvnExport, SvnDependencies};
 use Apex\App\Network\Sign\VerifyDownload;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Base\Router\RouterConfig;
@@ -37,6 +37,9 @@ class SvnInstall
 
     #[Inject(SvnExport::class)]
     private SvnExport $svn_export;
+
+    #[Inject(SvnDependencies::class)]
+    private SvnDependencies $dependencies;
 
     #[Inject(VerifyDownload::class)]
     private VerifyDownload $verifier;
@@ -81,14 +84,18 @@ class SvnInstall
 
         // Verify
         if ($noverify === true || $dev === true) { 
-            $this->cli->send("Skipping verification checks, proceeding with installation...\r\n");
+            $this->cli->send("Skipping verification checks, proceeding to install dependencies...\r\n");
         } else { 
             if (!$signed_by = $this->verifier->verify($svn, $dir_name, $tmp_dir)) { 
                 $this->cli->error("Unable to install package, as verification failed.");
                 return false;
             }
-            $this->cli->send("done (signed by: $signed_by).\r\nInstalling package... \n");
+            $this->cli->send("done (signed by: $signed_by).\r\nInstalling dependences... \n");
         }
+
+        // Install dependencies
+        $this->dependencies->process($svn->getPackage()->getRepo(), $tmp_dir, $noverify);
+        $this->cli->send("done.\r\nInstalling package... ");
 
         // Install
         $this->installer->install($svn->getPackage(), $tmp_dir, true);
@@ -105,9 +112,9 @@ class SvnInstall
             $this->migration->install($pkg);
         }
 
-        // Install dependencies
-        $this->cli->send("done.\r\nInstalling any needed dependencies... ");
-        $this->installDependencies($pkg, $noverify);
+        // Install composer dependencies
+        $this->cli->send("done.\r\nFinalizing installation... ");
+        $this->installComposerDependencies($pkg, $noverify);
 
         // Install registry
         $this->installRegistry($pkg);
@@ -127,31 +134,12 @@ class SvnInstall
     /**
      * Install dependencies
      */
-    private function installDependencies(LocalPackage $pkg, bool $no_verify):void
+    private function installComposerDependencies(LocalPackage $pkg, bool $no_verify):void
     {
-
-        // Apex dependencies
-        $yaml = $pkg->getConfig();
-        $dependencies = $yaml['require'] ?? [];
-        foreach ($dependencies as $pkg_alias => $version) { 
-
-            // Check if installed
-            if ($chk = $this->pkg_store->get($pkg_alias)) { 
-                continue;
-            }
-
-            // Check for latest version
-            if ($version == '*') { 
-                $version = '';
-            }
-
-            // Install package
-            $this->process($pkg->getSvnRepo(), (string) $version, false, $no_verify);
-        }
 
         // Get composer dependencies
         $registry = $pkg->getRegistry();
-        $dependencies = $registry['require_composer'] ?? [];
+        $dependencies = $registry['composer_require'] ?? [];
         if (count($dependencies) == 0) { 
             return;
         }

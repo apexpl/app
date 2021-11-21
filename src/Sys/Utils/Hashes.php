@@ -142,6 +142,11 @@ class Hashes
             $sort_by = $source[3] ?? 'name';
             $idcol = $source[4] ?? 'id';
 
+            // Format checkbox name, if needed
+            if ($form_field == 'checkbox' && !str_ends_with($form_name, '[]')) {
+                $form_name .= '[]';
+            }
+
             // Go through rows
             $html = '';
             $rows = $this->db->query("SELECT * FROM $source[1] ORDER BY $sort_by");
@@ -154,8 +159,13 @@ class Hashes
                 }
 
                 // Add to options
-                $chk = $row[$idcol] == $value && $row[$idcol] != '' ? 'selected="selected"' : '';
-                $html .= "<option value=\"$row[$idcol]\" $chk>$temp</option>\n";
+                if ($form_field == 'select') {
+                    $chk = $row[$idcol] == $value && $row[$idcol] != '' ? 'selected="selected"' : '';
+                    $html .= "<option value=\"$row[$idcol]\" $chk>$temp</option>\n";
+                } else {
+                    $chk = (is_array($value) && in_array($row[$idcol], $value)) || (is_scalar($value) && $value == $row[$idcol]) ? 'checked="checked"' : '';
+                    $html .= "<input type=\"$form_field\" name=\"$form_name\" value=\"$row[$idcol]\" $chk>$temp<br />\n";
+                }
             }
         }
 

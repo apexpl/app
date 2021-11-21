@@ -64,12 +64,14 @@ class PhpMailerAdapter extends AbstractAdapter implements EmailerInterface
         }
 
         // Set message contents
-        if ($msg->getContentType() == 'text/haml') {
+        if ($msg->getHtmlContents() != '') {
             $mailer->isHTML(true);
+            $mailer->Body = $msg->getHtmlMessage();
+            $mailer->AltBody = $msg->getTextMessage();
+        } else {
+            $mailer->Body = $msg->getTextMessage();
         }
         $mailer->Subject = $msg->getSubject();
-        $mailer->Body = $msg->getMessage();
-        $mailer->AltBody = $msg->getMessage();
 
         // Send the message
         try {
