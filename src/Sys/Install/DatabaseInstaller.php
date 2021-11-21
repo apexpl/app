@@ -112,6 +112,10 @@ class DatabaseInstaller
     private static function testConnection(Cli $cli, array $info):void
     {
 
+        // Check for confirm
+        $opt = $cli->getArgs();
+        $confirm = $opt['confirm'] ?? false;
+
         // Load db driver
         $db = new self::$db_class($info);
 
@@ -128,7 +132,7 @@ class DatabaseInstaller
         }
 
         // Prompt to delete tables
-        if (!$cli->getConfirm('Existing database tables detected.  This operation will delete all existing tables within the database.  Are you sure you want to continue? (y/n) [n]: ', 'n')) {  
+        if ($confirm === false && !$cli->getConfirm('Existing database tables detected.  This operation will delete all existing tables within the database.  Are you sure you want to continue? (y/n) [n]: ', 'n')) {  
             $cli->send('Ok, installation aborted.  If this is a slave server / installation, please use the --slave option and run installation again.\r\n\r\n');
             exit(0);
         }

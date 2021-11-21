@@ -127,6 +127,7 @@ class RedisInstaller
         // Check if slave
         $opt = $cli->getArgs();
         $is_slave = $opt['slave'] ?? false;
+        $confirm = $opt['confirm'] ?? false;
         if ($is_slave === true) { 
             return;
         }
@@ -138,7 +139,7 @@ class RedisInstaller
         }
 
         // Confirm deletion of all redis keys
-        if (!$cli->getConfirm('redis contains existing keys.  This will delete all existing keys within redis.  Are you sure you want to continue? (y/n) [n]' , 'n')) {  
+        if ($confirm === false && !$cli->getConfirm('redis contains existing keys.  This will delete all existing keys within redis.  Are you sure you want to continue? (y/n) [n]' , 'n')) {  
             $cli->send('Ok, aborting install.  If this is a slave server / installation, please use the --slave option and run installation again.');
             exit(0);
         }
