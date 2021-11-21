@@ -12,7 +12,7 @@
     "license": "MIT",
     "require": {
         "php": ">=8.0.0",
-        "apex/cluster": ">=0.1",  
+        "apex/cluster": "^0.1",  
         "league/flysystem": ">=1.0.6",
         "symfony/string": "^5.3",
         "nyholm/psr7": "^1.4",
@@ -23,17 +23,18 @@
         "apex/migrations": "^0.1",
         "apex/syrus": "^0.1",
         "symfony/process": "^5.3",
-        "apex/storage": "^0.1.0",
+        "apex/storage": "^0.1",
         "phar-io/version": "^3.1",
         "psr/http-server-handler": "^1.0",
-        "apex/debugger": "^0.1.4",
-        "apex/armor": "^0.1.3",
-        "apex/opus": "^0.2.0",
+        "apex/debugger": "^0.1",
+        "apex/armor": "^0.1",
+        "apex/opus": "^0.2",
         "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": ">=9.1.0",
-        "apex/signer": "^0.1.2"
+        "apex/signer": "^0.1.2",
+        "phpstan/phpstan": "^1.0"
     },
     "autoload": {
         "psr-4": { 

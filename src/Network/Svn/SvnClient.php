@@ -32,17 +32,19 @@ class SvnClient
     protected int $t_revid = 0;
     protected bool $t_local = false;
     protected bool $t_ssh = true;
+    protected bool $t_local_repo = false;
     protected string $t_rootdir = '';
 
     /**
      * Set target
      */
-    public function setTarget(string $dir_name = 'trunk', int $rev_id = 0, bool $is_local = false, bool $is_ssh = true, string $rootdir = ''):void
+    public function setTarget(string $dir_name = 'trunk', int $rev_id = 0, bool $is_local = false, bool $is_ssh = true, string $rootdir = '', bool $is_local_repo = false):void
     {
         $this->t_dir = $dir_name;
         $this->t_revid = $rev_id;
         $this->t_local = $is_local;
         $this->t_ssh = $is_ssh;
+        $this->t_local_repo = $is_local_repo;
         $this->t_rootdir = $rootdir;
     }
 
@@ -54,8 +56,9 @@ class SvnClient
 
         // Get base target
         $target = match (true) { 
-            ($this->t_local === true) ? true : false => '', 
-            ($this->t_ssh === true) ? true : false => 'svn+ssh://' . $this->pkg->getLocalUser() . '@' . $this->pkg->getRepo()->getSvnHost(), 
+            $this->t_local_repo => 'file://localhost/svn',
+            $this->t_local => '', 
+            $this->t_ssh => 'svn+ssh://' . $this->pkg->getLocalUser() . '@' . $this->pkg->getRepo()->getSvnHost(), 
             default => 'svn://' . $this->pkg->getRepo()->getSvnHost()
         };
 

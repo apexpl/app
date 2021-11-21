@@ -74,11 +74,11 @@ class SvnInstall
     /**
      * Install
      */
-    public function process(SvnRepo $svn, string $version = '', bool $dev = false, bool $noverify = false)
+    public function process(SvnRepo $svn, string $version = '', bool $dev = false, bool $noverify = false, bool $is_local_repo = false):void
     {
 
         // Export package
-        $tmp_dir = $this->svn_export->process($svn, $version, $dev);
+        $tmp_dir = $this->svn_export->process($svn, $version, $dev, $is_local_repo);
         $dir_name = $this->svn_export->svn_dir;
         $this->cli->send("Verifying digital signature... ");
 
@@ -88,13 +88,13 @@ class SvnInstall
         } else { 
             if (!$signed_by = $this->verifier->verify($svn, $dir_name, $tmp_dir)) { 
                 $this->cli->error("Unable to install package, as verification failed.");
-                return false;
+                return;
             }
             $this->cli->send("done (signed by: $signed_by).\r\nInstalling dependences... \n");
         }
 
         // Install dependencies
-        $this->dependencies->process($svn->getPackage()->getRepo(), $tmp_dir, $noverify);
+        $this->dependencies->process($svn->getPackage()->getRepo(), $tmp_dir, $noverify, $is_local_repo);
         $this->cli->send("done.\r\nInstalling package... ");
 
         // Install

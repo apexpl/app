@@ -169,6 +169,11 @@ class YamlInstaller
     public static function installPackages(array $yaml, App $app, Cli $cli):void
     {
 
+        // Get cli args
+        $opt = $cli->getArgs();
+        $noverify = $opt['noverify'] ?? false;
+        $is_local_repo = $opt['local'] ?? false;
+
         // Initialize
         $packages = $yaml['packages'] ?? [];
         $svn_dependencies = $app->getContainer()->make(SvnDependencies::class);
@@ -179,7 +184,7 @@ class YamlInstaller
 
         // Install needed dependencies
         foreach ($packages as $pkg_serial => $version) { 
-            $svn_dependencies->installPackage($repo, $pkg_serial, $version);
+            $svn_dependencies->installPackage($repo, $pkg_serial, $version, $noverify, $is_local_repo);
         }
 
     }

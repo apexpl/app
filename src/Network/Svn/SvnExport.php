@@ -28,7 +28,7 @@ class SvnExport
     /**
      * Process
      */
-    public function process(SvnRepo $svn, string $version = '', bool $dev = false):string
+    public function process(SvnRepo $svn, string $version = '', bool $dev = false, bool $is_local_repo = false):string
     {
 
         // Get latest release
@@ -51,7 +51,7 @@ class SvnExport
 
         // Export package
         $this->cli->send("Downloading package... ");
-        $svn->setTarget($dir_name, 0, false, false);
+        $svn->setTarget($dir_name, 0, false, false, '', $is_local_repo);
         if (!$res = $svn->exec(['export'], [$tmp_dir])) { 
             $svn->setTarget($dir_name);
             $res = $svn->exec(['export'], [$tmp_dir]);

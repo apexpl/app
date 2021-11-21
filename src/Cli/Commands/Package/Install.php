@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Cli\Commands\Package;
 
-use Apex\Svc\Convert;
+use Apex\Svc\{Convert, Container};
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\{AccountHelper, PackageHelper};
 use Apex\App\Network\NetworkClient;
@@ -22,6 +22,9 @@ class Install implements CliCommandInterface
 
     #[Inject(Convert::class)]
     private Convert $convert;
+
+    #[Inject(Container::class)]
+    private Container $cntr;
 
     #[Inject(AccountHelper::class)]
     private AccountHelper $acct_helper;
@@ -49,6 +52,7 @@ class Install implements CliCommandInterface
         $repo_alias = $opt['repo'] ?? 'apex';
         $dev = $opt['dev'] ?? false;
         $noverify = $opt['noverify'] ?? false;
+        $is_local_repo = $opt['local'] ?? false;
 
         // Get repo
         if (!$repo = $this->repo_store->get($repo_alias)) { 
@@ -60,7 +64,16 @@ class Install implements CliCommandInterface
         $install_queue = [];
         foreach ($args as $pkg_alias) { 
             $pkg_alias = $this->pkg_helper->getSerial($pkg_alias);
-            if (!$pkg = $this->pkg_helper->checkPackageAccess($repo, $pkg_alias, 'can_read', true)) { 
+
+            if ($is_local_repo === true) {
+                list($author, $alias) = explode('/', $pkg_alias, 2);
+                $pkg = $this->cntr->make(LocalPackage::class, [
+                    'author' => $author,
+                    'repo_alias' => $repo_alias,
+                    'alias' => $alias
+                ]);
+
+            } elseif (!$pkg = $this->pkg_helper->checkPackageAccess($repo, $pkg_alias, 'can_read', true)) { 
                 $cli->error("You do not have access to download the package '$pkg_alias'");
                 return;
             }
@@ -72,7 +85,7 @@ class Install implements CliCommandInterface
 
             // Install
             $svn = $pkg->getSvnRepo();
-            $this->svn_install->process($svn, '', $dev, $noverify);
+            $this->svn_install->process($svn, '', $dev, $noverify, $is_local_repo);
 
             // Success message
             $cli->send("Successfully installed the package, " . $pkg->getAlias() . ".\r\n\r\n");
