@@ -52,9 +52,9 @@ class EmailNotifications
                 'alias' => $alias,
                 'sender' => $sender,
                 'recipient' => $recipient,
-                'content_type' => $vars['content_type'] ?? 'text/plain',
                 'subject' => $vars['subject'],
-                'contents' => base64_decode($vars['contents']),
+                'text_contents' => isset($vars['text_contents']) ? base64_decode($vars['text_contents']) : '',
+                'html_contents' => isset($vars['html_contents']) ? base64_decode($vars['html_contents']) : '',
                 'condition_vars' => $condition
             ]);
 

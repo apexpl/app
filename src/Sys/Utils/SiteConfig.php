@@ -99,7 +99,7 @@ class SiteConfig
     /**
      * Generate YAML text
      */
-    private function generateText(array $yaml):string
+    public function generateText(array $yaml):string
     {
 
         // Generate text
