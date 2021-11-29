@@ -177,7 +177,7 @@ class SvnCommit
             $file = trim($m[2]);
 
             // Skip, if needed
-            if (preg_match("/^(\.apex|vendor|storage|\.env)/", $file)) {
+            if (preg_match("/^(\.apex|vendor|storage|\.env|composer\.lock)/", $file)) {
                 continue;
             } elseif (str_ends_with($file, '.pem')) {
                 continue;

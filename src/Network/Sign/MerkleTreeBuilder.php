@@ -84,7 +84,7 @@ class MerkleTreeBuilder
         // Create hashes
         $files = [];
         foreach ($filelist as $file) { 
-            if (preg_match("/^(\.svn|\.apex|\.env|vendor)/", $file)) { 
+            if (preg_match("/^(\.svn|\.apex|\.env|vendor|composer\.lock)/", $file)) { 
                 continue;
             } elseif (str_ends_with($file, '.pem')) {
                 continue;
