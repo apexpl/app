@@ -6,6 +6,7 @@ namespace Apex\App\Cli\Commands\Package;
 use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
+use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Attr\Inject;
 use redis;
@@ -21,6 +22,9 @@ class Merge implements CliCommandInterface
 
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
+
+    #[Inject(PackagesStore::class)]
+    private PackagesStore $pkg_store;
 
     #[Inject(redis::class)]
     private redis $redis;

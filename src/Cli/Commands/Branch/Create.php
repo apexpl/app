@@ -7,6 +7,7 @@ use Apex\Svc\Convert;
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Network\Models\LocalPackage;
+use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Attr\Inject;
@@ -23,6 +24,9 @@ class Create implements CliCommandInterface
 
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
+
+    #[Inject(PackagesStore::class)]
+    private PackagesStore $pkg_store;
 
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;

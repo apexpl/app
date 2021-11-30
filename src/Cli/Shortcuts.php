@@ -16,6 +16,7 @@ class Shortcuts
         'checkout' => ['package', 'checkout'],
         'commit' => ['package', 'commit'],
         'install' => ['package', 'install'],
+        'merge' => ['package', 'merge'],
         'pull' => ['package', 'pull'],
         'scan' => ['package', 'scan'],
         'search' => ['package', 'search'],
