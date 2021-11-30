@@ -35,7 +35,7 @@ class Ls implements CliCommandInterface
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
 
         // Check for project
-        if ($info = $this->redis->hgetall('config:project') && !$pkg = $this->pkg_store->get($pkg_alias)) {
+        if (($info = $this->redis->hgetall('config:project')) && !$pkg = $this->pkg_store->get($pkg_alias)) {
             $pkg_alias = $info['pkg_alias'];
         }
 

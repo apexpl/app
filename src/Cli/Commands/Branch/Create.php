@@ -43,7 +43,7 @@ class Create implements CliCommandInterface
         $from_branch = $this->convert->case(($opt['from-branch'] ?? 'trunk'), 'lower');
 
         // Check for project
-        if ($info = $this->redis->hgetall('config:project') && !$pkg = $this->pkg_store->get($pkg_alias)) {
+        if (($info = $this->redis->hgetall('config:project')) && !$pkg = $this->pkg_store->get($pkg_alias)) {
             $branch_name = $pkg_alias;
             $pkg_alias = $info['pkg_alias'];
         }

@@ -71,7 +71,7 @@ class Commit implements CliCommandInterface
     {
 
         // Check for project
-        if ($info = $this->redis->hgetall('config:project') && !$pkg = $this->pkg_store->get($pkg_alias)) {
+        if (($info = $this->redis->hgetall('config:project')) && !$pkg = $this->pkg_store->get($pkg_alias)) {
             $pkg_alias = $info['pkg_alias'];
         }
 

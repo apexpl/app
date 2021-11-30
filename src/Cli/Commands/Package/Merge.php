@@ -8,6 +8,7 @@ use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Attr\Inject;
+use redis;
 
 /**
  * Merge
@@ -21,6 +22,9 @@ class Merge implements CliCommandInterface
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
 
+    #[Inject(redis::class)]
+    private redis $redis;
+
     /**
      * Process
      */
@@ -32,6 +36,13 @@ class Merge implements CliCommandInterface
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
         $branch_name = $this->convert->case(($args[1] ?? ''), 'lower');
         $dry_run = $opt['dry-run'] ?? false;
+
+        // Check for project
+        if (($info = $this->redis->hgetall('config:project')) && !$pkg = $this->pkg_store->get($pkg_alias)) {
+            $branch_name = $pkg_alias;
+            $pkg_alias = $info['pkg_alias'];
+        }
+
 
         // Get package
         if (!$pkg = $this->pkg_helper->get($pkg_alias)) { 

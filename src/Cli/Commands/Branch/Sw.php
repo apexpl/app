@@ -36,7 +36,7 @@ class Sw implements CliCommandInterface
         $branch_name = $this->convert->case(($args[1] ?? ''), 'lower');
 
         // Check for project
-        if ($info = $this->redis->hgetall('config:project') && !$pkg = $this->pkg_store->get($pkg_alias)) {
+        if (($info = $this->redis->hgetall('config:project')) && !$pkg = $this->pkg_store->get($pkg_alias)) {
             $branch_name = $pkg_alias;
             $pkg_alias = $info['pkg_alias'];
         }
