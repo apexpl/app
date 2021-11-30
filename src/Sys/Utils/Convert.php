@@ -46,7 +46,7 @@ class Convert
             }
 
             if (is_string($key)) { $replace['{' . $key . '}'] = $value; }
-            $replace['{' . $x . '}'] = filter_var($value, FILTER_SANITIZE_STRING);
+            $replace['{' . $x . '}'] = filter_var($value);
         $x++; }
 
         // Return
