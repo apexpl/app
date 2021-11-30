@@ -33,7 +33,7 @@ class Pull implements CliCommandInterface
 
         // Initialize
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
-        if ($info = $this->redis->hgetall('config:project')) {
+        if ($info = $this->redis->hgetall('config:project') && !$pkg = $this->pkg_store->get($pkg_alias)) {
             $pkg_alias = $info['pkg_alias'];
         }
 

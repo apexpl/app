@@ -34,11 +34,7 @@ class Delete implements CliCommandInterface
         // Initialize
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
         $version = $args[1] ?? '';
-
-        // Get commit args
-        $opt = $cli->getArgs(['m', 'file']);
-        $message = $opt['m'] ?? '';
-        $commit_file = $opt['file'] ?? '';
+        $commit_args = $cli->getCommitArgs();
 
         // Load package
         if (!$pkg = $this->pkg_store->get($pkg_alias)) { 
@@ -71,7 +67,7 @@ class Delete implements CliCommandInterface
 
         // Delete from repo
         $svn->setTarget('tags/' . $version);
-        $svn->rmdir('tags/' . $version, $message, $commit_file);
+        $svn->rmdir('tags/' . $version, $commit_args);
 
         // Send message
         $cli->send("Successfully deleted the release of $pkg_alias v$version\r\n\r\n");

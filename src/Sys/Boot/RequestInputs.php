@@ -18,28 +18,28 @@ class RequestInputs
     /**
      * $_POST
      */
-    public function post(string $key, $default = null)
+    public function post(string $key, $default = null, string $filters = 'escape')
     {
-        return array_key_exists($key, $this->inputs['post']) ? $this->inputs['post'][$key] : $default; 
+        return array_key_exists($key, $this->inputs['post']) ? $this->filter($this->inputs['post'][$key], $filters) : $default; 
     }
 
     /**
      * $_GET
      */
-    public function get(string $key, $default = null)
+    public function get(string $key, $default = null, string $filters = 'escape')
     {
-        return array_key_exists($key, $this->inputs['get']) ? $this->inputs['get'][$key] : $default; 
+        return array_key_exists($key, $this->inputs['get']) ? $this->filter($this->inputs['get'][$key], $filters) : $default; 
     }
 
     /**
      * $_REQUEST
      */
-    public function request(string $key, $default = null)
+    public function request(string $key, $default = null, string $filters = 'escape')
     {
 
         $value = match(true) { 
-            array_key_exists($key, $this->inputs['post']) ? true : false => $this->inputs['post'][$key], 
-            array_key_exists($key, $this->inputs['get']) ? true : false => $this->inputs['get'][$key], 
+            array_key_exists($key, $this->inputs['post']) ? true : false => $this->filter($this->inputs['post'][$key], $filters),
+            array_key_exists($key, $this->inputs['get']) ? true : false => $this->filter($this->inputs['get'][$key], $filters),
             default => $default
         };
         return $value;
@@ -48,17 +48,17 @@ class RequestInputs
     /**
      * $_SERVER
      */
-    public function server(string $key, $default = null)
+    public function server(string $key, $default = null, string $filters = 'escape')
     {
-        return array_key_exists($key, $this->inputs['server']) ? $this->inputs['server'][$key] : $default; 
+        return array_key_exists($key, $this->inputs['server']) ? $this->filter($this->inputs['server'][$key], $filters) : $default; 
     }
 
     /**
      * $_COOKIE
      */
-    public function cookie(string $key, $default = null)
+    public function cookie(string $key, $default = null, string $filters = 'escape')
     {
-        return array_key_exists($key, $this->inputs['cookie']) ? $this->inputs['cookie'][$key] : $default; 
+        return array_key_exists($key, $this->inputs['cookie']) ? $this->filter($this->inputs['cookie'][$key], $filters) : $default; 
     }
 
     /**
@@ -351,6 +351,33 @@ class RequestInputs
     public function replacePathParams(array $values):void
     {
         $this->inputs['path_params'] = $values;
+    }
+
+    /**
+     * Filter
+     */
+    public function filter($value, string $filters)
+    {
+
+        // Initialize
+        $filters = array_map( fn ($var) => strtolower(trim($var)), explode('.', $filters));
+        foreach ($filters as $filter) {
+
+            $value = match($filter) {
+                'trim' => trim($value),
+                'escape' => filter_var($value, FILTER_UNSAFE_RAW),
+                'lower' => strtolower($value),
+                'upper' => strtoupper($value),
+                'title' => ucwords($value),
+                'strip_tags' => strip_tags($value),
+                'digit' => preg_replace("/\D/", "", $value),
+                default => $value
+            };
+
+        }
+
+        // Return
+        return $value;
     }
 
 }

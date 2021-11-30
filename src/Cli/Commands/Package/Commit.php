@@ -44,7 +44,6 @@ class Commit implements CliCommandInterface
     {
 
         // Get args
-        $opt = $cli->getArgs(['m', 'file']);
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
         $commit_args = $cli->getCommitArgs();
 
@@ -62,7 +61,7 @@ class Commit implements CliCommandInterface
         }
 
         // Success message
-        $cli->send("\r\nSuccessfully completed commit of package $pkg_alias.\r\n\r\n");
+        $cli->send("\r\nSuccessfully completed commit of package " . $pkg->getAlias() . ".\r\n\r\n");
     }
 
     /**
@@ -72,7 +71,7 @@ class Commit implements CliCommandInterface
     {
 
         // Check for project
-        if ($info = $this->redis->hgetall('config:project')) {
+        if ($info = $this->redis->hgetall('config:project') && !$pkg = $this->pkg_store->get($pkg_alias)) {
             $pkg_alias = $info['pkg_alias'];
         }
 

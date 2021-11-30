@@ -35,7 +35,7 @@ class Diff
         $svn_dir = SITE_PATH . '/.apex/svn/' . $pkg->getAlias();
 
         // Go through all files
-        foreach ($diff as $file) {
+        foreach ($diff as $file => $hash) {
 
             // Convert file
             $local_file = $this->file_converter->toLocal($pkg, $file);
@@ -56,7 +56,7 @@ class Diff
     {
 
         // Go through files
-        foreach ($diff as $file) {
+        foreach ($diff as $file => $hash) {
 
             // Convert file
             $local_file = $this->file_converter->svnToLocal($file);

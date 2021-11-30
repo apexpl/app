@@ -46,7 +46,7 @@ class SvnCheckout
 
         // Check local directory
         if (is_dir($local_dir)) { 
-            $this->cli->error("Local SVN directory already exists for the package $pkg_alias, please update instead, see 'apex help package update' for details.");
+            $this->cli->error("Local SVN directory already exists for the package $pkg_alias, please update instead, see 'apex help pull' for details.");
             return false;
         } elseif (!is_dir(dirname($local_dir))) { 
             mkdir(dirname($local_dir), 0755, true);

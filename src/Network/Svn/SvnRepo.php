@@ -123,20 +123,14 @@ class SvnRepo extends SvnClient
     /**
      * rm
      */
-    public function rmdir(string $dir_name, string $message = '', string $commit_file = ''):void
+    public function rmdir(string $dir_name, array $commit_args):void
     {
 
         // Delete
         $this->setTarget($dir_name);
 
-        // Get commit message args
-        if ($message == '' && $commit_file == '') { 
-            $message = "Deleting directory, $dir_name";
-        }
-        $options = $commit_file == '' ? ['-m', $message] : ['--file', $commit_file];
-
         // Remove dir
-        if (!$this->exec(['rm'], $options)) { 
+        if (!$this->exec(['rm'], $commit_args)) { 
             throw new ApexSvnRepoException("Unable to delete directory, $dir_name, error: " . $this->error_output);
         }
 
@@ -216,11 +210,11 @@ class SvnRepo extends SvnClient
     /**
      * Get all releases
      */
-    public function getReleases():?array
+    public function getReleases(bool $is_local_repo = false):?array
     {
 
         // Check public first
-        $this->setTarget('tags', 0, false, false);
+        $this->setTarget('tags', 0, false, false, '', $is_local_repo);
 
         // List public tags
         if (!$res = $this->exec(['list'])) { 
@@ -245,11 +239,11 @@ class SvnRepo extends SvnClient
     /**
      * Get latest release
      */
-    public function getLatestRelease():?string
+    public function getLatestRelease(bool $is_local_repo = false):?string
     {
 
         // Get releases
-        if (!$tags = $this->getReleases()) { 
+        if (!$tags = $this->getReleases($is_local_repo)) { 
             return null;
         }
 

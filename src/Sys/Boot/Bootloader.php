@@ -130,6 +130,7 @@ class Bootloader extends RequestInputs
         // Set addl properties
         $this->content_type = $this->request->getHeader('content-type')[0] ?? '';
         $this->cntr->set(UriInterface::class, $this->request->getUri());
+        $this->cntr->set(ServerRequestInterface::class, $this->request);
         $this->path = $this->request->getUri()->getPath();
     }
 

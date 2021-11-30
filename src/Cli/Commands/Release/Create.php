@@ -8,6 +8,7 @@ use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Sys\Utils\ScanClasses;
 use Apex\App\Network\Stores\PackagesStore;
+use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Attr\Inject;
@@ -42,24 +43,22 @@ class Create implements CliCommandInterface
         // Get package
         if (!$pkg = $this->pkg_helper->get(($args[0] ?? ''))) { 
             return;
-        } elseif (!$pkg->isVersionControlled()) {
+        } elseif ($pkg->getType() != 'project' && !$pkg->isVersionControlled()) {
             $cli->error("The package is not currently under version control, hence a release can not be added.  Please see 'apex help package checkout' for details.");
             return;
         }
 
         // Set variables
+        $opt = $cli->getArgs();
         $pkg_alias = $pkg->getAlias();
-        $commit_args = $cli->getCommitArgs();
-
-        // Initialize
-        $opt = $cli->getArgs(['m', 'file']);
         $version = $args[1] ?? '';
         $is_breaking = isset($opt['breaking']) && $opt['breaking'] === true ? 1 : 0;
         $commit_args = $cli->getCommitArgs();
 
         // Get version
         if ($version == '') { 
-            $version = $cli->getInput("Release Version: ");
+            $next_version = $this->getNextVersion($pkg);
+            $version = $cli->getInput("Release Version [$next_version]: ", $next_version);
         }
 
         // Checks
@@ -142,6 +141,24 @@ class Create implements CliCommandInterface
 
         // Return
         return $help;
+    }
+
+    /**
+     * Get next version
+     */
+    private function getNextVersion(LocalPackage $pkg):string
+    {
+
+        $parts = explode('.', $pkg->getVersion());
+        if (count($parts) == 2) {
+            $next_version = implode('.', $parts) . '.1';
+        } else {
+            $parts[2]++;
+            $next_version = implode('.', $parts);
+        }
+
+        // Return
+        return $next_version;
     }
 
 }

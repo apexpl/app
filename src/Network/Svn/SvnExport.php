@@ -34,7 +34,7 @@ class SvnExport
         // Get latest release
         if ($version == '' && $dev === false) { 
             $this->cli->send("Determining latest version... ");
-            if (!$version = $svn->getLatestRelease()) { 
+            if (!$version = $svn->getLatestRelease($is_local_repo)) { 
                 throw new ApexSvnRepoException("Unable to determine latest release of package, " . $svn->getPackage()->getAlias() . ".  Use --dev option to download /trunk branch.");
             }
             $this->cli->send("v$version\r\n");

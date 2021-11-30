@@ -9,6 +9,7 @@ use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Attr\Inject;
+use redis;
 
 /**
  * Delete branch
@@ -25,6 +26,9 @@ class Delete implements CliCommandInterface
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;
 
+    #[Inject(redis::class)]
+    private redis $redis;
+
     /**
      * Process
      */
@@ -35,8 +39,12 @@ class Delete implements CliCommandInterface
         $opt = $cli->getArgs(['m','file']);
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
         $branch_name = $this->convert->case(($args[1] ?? ''), 'lower');
-        $message = $opt['m'] ?? '';
-        $commit_file = $opt['file'] ?? '';
+
+        // Check for project
+        if ($info = $this->redis->hgetall('config:project') && !$pkg = $this->pkg_store->get($pkg_alias)) {
+            $branch_name = $pkg_alias;
+            $pkg_alias = $info['pkg_alias'];
+        }
 
         // Load package
         if (!$pkg = $this->pkg_store->get($pkg_alias)) { 
@@ -72,7 +80,8 @@ class Delete implements CliCommandInterface
         ]);
 
         // Delete branch
-        $svn->rmdir('branches/' . $branch_name, $message, $commit_file);
+        $commit_args = $cli->getCommitArgs();
+        $svn->rmdir('branches/' . $branch_name, $commit_args);
 
         // Success
         $cli->send("Successfully deleted branch from the package '$pkg_alias' with name, $branch_name\r\n\r\n");

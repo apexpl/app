@@ -8,6 +8,7 @@ use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Attr\Inject;
+use redis;
 
 /**
  * List branches
@@ -21,6 +22,9 @@ class Ls implements CliCommandInterface
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
 
+    #[Inject(redis::class)]
+    private redis $redis;
+
     /**
      * Process
      */
@@ -29,6 +33,12 @@ class Ls implements CliCommandInterface
 
         // Get args
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
+
+        // Check for project
+        if ($info = $this->redis->hgetall('config:project') && !$pkg = $this->pkg_store->get($pkg_alias)) {
+            $pkg_alias = $info['pkg_alias'];
+        }
+
 
         // Load package
         if (!$pkg = $this->pkg_store->get($pkg_alias)) { 

@@ -10,6 +10,7 @@ use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Attr\Inject;
+use redis;
 
 /**
  * Create branch
@@ -26,6 +27,9 @@ class Create implements CliCommandInterface
     #[Inject(NetworkClient::class)]
     private NetworkClient $network;
 
+    #[Inject(redis::class)]
+    private redis $redis;
+
     /**
      * Process
      */
@@ -37,6 +41,12 @@ class Create implements CliCommandInterface
         $pkg_alias = $this->convert->case(($args[0] ?? ''), 'lower');
         $branch_name = $this->convert->case(($args[1] ?? ''), 'lower');
         $from_branch = $this->convert->case(($opt['from-branch'] ?? 'trunk'), 'lower');
+
+        // Check for project
+        if ($info = $this->redis->hgetall('config:project') && !$pkg = $this->pkg_store->get($pkg_alias)) {
+            $branch_name = $pkg_alias;
+            $pkg_alias = $info['pkg_alias'];
+        }
 
         // Load package
         if (!$pkg = $this->pkg_helper->get($pkg_alias)) { 

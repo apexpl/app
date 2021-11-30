@@ -36,7 +36,7 @@ class ClientInfo extends GeoIpAddress
 
         // Get user agent
         if ($this->user_agent == '') { 
-            $this->user_agent = filter_var(($this->server['HTTP_USER_AGENT'] ?? ''), FILTER_SANITIZE_STRING);
+            $this->user_agent = $this->server['HTTP_USER_AGENT'] ?? '';
         }
 
     }
