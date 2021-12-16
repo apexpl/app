@@ -22,7 +22,7 @@ class MagicModel extends BaseModel
      */
     public function __set(string $prop, mixed $value):void
     {
-        $parent->$prop = $value;
+        $this->$prop = $value;
     }
 
 

@@ -144,7 +144,7 @@ class BaseModel implements BaseModelInterface
     /**
      * Insert a new record into the database table assigned to the model class.
      */
-    public static function insert(array $values):?static
+    public static function insert(object | array $values):?static
     {
         $db = Di::get(Db::class);
         $db->insert(static::$dbtable, $values);
@@ -254,13 +254,14 @@ class BaseModel implements BaseModelInterface
 
         $vars = [];
         foreach ($this as $key => $value) { 
-            if ($key == 'convert') { 
-                continue;
-            }
 
             // Check for DateTime
             if (is_object($value) && $value::class == 'DateTime') { 
                 $value = $value->format('Y-m-d H:i:s');
+            } elseif (is_object($value) && enum_exists($value::class)) {
+                $value = $value->value;
+            } elseif (is_object($value)) {
+                continue;
             }
             $vars[$key] = $value;
         }

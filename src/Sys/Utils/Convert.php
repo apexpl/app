@@ -3,7 +3,7 @@ declare(strict_Types = 1);
 
 namespace Apex\App\Sys\Utils;
 
-use Apex\Svc\App;
+use Apex\Svc\{App, Db};
 use Symfony\Component\String\UnicodeString;
 use Apex\App\Attr\Inject;
 use DateTime;
@@ -16,6 +16,12 @@ class Convert
 
     #[Inject(App::class)]
     private App $app;
+
+    #[Inject(Db::class)]
+    private Db $db;
+
+    // Properties
+    private ?array $rates = null;
 
     /**
      * Translate string to language, and merge placeholders.
@@ -180,6 +186,47 @@ class Convert
 
         // Return
         return $seen;
+    }
+
+    /**
+     * Exchange money
+     */
+    public function exchange_money(float $amount, string $from_currency, string $to_currency, ?DateTime $date = null): ?float
+    { 
+
+        // Check for same currency
+        if ($from_currency == $to_currency) {
+            return $amount;
+        }
+
+        // Get rates, if needed
+        if ($date !== null) {
+            $rates = $this->db->getHash("SELECT abbr,rate FROM transaction_rates WHERE created_at < %s ORDER BY created_at DESC LIMIT 1", $date->format('Y-m-d H:i:s'));
+        } elseif ($this->rates === null) {
+            $this->rates = $this->db->getHash("SELECT abbr,current_rate FROM transaction_currencies");
+            $rates = $this->rates;
+        } else {
+            $rates = $this->rates;
+        }
+
+        // Exchange to base currency, if needed
+        if ($from_currency != $this->app->config('core.default_currency')) {
+            $amount *= $rates[$from_currency];
+        }
+
+        // Check for base currency
+        if ($to_currency == $this->app->config('core.default_currency')) {
+            return $amount;
+        }
+
+        // Convert to currency
+        $rate = $rates[$to_currency];
+        if ($rate == 0.00000000) {
+            return null;
+        }
+
+        // Return
+        return($amount / $rate);
     }
 
 }
