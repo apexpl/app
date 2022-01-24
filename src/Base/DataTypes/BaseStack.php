@@ -9,7 +9,7 @@ use Apex\Db\Mapper\FromInstance;
 /**
  * Base stack
  */
-class BaseStack
+abstract class BaseStack
 {
 
 

@@ -8,7 +8,7 @@ use Apex\Db\Mapper\FromInstance;
 /**
  * Base iterator
  */
-class BaseIterator implements \Iterator, \Countable, \jsonSerializable
+abstract class BaseIterator implements \Iterator, \Countable, \jsonSerializable
 {
 
     // Properties

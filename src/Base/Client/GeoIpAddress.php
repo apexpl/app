@@ -9,7 +9,7 @@ use Apex\App\Base\Lists\CountryList;
 /**
  * Geo IP address
  */
-class GeoIpAddress
+abstract class GeoIpAddress
 {
 
     // Properties

@@ -113,7 +113,7 @@ class Container
             'syrus.enable_autorouting' => true, 
             'syrus.auto_extract_title' => true, 
             'syrus.use_cluster' => true, 
-            'syrus.rpc_message_request' => \Apex\Cluster\Message\MessageRequest::class, 
+            'syrus.rpc_message_request' => \Apex\Svc\MessageRequest::class, 
             'syrus.tag_namespaces' => self::getTagNamespaces($redis), 
             'migrations.yaml_file' => SITE_PATH . '/boot/migrations.yml'
         ];
@@ -261,6 +261,9 @@ class Container
         // Set callbacks
         $cntr->set('cluster.custom_router', [$adapter, 'lookupRoute']);
         $cntr->set('cluster.fe_handler_callback', [$adapter, 'handleFrontEndCallback']);
+        $cntr->set('cluster.prepare_msg_handler', [$adapter, 'handleFrontEndCallback']);
+//'' => function (eventMessageInterface $msg) { }, 
+
         $cntr->set('cluster.timeout_handler', [$adapter, 'timeout']);
 
         // Return

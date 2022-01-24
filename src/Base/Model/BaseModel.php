@@ -12,7 +12,7 @@ use Apex\App\Attr\Inject;
 /**
  * Create, manage and retrieve records from the assigned model class that implements this class.
  */
-class BaseModel implements BaseModelInterface
+abstract class BaseModel implements BaseModelInterface
 {
 
     #[Inject(Convert::class)]

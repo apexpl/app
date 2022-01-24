@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Adapters;
 
-use Apex\Svc\Convert;
+use Apex\Svc\{App, Convert, Di};
 use Apex\Cluster\Interfaces\{MessageRequestInterface, FeHandlerInterface};
 use Apex\App\Attr\Inject;
 use redis;
@@ -40,6 +40,15 @@ class ClusterAdapter
 
         // Return
         return $classes; 
+    }
+
+    /**
+     * Prepare message for listener
+     */
+    public function prepareMessage(MessageRequestInterface $msg)
+    {
+        $app = Di::get(App::class);
+        $app->setRequest($msg->getRequest());
     }
 
     /**

@@ -49,7 +49,11 @@ class Pull implements CliCommandInterface
         // Update
         $svn = $pkg->getSvnRepo();
         $svn->setTarget('', 0, true);
-        $svn->exec(['update'], [], true);
+        if (!$svn->exec(['update'], [], true)) {
+            $svn->checkSshAgent();
+            $svn->exec(['update'], [], true);
+        }
+
     }
 
     /**

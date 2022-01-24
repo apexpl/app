@@ -10,7 +10,7 @@ use Symfony\Component\Yaml\Exception\ParseException;
 /**
  * Abstract store
  */
-class AbstractStore
+abstract class AbstractStore
 {
 
     /**

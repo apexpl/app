@@ -11,7 +11,7 @@ use Apex\App\Attr\Inject;
 /**
  * AJAX library
  */
-class Ajax
+abstract class Ajax
 {
 
     #[Inject(Components::class)]

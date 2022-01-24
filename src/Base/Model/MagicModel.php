@@ -6,7 +6,7 @@ namespace Apex\App\Base\Model;
 /**
  * Magic model
  */
-class MagicModel extends BaseModel
+abstract class MagicModel extends BaseModel
 {
 
     /**
