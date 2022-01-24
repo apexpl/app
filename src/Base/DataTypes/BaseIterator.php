@@ -34,7 +34,7 @@ abstract class BaseIterator implements \Iterator, \Countable, \jsonSerializable
     /**
      * Rewind
      */
-    public function rewind()
+    public function rewind():void
     {
         $this->position = 0;
     }
@@ -42,7 +42,7 @@ abstract class BaseIterator implements \Iterator, \Countable, \jsonSerializable
     /**
      * Current
      */
-    public function current()
+    public function current():mixed
     {
         return isset($this->items[$this->position]) ? $this->items[$this->position] : null;
     }
@@ -50,7 +50,7 @@ abstract class BaseIterator implements \Iterator, \Countable, \jsonSerializable
     /**
      * Key
      */
-    public function key()
+    public function key():mixed
     {
         return $this->position;
     }
@@ -58,7 +58,7 @@ abstract class BaseIterator implements \Iterator, \Countable, \jsonSerializable
     /**
      * Next
      */
-    public function next()
+    public function next():void
     {
         ++$this->position;
     }
@@ -66,7 +66,7 @@ abstract class BaseIterator implements \Iterator, \Countable, \jsonSerializable
     /**
      * Valid
      */
-    public function valid()
+    public function valid():bool
     {
         return $this->position >= count($this->items) ? false : true;
     }

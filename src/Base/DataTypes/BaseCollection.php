@@ -37,7 +37,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * Set offset
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value):void
     {
 
         // Enforce item_class
@@ -58,7 +58,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * Offset exists
      */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset):bool
     {
         return isset($this->items[$offset]);
     }
@@ -66,7 +66,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * Offset unset
      */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset):void
     {
         unset($this->items[$offset]);
     }
@@ -74,7 +74,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * Offset get
      */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset):mixed
     {
         return isset($this->items[$offset]) ? $this->items[$offset] : null;
     }
@@ -82,7 +82,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * Rewind
      */
-    public function rewind()
+    public function rewind():void
     {
         $this->position = 0;
     }
@@ -90,7 +90,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * Current
      */
-    public function current()
+    public function current():mixed
     {
         return isset($this->items[$this->position]) ? $this->items[$this->position] : null;
     }
@@ -98,7 +98,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * Key
      */
-    public function key()
+    public function key():mixed
     {
         return $this->position;
     }
@@ -106,7 +106,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * Next
      */
-    public function next()
+    public function next():void
     {
         ++$this->position;
     }
@@ -114,7 +114,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * Valid
      */
-    public function valid()
+    public function valid():bool
     {
         return $this->position >= count($this->items) ? false : true;
     }

@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Adapters;
 
 use Apex\Svc\{App, Convert, Di};
+use Apex\Syrus\Render\Templates;
 use Apex\Cluster\Interfaces\{MessageRequestInterface, FeHandlerInterface};
 use Apex\App\Attr\Inject;
 use redis;
@@ -64,7 +65,8 @@ class ClusterAdapter
      */
     public function handleFrontEndCallback(FeHandlerInterface $handler):void
     {
-        //echo "Front end handler needs to be implemented.\n";
+        $templates = Di::make(Templates::class);
+        $templates->handleClusterResponse($handler);
     }
 
 
