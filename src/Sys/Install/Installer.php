@@ -65,6 +65,7 @@ class Installer
         } elseif ($project != '') {
             $cmd = $app->getContainer()->make(\Apex\App\Cli\Commands\Project\Checkout::class, ['auto_confirm' => true]);
             $cmd->process($cli, [$project]);
+            $app->setConfigVar('core.domain_name', ApexInstaller::$domain_name);
         }
 
         // Welcome message
