@@ -113,7 +113,7 @@ class MessageRequest implements MessageRequestInterface
      * Get request
      */
     public function getRequest():mixed 
-    { 
+    {
         $app = Di::get(App::class);
         return $app->getRequest();
     }
