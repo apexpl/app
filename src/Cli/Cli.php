@@ -200,7 +200,12 @@ class Cli extends CliRouter
         }
 
         // Output data
-        fputs(STDOUT, $data);
+        if (!defined('STDOUT')) {
+            echo $data;
+        } else {
+            fputs(STDOUT, $data);
+        }
+
     }
 
     /**

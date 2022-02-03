@@ -140,7 +140,7 @@ class SvnClient
         // Run
         if ($buffer_output === true) { 
             $process->run(function ($type, $buffer) { 
-                fputs(STDOUT, $buffer);
+                $this->cli->send($buffer);
             });
         } else { 
             $process->run();
