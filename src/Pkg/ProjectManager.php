@@ -96,13 +96,13 @@ class ProjectManager
         $this->io->removeDir($tmp_dir);
 
         // Save .svnignore file
-        file_put_contents(SITE_PATH . '/.svnignore', "vendor\n.apex\n.env\nstorage\n");
+        file_put_contents(SITE_PATH . '/.svnignore', "vendor\n.apex\n.env\nstorage\ncomposer.lock\n");
         $svn->setTarget('trunk', 0, true, false, SITE_PATH);
 
         // Add necessary files / dirs
         $files = scandir(SITE_PATH);
         foreach ($files as $file) { 
-            if (in_array($file, ['.', '..', '.env', '.svnignore'])) { 
+            if (in_array($file, ['.', '..', '.env', '.svnignore', 'composer.lock'])) { 
                 continue;
             } elseif (preg_match("/^(\.svn|\.apex|vendor)/", $file)) { 
                 continue;

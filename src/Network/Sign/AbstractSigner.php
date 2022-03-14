@@ -29,8 +29,6 @@ class AbstractSigner
         // Unlock key
         if (!$privkey = openssl_pkey_get_private($private_key)) { 
 
-
-
             if (!$password = $this->cli->getSigningPassword()) { 
                 $password = $this->cli->getInput($rsa->getAlias() . "'s Signing Password: ", '', true);
             }

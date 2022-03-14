@@ -28,9 +28,9 @@ class Iterator implements CliCommandInterface
     {
 
         // Get args
-        $opt = $cli->getArgs(['item_class']);
+        $opt = $cli->getArgs(['item-class']);
         $filename = trim(($args[0] ?? ''), '/');
-        $item_class = $opt['item_class'] ?? '';
+        $item_class = $opt['item-class'] ?? '';
 
         // Parse item class
         $item_class = $this->helper->pathToNamespace($item_class);
@@ -75,10 +75,10 @@ class Iterator implements CliCommandInterface
 
         // Params
         $help->addParam('filename', 'File location of the new iterator class, relative to the /src/ directory.');
-        $help->addFlag('--item_class', 'The filepath to the item class.');
+        $help->addFlag('--item-class', 'The filepath to the item class.');
 
         // Examples
-        $help->addExample('./apex opus iterator MyShop/ProductIterator --item_class Demo/Models/Product');
+        $help->addExample('./apex opus iterator MyShop/ProductIterator --item-class Demo/Models/Product');
 
         // Return
         return $help;

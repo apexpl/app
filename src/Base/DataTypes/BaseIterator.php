@@ -82,7 +82,7 @@ abstract class BaseIterator implements \Iterator, \Countable, \jsonSerializable
     /**
      * JSON serialize
      */
-    public function jsonSerialize()
+    public function jsonSerialize():mixed
     {
 
         // Initialize

@@ -359,6 +359,11 @@ class RequestInputs
     public function filter($value, string $filters)
     {
 
+        // Return if array
+        if (is_array($value)) {
+            return $value;
+        }
+
         // Initialize
         $filters = array_map( fn ($var) => strtolower(trim($var)), explode('.', $filters));
         foreach ($filters as $filter) {

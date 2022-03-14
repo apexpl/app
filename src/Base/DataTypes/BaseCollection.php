@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Apex\App\Base\Model;
+namespace Apex\App\Base\DataTypes;
 
 use Apex\Db\Mapper\FromInstance;
 
@@ -130,7 +130,7 @@ abstract class BaseCollection implements \ArrayAccess, \Iterator, \Countable, \j
     /**
      * JSON serialize
      */
-    public function jsonSerialize()
+    public function jsonSerialize():mixed
     {
 
         // Initialize

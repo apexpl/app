@@ -9,6 +9,7 @@ use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Sys\Utils\ScanClasses;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Network\Models\LocalPackage;
+use Apex\App\Network\Svn\SvnCommit;
 use Apex\App\Network\NetworkClient;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Attr\Inject;
@@ -34,6 +35,9 @@ class Create implements CliCommandInterface
     #[Inject(ScanClasses::class)]
     private ScanClasses $scan_classes;
 
+    #[Inject(SvnCommit::class)]
+    private SvnCommit $svn_commit;
+
     /**
      * Process
      */
@@ -53,6 +57,7 @@ class Create implements CliCommandInterface
         $pkg_alias = $pkg->getAlias();
         $version = $args[1] ?? '';
         $is_breaking = isset($opt['breaking']) && $opt['breaking'] === true ? 1 : 0;
+        $is_commit = isset($opt['commit']) || isset($opt['c']) ? true : false;
         $commit_args = $cli->getCommitArgs();
 
         // Get version
@@ -85,6 +90,11 @@ class Create implements CliCommandInterface
         // Scan classes
         $this->scan_classes->scan();
         $cli->send("done.\r\nVerifying access... ");
+
+        // Commit, if needed
+        if ($is_commit === true) {
+            $this->svn_commit->process($pkg, $commit_args);
+        }
 
         // Send API call
         $this->network->setAuth($pkg->getLocalAccount());

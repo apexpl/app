@@ -28,9 +28,9 @@ class Collection implements CliCommandInterface
     {
 
         // Get args
-        $opt = $cli->getArgs(['item_class']);
+        $opt = $cli->getArgs(['item-class']);
         $filename = trim(($args[0] ?? ''), '/');
-        $item_class = $opt['item_class'] ?? '';
+        $item_class = $opt['item-class'] ?? '';
 
         // Parse item class
         $item_class = $this->helper->pathToNamespace($item_class);
@@ -68,25 +68,21 @@ class Collection implements CliCommandInterface
     {
 
         $help = new CliHelpScreen(
-            title: 'Generate Model',
-            usage: 'opus model <FILENAME> --dbtable=<TABLE> [--type=(php8|php7|eloquent|doctrine)] [--magic]',
-            description: 'Generate a new model class.'
+            title: 'Generate Collection',
+            usage: 'opus collection <FILENAME> --item_class=<ITEM_CLASS>',
+            description: 'Generate a new collection class.'
         );
 
         // Params
-        $help->addParam('filename', 'File location of the new model class, relative to the /src/ directory.');
-        $help->addFlag('--dbtable', 'The name of the database table to use to generate property names.  Not required if generating Eloquent model.');
-        $help->addFlat('--type', "Type of model to generate, defaults to 'php8'.  Supported values are: php8, php7, eloquent, doctrine");
-        $help->addFlag('--magic', "No value, and only applicable if type is 'php8' or 'php7'.  If present, will generate model without hard coded get / set methods and instead use magic methods in place via extension.  Otherwise, will generate model with hard coded ge / set methods.");
+        $help->addParam('filename', 'File location of the new collection class, relative to the /src/ directory.');
+        $help->addFlag('--item-class', 'The filepath to the item class.');
 
         // Examples
-        $help->addExample('./apex opus MyShop/Models/Products --dbtable shop_products --magic');
-        $help->addExample('./apex opus model MyShop/Models/ShopOrder --type eloquent');
+        $help->addExample('./apex opus collection MyShop/ProductIterator --item-class Demo/Models/Product');
 
         // Return
         return $help;
     }
-
 
 }
 

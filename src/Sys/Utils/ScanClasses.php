@@ -51,6 +51,9 @@ class ScanClasses
 
             // Load object
             $class_name = $this->opus_helper->pathToNamespace($file);
+            if (!class_exists($class_name)) {
+                continue;
+            }
             $obj = new \ReflectionClass($class_name);
 
             // Get interfaces class implements

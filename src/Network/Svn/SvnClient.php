@@ -58,7 +58,7 @@ class SvnClient
         $target = match (true) { 
             $this->t_local_repo => 'file://localhost/svn',
             $this->t_local => '', 
-            $this->t_ssh => 'svn+ssh://' . $this->pkg->getLocalUser() . '@' . $this->pkg->getRepo()->getSvnHost(), 
+            $this->t_ssh => 'svn+ssh://svn@' . $this->pkg->getRepo()->getSvnHost(), 
             default => 'svn://' . $this->pkg->getRepo()->getSvnHost()
         };
 
@@ -97,7 +97,7 @@ class SvnClient
         if ($is_public === true) { 
             $url = 'svn://' . $this->pkg->getRepo()->getSvnHost();
         } else { 
-            $url = 'svn+ssh://' . $this->pkg->getLocalUser() . '@' . $this->pkg->getRepo()->getSvnHost();
+            $url = 'svn+ssh://svn@' . $this->pkg->getRepo()->getSvnHost();
         }
 
         // Finish url

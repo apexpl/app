@@ -76,7 +76,10 @@ class Commit implements CliCommandInterface
         }
 
         // Load package
-        if (!$pkg = $this->pkg_store->get($pkg_alias)) { 
+        if ($pkg_alias == '') {
+            $cli->error("You did not specify a package alias to commit to.");
+            return null;
+        } elseif (!$pkg = $this->pkg_store->get($pkg_alias)) { 
             $cli->error("Package does not exist on local system, $pkg_alias");
             return null;
         } elseif (false === $pkg->isVersionControlled()) { 
