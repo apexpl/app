@@ -6,6 +6,8 @@ namespace Apex\App\Network\Svn;
 use Apex\Svc\{Db, Container};
 use Apex\App\Cli\Helpers\PackageHelper;
 use Apex\App\Network\Models\LocalPackage;
+use Apex\App\Network\Stores\PackagesStore;
+use Apex\App\Pkg\Helpers\Migration;
 use Apex\App\Sys\Utils\Io;
 use Symfony\Component\Process\Process;
 use Apex\App\Attr\Inject;
@@ -25,6 +27,12 @@ class SvnCheckoutProject
 
     #[Inject(PackageHelper::class)]
     private PackageHelper $pkg_helper;
+
+    #[Inject(PackagesStore::class)]
+    private PackagesStore $pkg_store;
+
+    #[Inject(Migration::class)]
+    private Migration $migration;
 
     #[Inject(Io::class)]
     private Io $io;
@@ -55,7 +63,6 @@ class SvnCheckoutProject
             }
         }
 
-
         // Create prev_fs directory
         $prev_dir = SITE_PATH . '/.apex/prev_fs';
         $this->io->createBlankDir($prev_dir);
@@ -83,13 +90,14 @@ class SvnCheckoutProject
             mkdir(SITE_PATH . '/storage/logs', 0755, true);
         }
 
-        // Get database adapter
-        $parts = explode("\\", $this->db::class);
-        $adapter_class = "Apex\\App\\Pkg\\Helpers\\Database\\" . array_pop($parts) . "Adapter";
-        $db_adapter = $this->cntr->make($adapter_class);
+        // Install migrations
+        $this->installMigrations();
 
-        // Transfer database
-        $db_adapter->transferStageToLocal($pkg, $dbinfo['password'], $dbinfo['host'], (int) $dbinfo['port']);
+        // Get database adapter
+        //$parts = explode("\\", $this->db::class);
+        //$adapter_class = "Apex\\App\\Pkg\\Helpers\\Database\\" . array_pop($parts) . "Adapter";
+        //$db_adapter = $this->cntr->make($adapter_class);
+        //$db_adapter->transferStageToLocal($pkg, $dbinfo['password'], $dbinfo['host'], (int) $dbinfo['port']);
 
         // Reset redis
         $process = new Process(['./apex', 'sys', 'reset-redis', '--full']);
@@ -105,6 +113,30 @@ class SvnCheckoutProject
         $dbinfo['pkg_alias'] = $pkg->getAlias();
         $dbinfo['has_staging'] = $has_staging === true ? 1 : 0;
         $this->redis->hmset('config:project', $dbinfo);
+    }
+
+    /**
+     * Install migrations
+     */
+    private function installMigrations():void
+    {
+
+        // Drop all tables
+        $this->db->dropAllTables();
+
+        // Create migrations table
+        $sql = trim(file_get_contents(SITE_PATH . '/vendor/apex/migrations/config/setup.sql'));
+        $sql = str_replace('~table_name~', 'internal_migrations', $sql);
+        $this->db->query($sql);
+        $this->db->clearCache();
+
+        // Go through packages
+        $packages = $this->pkg_store->list();
+        foreach ($packages as $pkg_alias => $vars) {
+            $pkg = $this->pkg_store->get($pkg_alias);
+            $this->migration->install($pkg);
+        }
+
     }
 
 }
