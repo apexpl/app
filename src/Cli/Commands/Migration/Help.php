@@ -28,6 +28,7 @@ class Help
         $help->addParam('create', 'Create a new database migration.');
         $help->addParam('history', 'View history of previously installed migrations.');
         $help->addParam('install', 'Run installation migration on package.  Used during development of a package.');
+        $help->addParam('install-email', "Install e-mail notifications within package.yml of package.");
         $help->addParam('migrate', 'Install pending migrations.');
         $help->addParam('rollback', 'Rollback previously installed migrations.');
         $help->addParam('status', 'View current status and any pending migrations awaiting installation.');
