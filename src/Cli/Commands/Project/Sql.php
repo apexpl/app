@@ -113,6 +113,9 @@ class Sql Implements CliCommandInterface
         // Set args
         if ($driver == 'SQLite') {
             $args = [$cmd, $dbinfo['dbname']];
+        } elseif ($driver == 'PostgreSQL') {
+            $dsn = 'postgresql://' . $dbinfo['user'] . ':' . $dbinfo['password'] . '@' . $dbinfo['host'] . ':' . $dbinfo['port'] . '/' . $dbinfo['dbname'];
+            $args = [$cmd, $dsn];
         } else {
             $args = [$cmd, '-u' . $dbinfo['user'], '-p' . $dbinfo['password'], '-h' . $dbinfo['host'], '-P' . $dbinfo['port'], $dbinfo['dbname']];
         }

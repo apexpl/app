@@ -37,9 +37,9 @@ class Dump implements CliCommandInterface
             if (!$cli->getConfirm("Are you sure you want to continue?")) {
                 $cli->send("Ok, goodbye.\r\n\r\n");
                 return;
-        }
+            }
             unlink(SITE_PATH . '/' . $file);
-    }
+        }
 
         // Get db driver
         $parts = explode("\\", $this->db::class);
@@ -55,7 +55,17 @@ class Dump implements CliCommandInterface
         }
 
         // Get cmd
-        $cmd = "mysqldump -u$dbinfo[user] -p$dbinfo[password] -h$dbinfo[host] -P$dbinfo[port] $dbinfo[dbname] > " . SITE_PATH . '/' . $file;
+        if ($db_driver == 'PostgreSQL') {
+            if ($file == 'dump.sql') {
+                $file = 'database.dump';
+            }
+            $dsn = 'postgresql://' . $dbinfo['user'] . ':' . $dbinfo['password'] . '@' . $dbinfo['host'] . ':' . $dbinfo['port'] . '/' . $dbinfo['dbname'];
+            $cmd = "pg_dump -Fc $dsn -f " . SITE_PATH . '/' . $file; 
+        } else { 
+            $cmd = "mysqldump -u$dbinfo[user] -p$dbinfo[password] -h$dbinfo[host] -P$dbinfo[port] $dbinfo[dbname] > " . SITE_PATH . '/' . $file;
+        }
+
+        // Dump database
         shell_exec($cmd);
 
         // Check for success

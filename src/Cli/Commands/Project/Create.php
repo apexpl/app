@@ -131,7 +131,7 @@ class Create implements CliCommandInterface
 
         // Add staging environment message
         if ($is_staging === true) { 
-            $staging_url = "http://" . $pkg->getAlias() . '.' . $pkg->getAuthor() . '.' . $repo->getStagingHost() . '/';
+            $staging_url = "https://" . $pkg->getAlias() . '.' . $pkg->getAuthor() . '.' . $repo->getStagingHost() . '/';
             $dbname = str_replace('-', '_', ($pkg->getAuthor() . '_' . $pkg->getAlias()));
 
             // Add to project info
