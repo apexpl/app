@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Base\Model;
 
-use Apex\Svc\{Db, Di, Convert};
+use Apex\Svc\{Db, Di, Convert, App};
 use Apex\App\Base\Model\ModelIterator;
 use Apex\App\Interfaces\BaseModelInterface;
 use Apex\App\Exceptions\ApexForeignKeyNotExistsException;
@@ -150,6 +150,31 @@ abstract class BaseModel implements BaseModelInterface
         $db->insert(static::$dbtable, $values);
         $id = $db->insertId();
         return $db->getIdObject(static::class, static::$dbtable, $id);
+    }
+
+    /**
+     * Insert from form
+     */
+    public static function insertFromForm():static
+    {
+
+        // Initialize
+        $app = Di::get(App::class);
+        $db = Di::get(Db::class);
+        $columns = $db->getColumnNames(static::$dbtable);
+
+        // Gather values
+        $values = [];
+        foreach ($columns as $alias) {
+            if (!$app->hasPost($alias)) {
+                continue;
+            }
+            $values[$alias] = $app->post($alias);
+        }
+
+        // Insert, and return
+        $obj = self::insert($values);
+        return $obj;
     }
 
     /**

@@ -33,6 +33,7 @@ class Help
         $help->addParam('iterator', 'Create a new iterator class constrained to a single model class.');
         $help->addParam('model', 'Create a new model class from existing database table.');
         $help->addParam('stack', 'Create a new stack class.');
+        $help->addParam('ws-listener', 'Create a new web socket listener.');
 
         // Return
         return $help;
