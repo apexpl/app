@@ -295,5 +295,32 @@ abstract class BaseModel implements BaseModelInterface
         return $vars;
     }
 
+    /**
+     * toFormattedArray
+     */
+    public function toFormattedArray():array
+    {
+
+        // Init
+        $data = $this->toArray();
+        $vars = [];
+
+        // Format
+        foreach ($data as $key => $value) {
+
+            // Format var
+            if (is_bool($value)) {
+                $value = $value === true ? 'Yes' : 'No';
+            } elseif (GetType($this->$key) == 'DateTime') {
+                $value = $this->convert->date($value, true);
+            }
+            $vars[$key] = $value;
+        }
+
+        // Return
+        return $vars;
+    }
+
+
 }
 

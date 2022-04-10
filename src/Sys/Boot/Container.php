@@ -89,6 +89,9 @@ class Container
 
         // Define items
         $sys_items = [ 
+            \Apex\Db\Drivers\mySQL\mySQL::class => \Apex\Db\Drivers\mySQL\mySQL::class,
+            \Apex\Db\Drivers\PostgreSQL\PostgreSQL::class => \Apex\Db\Drivers\PostgreSQL\PostgreSQL::class,
+            \Apex\Db\Drivers\SQLite\SQLite::class => \Apex\Db\Drivers\SQLite\SQLite::class,
             \Apex\Armor\Armor::class => [\Apex\Armor\Armor::class, ['container_file' => null, 'policy_name' => 'user', 'policy' => null]], 
             \Apex\Armor\Interfaces\AdapterInterface::class => [\Apex\App\Adapters\ArmorAdapter::class], 
             DebuggerInterface::class => [\Apex\Debugger\Debugger::class, ['debug_level' => $debug_level]], 
@@ -169,6 +172,9 @@ class Container
         // Define services
         $services = [
             DbInterface::class, 
+            \Apex\Db\Drivers\mySQL\mySQL::class,
+            \Apex\Db\Drivers\PostgreSQL\PostgreSQL::class,
+            \Apex\Db\Drivers\SQLite\SQLite::class,
             RouterInterface::class, 
             LoggerInterface::class,
             CacheItemPoolInterface::class, 
@@ -201,7 +207,7 @@ class Container
         // Mark items as services
         foreach ($services as $class_name) { 
             if (!$cntr->markItemAsService($class_name)) { 
-                //echo $cntr->getFailReason() . "<br />\n";
+                //echo $cntr->getFailReason() . "<br />\n"; exit;
             }
         }
 
