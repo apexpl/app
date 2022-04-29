@@ -229,6 +229,39 @@ class Convert
         return($amount / $rate);
     }
 
+    /**
+     * Date interval
+     */
+    public function dateInterval(string $interval):array
+    {
+
+        // Check format
+        if (!preg_match("/^(\w)(\d+)$/", $interval, $m)) {
+            throw new ApexInvalidDateIntervalException("Invalid interval, $interval.  Must be in format WDD");
+        }
+        $period = strtolower($m[1]);
+
+        // Set intervals
+        $names = [
+            's' => 'second',
+            'i' => 'minute',
+            'h' => 'hour',
+            'd' => 'day',
+            'w' => 'week',
+            'm' => 'month',
+            'q' => 'quarter',
+            'y' => 'year'
+        ];
+
+        // Check name
+        if (!isset($names[$period])) {
+            throw new ApexInvalidDateIntervalException("Invalid date interval period, $period.  Supported values are: s, i, h, d, w, m, q, y");
+        }
+
+        // Return
+        return [$names[$period], (int) $m[2]];
+    }
+
 }
 
 

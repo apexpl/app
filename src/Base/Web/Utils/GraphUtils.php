@@ -28,7 +28,11 @@ class GraphUtils
     {
 
         // Get number of days
-        $days = (int) $this->db->getField("SELECT datediff(date(now()), '$start_date')");
+        if (str_ends_with($this->db::class, 'PostgreSQL')) {
+            $days = (int) $this->db->getField("SELECT date(now()) - '$start_date'");
+        } else {
+            $days = (int) $this->db->getField("SELECT datediff(date(now()), '$start_date')");
+        }
 
         // Evaluate periods as necessary
         $days = match($period) {
@@ -64,28 +68,47 @@ class GraphUtils
         }
 
         // Break down date
-        $year = $this->db->getField("SELECT YEAR('$date')");
+        if (str_ends_with($this->db::class, 'PostgreSQL')) {
+            $year = $this->db->getField("SELECT extract(YEAR FROM TIMESTAMP '$date')");
+        } else {
+            $year = $this->db->getField("SELECT YEAR('$date')");
+        }
         if ($period == 'year') { 
             $where_sql = "$column BETWEEN '" . $year . "-01-01 00:00:00' AND '" . $year . "-12-31 23:59:59'";
             $display_date = 'Y' . $year;
         } elseif ($period == 'quarter') { 
-            $quarter = $this->db->getField("SELECT QUARTER('$date')");
-            $month = (($quarter - 1) * 3) + 1;
-            $last_day = $this->db->getField("SELECT DATE(LAST_DAY(" . $year . '_' . str_pad((string) ($month + 3), 2, '0', STR_PAD_LEFT) . "-01'))");
 
+            if (str_ends_with($this->db::class, 'PostgreSQL')) {
+                $quarter = $this->db->getField("SELECT extract(QUARTER FROM TIMESTAMP '$date')");
+                $month = (($quarter - 1) * 3) + 1;
+            $last_date = $year . '_' . str_pad((string) ($month + 3), 2, '0', STR_PAD_LEFT) . '-01';
+                $last_day = $this->db->getField("SELECT (date_trunc('month', '$last_date'::date) + interval '1 month' - interval '1 day')::date");
+                $last_day = $this->db->getField("SELECT extract(DAY FROM TIMESTAMP '$last_day')");
+            } else {
+                $quarter = $this->db->getField("SELECT QUARTER('$date')");
+                $month = (($quarter - 1) * 3) + 1;
+                $last_day = $this->db->getField("SELECT DATE(LAST_DAY(" . $year . '_' . str_pad((string) ($month + 3), 2, '0', STR_PAD_LEFT) . "-01'))");
+            }
             $where_sql = "$column BETWEEN '" . $year . '-' . str_pad((string) $month, 2, '0', STR_PAD_LEFT) . "-01 00:00:00 AND '" . $year . '-' . str_pad((string) ($month + 3), 2, '0', STR_PAD_LEFT) . '-' . $last_day . " 23:59:59'";
             $display_date = 'Q' . $quarter . 'Y' . $year;
 
         } elseif ($period == 'month') { 
-            $month = str_pad((string) $this->db->getField("SELECT MONTH('$date')"), 2, '0', STR_PAD_LEFT);
-            $last_day = $this->db->getField("SELECT LAST_DAY('$date')");
+
+            if (str_ends_with($this->db::class, 'PostgreSQL')) {
+                $month = str_pad((string) $this->db->getField("SELECT extract(MONTH FROM TIMESTAMP '$date')"), 2, '0', STR_PAD_LEFT);
+                $last_day = $this->db->getField("SELECT (date_trunc('month', '$date'::date) + interval '1 month' - interval '1 day')::date");
+                //$last_day = $this->db->getField("SELECT extract(DAY FROM TIMESTAMP '$last_day')");
+            } else {
+                $month = str_pad((string) $this->db->getField("SELECT MONTH('$date')"), 2, '0', STR_PAD_LEFT);
+                $last_day = $this->db->getField("SELECT LAST_DAY('$date')");
+            }
             $where_sql = "$column BETWEEN '" . $year . '-' . $month . "-01 00:00:00' AND '" . $last_day . " 23:59:59'";
 
             $date_format = $is_graph === true ? 'M, y' : 'F, Y';
             $display_date = date($date_format, mktime(0, 0, 0, (int) $month, 1, (int) $year));
 
         } elseif ($period == 'week') { 
-            $end_date = $this->db->getField("SELECT DATE(DATE_ADD('$date', interval 7 day))");
+            list($end_date, $end_time) = explode(' ', $this->db->addTime('day', 7, $date), 2);
             $where_sql = "$column BETWEEN '$date 00:00:00' AND '$end_date 23:59:59'";
             $display_date = $this->convert->date($date);
 
@@ -112,22 +135,53 @@ class GraphUtils
 
         // Get URI, if needed
         if ($uri == '') { 
-            $uri = $this->app->getPath();
+            $uri = $this->app->getPath() . '?' . http_build_query($this->app->getAllGet());
+        }
+        if (!str_contains($uri, '?')) {
+            $uri .= '?';
         }
 
         // Get HTML
         $html = "<p><b>View By:</b> ";
-        $html .= "<a href=\"" . $uri . "?period=day\">Day</a> | ";
-        $html .= "<a href=\"" . $uri . "?period=week\">Week</a> | "; 
-        $html .= "<a href=\"" . $uri . "?period=month\">Month</a> | "; 
-        $html .= "<a href=\"" . $uri . "?period=quarter\">Quarter</a> | ";
-        $html .= "<a href=\"" . $uri . "?period=year\">Year</a></p>";
+        $html .= "<a href=\"" . $uri . "&period=day\">Day</a> | ";
+        $html .= "<a href=\"" . $uri . "&period=week\">Week</a> | "; 
+        $html .= "<a href=\"" . $uri . "&period=month\">Month</a> | "; 
+        $html .= "<a href=\"" . $uri . "&period=quarter\">Quarter</a> | ";
+        $html .= "<a href=\"" . $uri . "&period=year\">Year</a></p>";
 
         // return
         return $html;
     }
 
+    /**
+     * Get intervals html
+     */
+    public function getIntervalsHtml(string $selected = 'D3', string $uri = ''):string
+    {
 
+        // Set periods
+        $periods = ['H1', 'H3', 'H24', 'D3', 'W1', 'W2', 'M1', 'M3', 'M6', 'Y1', 'Y3', 'Y10'];
+
+        // Get URI, if needed
+        if ($uri == '') { 
+            $uri = $this->app->getPath();
+        }
+        $uri .= '?interval=';
+
+        // Get html
+        $html = '';
+        foreach ($periods as $period) {
+            if ($period == $selected) {
+                $html .= strtolower($period) . ' | ';
+            } else {
+                $html .= "<a href=\"" . $uri . $period . "\">" . strtolower($period) . "</a> | ";
+            }
+        }
+        $html = rtrim($html, ' | ');
+
+        // Return
+        return $html;
+    }
 
 }
 

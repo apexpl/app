@@ -40,11 +40,18 @@ class Model implements CliCommandInterface
     {
 
         // Get args
-        $opt = $cli->getArgs(['dbtable','type']);
+        $opt = $cli->getArgs(['dbtable']);
         $filename = trim(($args[0] ?? ''), '/');
         $dbtable = $opt['dbtable'] ?? '';
-        $type = $opt['type'] ?? 'php8';
         $magic = $opt['magic'] ?? false;
+
+        // Get type
+        $type = 'php8';
+        if (isset($opt['doctrine']) && $opt['doctrine'] === true) {
+            $type = 'doctrine';
+        } elseif (isset($opt['eloquent']) && $opt['eloquent'] === true) {
+            $type = 'eloquent';
+        }
 
         // Format filename
         if (!preg_match("/^src\//", $filename)) { 
@@ -96,19 +103,20 @@ class Model implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'Generate Model',
-            usage: 'opus model <FILENAME> --dbtable=<TABLE> [--type=(php8|php7|eloquent|doctrine)] [--magic]',
+            usage: 'opus model <FILENAME> --dbtable=<TABLE> [--magic] [--doctrine] [--eloquent]',
             description: 'Generate a new model class.'
         );
 
         // Params
         $help->addParam('filename', 'File location of the new model class, relative to the /src/ directory.');
         $help->addFlag('--dbtable', 'The name of the database table to use to generate property names.  Not required if generating Eloquent model.');
-        $help->addFlat('--type', "Type of model to generate, defaults to 'php8'.  Supported values are: php8, php7, eloquent, doctrine");
-        $help->addFlag('--magic', "No value, and only applicable if type is 'php8' or 'php7'.  If present, will generate model without hard coded get / set methods and instead use magic methods in place via extension.  Otherwise, will generate model with hard coded ge / set methods.");
+        $help->addFlag('--magic', "If present, will generate model without hard coded get / set methods and instead allow properties to be accessed directly.  .  Otherwise, will generate model with hard coded get / set methods.");
+        $help->addFlag('--doctrine', 'If present, will generate a Doctrine entity class for given database table.');
+        $help->addFlag('--eloquent', 'If present, will generate an Eloquent model class.');
 
         // Examples
         $help->addExample('./apex opus MyShop/Models/Products --dbtable shop_products --magic');
-        $help->addExample('./apex opus model MyShop/Models/ShopOrder --type eloquent');
+        $help->addExample('./apex opus model MyShop/Models/ShopOrder --eloquent');
 
         // Return
         return $help;
