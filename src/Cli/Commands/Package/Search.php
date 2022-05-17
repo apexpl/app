@@ -29,7 +29,7 @@ class Search implements CliCommandInterface
 
         // Get args
         $term = $args[0] ?? '';
-        $found = false;
+        $results = [['Name', 'Repo', 'Description']];
 
         // Go through repos
         foreach ($this->repo_store->list() as $repo_alias => $vars) { 
@@ -38,19 +38,24 @@ class Search implements CliCommandInterface
             if ($res['count'] == 0) { 
                 continue;
             }
-            $found = true;
 
-            $cli->send("Found the following packages on the '$repo_alias' (https://" . $repo->getHttpHost() . ") repository:\r\n\r\n");
-            foreach ($res['packages'] as $vars) { 
-                $line = $vars['serial'] . ' (' . $vars['name'] . ' v' . $vars['version'] . ')';
-                $cli->send("    $line\r\n");
+            foreach ($res['packages'] as $vars) {
+                $results[] = [
+                    $vars['serial'] . ' v' . $vars['version'],
+                    $repo_alias,
+                    $vars['description']
+                ];
             }
-            $cli->send("\r\n");
         }
 
         // No packages found
-        if ($found === false) { 
+        if (count($results) == 0) {
             $cli->send("No packages were found that match the term '$term'\r\n\r\n");
+        } else {
+            $cli->send("The following packages were found for the term '$term'\n\n");
+            $cli->sendTable($results);
+            $cli->send("You may install any of these packages by running the command:\n\n");
+            $cli->send("    apex install <PACKAGE_NAME>\n\n");
         }
 
     }
