@@ -99,7 +99,7 @@ class Checkout implements CliCommandInterface
 
         // Check user has read access
         if ($res['can_read'] === false) {
-            $this->cli->error("You do not have write access to the package, $pkg_serial hence can not check it out.");
+            $cli->error("You do not have write access to the package, $pkg_serial hence can not check it out.");
             return;
         }
 

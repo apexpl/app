@@ -96,15 +96,15 @@ class GrantPackage implements CliCommandInterface
     {
 
         $help = new CliHelpScreen(
-            title: 'Grant User Role',
-            usage: 'acl grant-role <PKG_SERIAL> <USERNAME> <ROLE> [--repo=<REPO>]',
+            title: 'Grant User Access to Package',
+            usage: 'acl grant-package <PKG_SERIAL> <USERNAME> <ROLE> [--repo=<REPO>]',
             description: "Grants an access role to a user to the specified package."
         );
 
         // Params
         $help->addParam('pkg_serial', 'The package serial (author/alias) of the package to add access to.');
         $help->addParam('username', 'The username of the person to provide access to.');
-        $this->addParam('role', "The role which to grant access for.  Supported values are: admin, maintainer, team, readonly");
+        $help->addParam('role', "The role which to grant access for.  Supported values are: admin, maintainer, team, readonly");
         $help->addFlag('repo', 'The repository alias to grant access to.  Defaults to main apex repository.');
         $help->addExample('./apex acl grant-role myuser/shop jsmith maintainer');
 
