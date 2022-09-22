@@ -41,6 +41,7 @@ class ScanClasses
         $this->purge();
 
         // Go through files
+        $done = [];
         $files = $this->io->parseDir(SITE_PATH . '/src');
         foreach ($files as $file) { 
 
@@ -49,12 +50,22 @@ class ScanClasses
                 continue;
             }
 
-            // Load object
+            // Get class name
             $class_name = $this->opus_helper->pathToNamespace($file);
+            $parts = explode("\\", $class_name);
+            $short_name = array_pop($parts);
+
+            // Check for duplicate class name
+            if (in_array($short_name, $done)) {
+                continue;
+            }
+
+            // Load object
             if (!class_exists($class_name)) {
                 continue;
             }
             $obj = new \ReflectionClass($class_name);
+            $done[] = $short_name;
 
             // Get interfaces class implements
             $interfaces = $obj->getInterfaceNames();
