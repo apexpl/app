@@ -39,6 +39,7 @@ public function __construct(
         // Get menus
         $area = $this->app->getArea();
         $prefix_links = $this->app->getClient()->getPrefixMenuLinks();
+        $base_domain = $e->getAttr('base_domain') ?? '';
         if (!$menus = $this->getArea($area)) { 
             return '';
         }
@@ -66,6 +67,8 @@ public function __construct(
                 $url = $prefix_links === false ? "/$alias/$sub_alias" : "/$area/$alias/$sub_alias";
                 if ($srow['type'] == 'external') { 
                     $url = $srow['url'];
+                } elseif ($base_domain != '') {
+                    $url = "https://" . $base_domain . $url;
                 }
 
                 // Add to html
@@ -82,6 +85,11 @@ public function __construct(
                 'external' => $row['url'], 
                 default => ($prefix_links === false ? "/$alias" : "/$area/$alias")
             }; 
+
+            // Add base domain, if needed
+            if ($row['type'] == 'internal' && $base_domain != '') {
+                $url = "https://" . $base_domain . $url;
+            }
 
             // Set variables
             $vars = [
