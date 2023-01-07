@@ -103,7 +103,7 @@ abstract class BaseModel implements BaseModelInterface
 
         // Get sort_by
         if ($sort_by == '') { 
-            $sort_by = $db->getPrimaryColumn($key['ref_table']);
+            $sort_by = $db->getPrimaryKey($key['ref_table']);
         }
 
         // Start SQL

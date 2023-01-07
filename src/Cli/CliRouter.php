@@ -26,6 +26,7 @@ class CliRouter
         'branch',
         'create',
         'docs',
+        'gpt',
         'image',
         'migration',
         'opus',

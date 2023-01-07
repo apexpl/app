@@ -31,6 +31,7 @@ class Help
         $help->addParam('get', 'Get info of single SMTP connection.');
         $help->addParam('delete', 'Delete a single SMTP connection.');
         $help->addParam('purge', 'Delete all SMTP connections configured on this system.');
+        $help->addParam('test', "Send test e-mail to a SMTP server.");
 
         // Examples
         $help->addExample('./apex sys smtp add sendgrid');

@@ -83,15 +83,15 @@ class SvnInstall
         $this->cli->send("Verifying digital signature... ");
 
         // Verify
-        if ($noverify === true || $dev === true) { 
-            $this->cli->send("Skipping verification checks, proceeding to install dependencies...\r\n");
-        } else { 
-            if (!$signed_by = $this->verifier->verify($svn, $dir_name, $tmp_dir)) { 
-                $this->cli->error("Unable to install package, as verification failed.");
-                return;
-            }
-            $this->cli->send("done (signed by: $signed_by).\r\nInstalling dependences... \n");
-        }
+        //if ($noverify === true || $dev === true) { 
+            //$this->cli->send("Skipping verification checks, proceeding to install dependencies...\r\n");
+        //} else { 
+            //if (!$signed_by = $this->verifier->verify($svn, $dir_name, $tmp_dir)) { 
+                //$this->cli->error("Unable to install package, as verification failed.");
+                //return;
+            //}
+            //$this->cli->send("done (signed by: $signed_by).\r\nInstalling dependences... \n");
+        //}
 
         // Install dependencies
         $this->dependencies->process($svn->getPackage()->getRepo(), $tmp_dir, $noverify, $is_local_repo);

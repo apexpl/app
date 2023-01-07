@@ -43,8 +43,10 @@ class Diff
             // Remove SVN file / dir
             $this->io->rm("$svn_dir/$file");
 
-        // Copy over
-            $this->io->copy(SITE_PATH . '/' . $local_file, "$svn_dir/$file");
+            // Copy over
+            if (file_exists(SITE_PATH . '/' . $local_file)) {
+                $this->io->copy(SITE_PATH . '/' . $local_file, "$svn_dir/$file");
+            }
         }
 
     }

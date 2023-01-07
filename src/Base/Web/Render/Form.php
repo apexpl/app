@@ -74,10 +74,11 @@ class Form
                 $html .= $vars['options'] . "\n</s:ft_" . $vars['field'] . ">\n";
             } elseif ($vars['field'] == 'textarea' && isset($vars['value']) && $vars['value'] != '') { 
                 $html .= $vars['value'] . "\n</s:ft_textarea>\n";
+            } elseif (in_array($vars['field'], ['onecol', 'twocol']) && isset($vars['contents']) && $vars['contents'] != '') { 
+                $html .= $vars['contents'] . "\n</s:ft_" . $vars['field'] . ">\n";
             }
         }
         $html .= "</s:form_table>\n";
-
 
         // Return
         return $this->view->renderBlock($html);
@@ -92,7 +93,7 @@ class Form
         // Go through
         $string = '';
         foreach ($vars as $key => $value) { 
-            if (in_array($key, ['field','options']) || $value == '') { 
+            if (in_array($key, ['field','options', 'contents']) || $value == '') { 
                 continue;
             } elseif ($vars['field'] == 'textarea' && $key == 'value') { 
                 continue;

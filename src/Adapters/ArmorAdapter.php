@@ -15,6 +15,7 @@ use App\Webapp\Models\EmailNotification;
 use Apex\Armor\Exceptions\{ArmorOutOfBoundsException, ArmorNotImplementedException};
 use Apex\App\Attr\Inject;
 use Nyholm\Psr7\Response;
+use redis;
 
 /**
  * Apex adapter that utilizes the apex/mercury and apex/syrus packages.
@@ -33,6 +34,9 @@ class ArmorAdapter implements AdapterInterface
 
     #[Inject(View::class)]
     private View $view;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     /**
      * Get user by uuid
@@ -143,19 +147,32 @@ class ArmorAdapter implements AdapterInterface
     public function handleSessionStatus(AuthSession $session, string $status):void
     {
 
+        // Initialize
+        $type = $session->getUser()->getType() == 'user' ? 'members' : $session->getUser()->getType() . 's';
+        if ($type == 'admins') {
+            $type = 'admin';
+        }
+
         // Get template file
         $file = match($status) { 
-            'email' => '/members/auth/2fa_email.html', 
-            'email_otp' => '/members/auth/2fa_email_otp.html', 
-            'phone' => '/members/auth/2fa_phone.html',
-            'verify_email' => 'members/auth/verify_email',
-            'verify_email_otp' => 'members/auth/verify_email_otp',
-            'verify_phone' => 'members/auth/verify_phone',
-            default => '/members/index'
+            'email' => '/auth/twofactor_email.html', 
+            'email_otp' => 'auth/twofactor_email_otp.html', 
+            'phone' => '/auth/twofactor_phone.html',
+            'pgp' => '/auth/twofactor_pgp.html',
+            'verify_email' => 'auth/verify_email',
+            'verify_email_otp' => 'auth/verify_email_otp',
+            'verify_phone' => 'auth/verify_phone',
+            default => '/' . $type . '/index'
         };
+        $file = $type . '/' . $file;
 
         // Template variables
         $this->view->assign('profile', $session->getUser()->toDisplayArray());
+        if ($session->getStatus() == 'pgp') {
+            $message = $this->redis->get('armor:pgp:' . $session->getUuid()); 
+            $this->view->assign('message', $message);
+        }
+        $this->view->assign('area', $type);
 
         // Display template
         $this->view->setTemplateFile($file);
@@ -173,11 +190,13 @@ class ArmorAdapter implements AdapterInterface
         $this->app->setRequest($request);
         $this->app->setSession($session);
         $this->view->setTemplateFile('');
+        $type = $session->getUser()->getType() == 'user' ? 'members' : $session->getUser()->getType() . 's';
 
         // Check for login
         if ($is_login === true) {
-            $template_file = $this->app->config('users.redirect_after_login') == 'index' ? 'index' : 'members/index';
-            $this->view->setTemplateFile($template_file, true);
+            $url = '/' . $type . '/index';
+            header("Location: $url");
+            exit(0);
         }
 
         // Handle request

@@ -22,6 +22,14 @@ class FormBuilder
     }
 
     /**
+     * Hidden
+     */
+    public function hidden():FormField
+    {
+        return new FormField('hidden');
+    }
+
+    /**
      * textbox
      */
     public function textbox():FormField
@@ -160,8 +168,15 @@ class FormBuilder
      */
     public function onecol(string $contents = ''):FormField
     {
-        $field = new FormField('onecol');
-        return $field->contents($contents);
+        return $field = new FormField('onecol');
+    }
+
+    /**
+     * Two column row
+     */
+    public function twocol(string $contents = ''):FormField
+    {
+        return $field = new FormField('twocol');
     }
 
 }

@@ -3,18 +3,22 @@ declare(strict_types = 1);
 
 namespace Apex\App\Base\Web\Render;
 
-use Apex\Svc\{Container, View, Convert};
+use Apex\Svc\{App, Container, View, Convert};
 use Apex\App\Base\Web\Components;
 use Apex\Syrus\Parser\StackElement;
 use Apex\App\Base\Web\Utils\DataTableDetails as TableDetails;
 use Apex\App\Interfaces\Opus\DataTableInterface;
 use Apex\App\Attr\Inject;
+use App\Webapp\Opus\Ajax\DeleteCheckedRows;
 
 /**
  * Render data table
  */
 class DataTable
 {
+
+    #[Inject(App::class)]
+    private App $app;
 
     #[Inject(Container::class)]
     private Container $cntr;
@@ -54,6 +58,12 @@ class DataTable
             'divid' => $attr['id']
         ]);
 
+        // Delete table rows, if needed
+        if ($this->app->getAction() == 'delete_table_rows') {
+            $ajax = $this->cntr->make(DeleteCheckedRows::class);
+            $ajax->process();
+        }
+
         // Create header line
         $tpl = $this->createHeaderLine($attr, $obj, $details);
 
@@ -83,7 +93,7 @@ class DataTable
             // Columns
             foreach ($obj->columns as $alias => $name) { 
                 $value = $row[$alias] ?? "&nbsp;";
-                $tpl .= "<    <td>$value</td>\n";
+                $tpl .= "    <td>$value</td>\n";
             }
             $tpl .= "</tr>\n";
         }

@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Base\Web\Render;
 
-use Apex\Svc\View;
+use Apex\Svc\{App, View};
 use Apex\App\Base\Web\Components;
 use Apex\Syrus\Parser\StackElement;
 use Apex\App\Attr\Inject;
@@ -13,6 +13,9 @@ use Apex\App\Attr\Inject;
  */
 class AutoComplete
 {
+
+    #[Inject(App::class)]
+    private App $app;
 
     #[Inject(Components::class)]
     private Components $components;
@@ -43,7 +46,13 @@ class AutoComplete
         $width = $e->getAttr('width') ?? '';
         $placeholder = $e->getAttr('placeholder') ?? '';
 
-        // Set HTML
+        // Check for disabled Javascript
+        if ($this->app->config('core.enable_javascript') != 1) {
+            $html = "<input type=\"text\" name=\"$name\" class=\"form-control\">";
+            return $html;
+        }
+
+        // Set html
         $html = "<div class=\"form-group\">\n";
         $html .= "<input type=\"hidden\" name=\"$idfield\" value=\"\" id=\"$idfield\" />\n";
         $html .= "<input type=\"text\" name=\"$name\" id=\"$name\" ";

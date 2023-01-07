@@ -256,13 +256,13 @@ class FormField
     {
 
         // Validate
-        if ($this->field != 'onecol') { 
-            throw new ApexFormValidationException("The contents() method is only available for 'onecol' fields.");
+        if (!in_array($this->field, ['onecol', 'twocol'])) { 
+            throw new ApexFormValidationException("The contents() method is only available for 'onecol' and 'twocol' fields.");
         }
 
         // Return
         $this->contents = $contents;
-        return $static;
+        return $this;
     }
 
     /**
@@ -298,6 +298,9 @@ class FormField
                 continue;
             }
             $vars[$key] = $this->$key;
+            if ($vars['field'] == 'contents') {
+                $vars['contents'] = str_replace('"', "\\\"", $vars['contents']);
+            }
         }
 
         // Textbox type

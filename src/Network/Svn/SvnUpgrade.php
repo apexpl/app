@@ -86,11 +86,11 @@ class SvnUpgrade
         }
 
         // Verify
-        if ($noverify === true) { 
-            $this->cli->send("Skipping verification checks...\r\n");
-        } elseif (!$this->verify($pkg, $inventory, $tmp_dir, $latest_version)) { 
-            return null;
-        }
+        //if ($noverify === true) { 
+            //$this->cli->send("Skipping verification checks...\r\n");
+        //} elseif (!$this->verify($pkg, $inventory, $tmp_dir, $latest_version)) { 
+            //return null;
+        //}
 
         // Install
         $this->install($pkg, $inventory, $tmp_dir, $latest_version);

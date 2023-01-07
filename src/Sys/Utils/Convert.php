@@ -4,6 +4,7 @@ declare(strict_Types = 1);
 namespace Apex\App\Sys\Utils;
 
 use Apex\Svc\{App, Db};
+use Apex\App\Base\Lists\CurrencyList;   
 use Symfony\Component\String\UnicodeString;
 use Apex\App\Attr\Inject;
 use DateTime;
@@ -92,22 +93,27 @@ class Convert
     /**
      * Format currency
      */
-    public function money(float $amount, string $currency = '', bool $include_abbr = true):string
+    public function money(float | string $amount, string $currency = '', bool $include_abbr = true, bool $is_crypto = false):string
     { 
 
         // Use default currency, if none specified
         if ($currency == '') { 
-            $currency = $this->app->config('core.base_currency', 'USD');
+            $currency = $this->app->config('core.default_currency', 'USD');
         }
 
         // Get currency details
-        $symbol = $this->app->getClient()->getCurrencySymbol();
-        $decimals = $this->app->getClient()->getCurrencyDecimals();
-        $is_crypto = $this->app->getClient()->getCurrencyIsCrypto();
+        if (!isset(CurrencyList::$opt[$currency])) {
+            $symbol = '';
+            $decimals = 8;
+            $is_crypto = true;
+        } else {
+            $symbol = CurrencyList::$opt[$currency]['symbol'];
+            $decimals = CurrencyList::$opt[$currency]['decimals'];
+            $is_crypto = false;
+        }
 
         // Format crypto currency
         if ($is_crypto === true) { 
-
 
             $amount = preg_replace("/0+$/", "", sprintf("%.8f", $amount));
             $length = strlen(substr(strrchr($amount, "."), 1));
@@ -116,7 +122,7 @@ class Convert
                 $length = 4;
             }
 
-        // Format amount
+            // Format amount
             $name = number_format((float) $amount, (int) $length);
             if ($include_abbr === true) {
                 $name .= ' ' . $currency;
@@ -191,7 +197,7 @@ class Convert
     /**
      * Exchange money
      */
-    public function exchange_money(float $amount, string $from_currency, string $to_currency, ?DateTime $date = null): ?float
+    public function exchangeMoney(float | string $amount, string $from_currency, string $to_currency, ?DateTime $date = null):mixed
     { 
 
         // Check for same currency
@@ -211,7 +217,11 @@ class Convert
 
         // Exchange to base currency, if needed
         if ($from_currency != $this->app->config('core.default_currency')) {
-            $amount *= $rates[$from_currency];
+            if (is_string($amount)) {
+                $amount = bcmul($amount, $rates[$from_currency]);
+            } else {
+                $amount *= $rates[$from_currency];
+            }
         }
 
         // Check for base currency
@@ -225,8 +235,15 @@ class Convert
             return null;
         }
 
+        // Exchange currency
+        if (is_string($amount)) {
+            $amount = bcdiv($amount, $rate);
+        } else {
+            $amount /= $rate;
+        }
+
         // Return
-        return($amount / $rate);
+        return $amount;
     }
 
     /**

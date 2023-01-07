@@ -78,6 +78,7 @@ class Router implements RouterInterface
 
         // Load middleware
         $class_name = "\\App\\HttpControllers\\" . $http_controller;
+
         if (!class_exists($class_name)) { 
             throw new ApexRouterException("Middleware does not exist at $http_controller");
         }

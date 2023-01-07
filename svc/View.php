@@ -42,6 +42,7 @@ final class View extends \Apex\Syrus\Syrus
             $this->setTemplateFile($file);
         }
 
+
         // Load base vars
         $this->loadBaseVariables();
 
@@ -55,7 +56,11 @@ final class View extends \Apex\Syrus\Syrus
         }
 
         // Apply Javascript
-        $html = $this->applyJavascript($html);
+        if ($this->app->config('core.enable_javascript') == 1) {
+            $html = $this->applyJavascript($html);
+        } else {
+            $html = $this->disableJavascript($html);
+        }
 
         // Return
         return $html;
@@ -115,6 +120,90 @@ final class View extends \Apex\Syrus\Syrus
 
         // Get message counters
         $this->getMessageCounters();
+    }
+
+    /**
+     * Disable javascript
+     */
+    public function disableJavascript(string $html):string
+    {
+
+        // Go through search table buttons
+        preg_match_all("/<a href=\"javascript:ajaxSend\(\'webapp\/search_table\',(.*?)\)(.*?)<\/a>/si", $html, $search_match, PREG_SET_ORDER);
+        foreach ($search_match as $match) {
+
+            // Set button html
+            $button = "<form action=\"" . $this->app->getPath() . "\" method=\"POST\">\n";
+            $button .= "<button type=\"submit\" class=\"btn btn-primary btn-md\" title=\"Search\">Search <a class=\"fa fa-fw fa-search\"></i></button>\n";
+            $button .= "</form>\n";
+
+            // Replace
+            $html = str_replace($match[0], $button, $html);
+        }
+
+        // Go through delete rows buttons
+        preg_match_all("/<a href=\"javascript:ajaxConfirm\((.*?)webapp\/delete_checked_rows(.*?)table=(.*?)\&(.*?)\)/si", $html, $delete_match, PREG_SET_ORDER);
+        foreach ($delete_match as $match) {
+
+            // Set button html
+            $button = "<input type=\"hidden\" name=\"table\" value=\"$match[3]\">\n";
+            $button .= "<button type=\"submit\" name=\"submit\" value=\"delete_table_rows\" class=\"btn btn-primary btn-lg\">Delete Checked Rows</button>\n";
+
+            // Replace
+            $html = str_replace($match[0], $button, $html);
+        }
+
+        // Modals
+        preg_match_all("/<a href=\"javascript:openModal\((.*?)\)(.*?)>(.*?)<\/a>/si", $html, $modal_match, PREG_SET_ORDER);
+        foreach ($modal_match as $match) {
+
+            // Get vars
+            $vars = $this->parseJavascriptArgs($match[1]);
+
+            // Replace
+            $href = "<a href=\"/modal/" . $vars[0] . "?" . $vars[1] . "\">$match[3]</a>";
+            $html = str_replace($match[0], $href, $html);
+        }
+
+        // Replace ajax calls
+        preg_match_all("/<a href=\"javascript:(ajaxSend|ajaxConfirm)\((.*?)\)(.*?)>(.*?)<\/a>/si", $html, $ajax_match, PREG_SET_ORDER);
+        foreach ($ajax_match as $match) {
+
+            // Parse args, and start URI
+            $vars = $this->parseJavascriptArgs($match[2]);
+            if ($match[1] == 'ajaxConfirm') {
+                array_splice($vars, 1, 1);
+            }
+            $query = 'ajax_function=' . urlencode($vars[0]) . '&' . $vars[1];
+
+            // Replace
+            $uri = $this->app->getPath() . '?' . $query;
+            $href = "<a href=\"$uri\" $match[3]>$match[4]</a>";
+//if ($vars[0] == 'webapp/sort_table') {
+    //header("Content-type: text/plain"); print "$href\n\n"; exit; }
+
+            $html = str_replace($match[0], $href, $html);
+        }
+
+        // Return
+        return $html;
+    }
+
+    /**
+     * Parse Javascript args
+     */
+    private function parseJavascriptARgs(string $js_string):array
+    {
+
+        // GO through js string
+        $vars = [];
+        preg_match_all("/\'(.+?)\'/", $js_string, $js_match, PREG_SET_ORDER);
+        foreach ($js_match as $match) {
+            $vars[] = trim($match[1]);
+        }
+
+        // Return
+        return $vars;
     }
 
     /**

@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 
 use Apex\Svc\{Di, App};
+use Symfony\Component\String\UnicodeString;
 
 /**
  * translate message with placeholders
@@ -38,10 +39,25 @@ function tr(...$args):string
     $x++; }
 
     // Return
-    return strtr($text, $replace);
+    return strtr((string) $text, $replace);
 
 }
 
 
+/**
+ * Check package
+ */
+function checkPackage(string $pkg_alias):bool
+{
+
+    // Convert to title case
+    $word = new UnicodeString($pkg_alias);
+    $pkg_alias = $word->camel()->title();
+
+    // Check /etc/ directory
+    $package_file = SITE_PATH . '/etc/' . $pkg_alias . '/package.yml';
+    return file_exists($package_file);
+
+}
 
 

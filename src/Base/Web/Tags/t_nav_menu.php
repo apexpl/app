@@ -46,6 +46,7 @@ public function __construct(
 
         // Go through menus
         $html = '';
+        $nav_num=1;
         foreach ($menus as $alias => $row) { 
 
             // Check if viewable
@@ -96,12 +97,14 @@ public function __construct(
                 'url' => $url, 
                 'icon' => $row['icon'] == '' ? '' : '<i class="' . $row['icon'] . '"></i>', 
                 'name' => $row['name'], 
-                'submenus' => $sub_html
+                'submenus' => $sub_html,
+                'nav_num' => $nav_num
             ];
 
             // Add to html
             $tag_name = in_array($row['type'], ['internal', 'external']) ? 'nav.menu' : 'nav.' . $row['type'];
             $html .= $this->tags->getSnippet($tag_name, '', $vars);
+            $nav_num++;
         }
 
         // Return

@@ -5,6 +5,7 @@ namespace Apex\App\Base\Web\Tags;
 
 use Apex\Svc\{App, Convert};
 use App\Webapp\Alerts\Messages;
+use App\Users\User;
 use Apex\Syrus\Parser\StackElement;
 use Apex\Syrus\Render\Tags;
 use Apex\Syrus\Interfaces\TagInterface;

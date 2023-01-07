@@ -99,12 +99,12 @@ class SvnCheckout
         // Get local package
         $inv = $this->pkg_inventory->get($pkg);
         $tree = $this->tree_builder->build($svn->getPackage(), $inv);
-        $local_merkle_root = $tree->getMerkleRoot();
+        //$local_merkle_root = $tree->getMerkleRoot();
 
         // Check merkle roots
-        if ($merkle_root == $local_merkle_root) { 
-            return 'use_local';
-        }
+        //if ($merkle_root == $local_merkle_root) { 
+            //return 'use_local';
+        //}
 
         // Compare
         $handle_diff = $this->svn_inventory->compare($svn->getPackage(), $tree->getFiles());

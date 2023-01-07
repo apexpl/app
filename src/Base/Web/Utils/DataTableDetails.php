@@ -30,9 +30,9 @@ class DataTableDetails
     ) { 
 
         // Set variables
-        $search_term = $app->post('search_' . $this->divid, '');
-        if ($app->hasPost('sort_col') && $app->hasPost('sort_dir')) { 
-            $order_by = $app->post('sort_col') . ' ' . $app->post('sort_dir', 'asc');
+        $search_term = $app->request('search_' . $this->divid, '');
+        if ($app->hasRequest('sort_col') && $app->hasRequest('sort_dir')) { 
+            $order_by = $app->request('sort_col') . ' ' . $app->request('sort_dir', 'asc');
         } else { 
             $order_by = '';
         }

@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Pkg;
 
-use Apex\Svc\{Convert, Container};
+use Apex\Svc\{Convert, Container, Db};
 use Apex\App\Cli\Cli;
 use Apex\Opus\Opus;
 use Apex\App\Sys\Utils\Io;
@@ -13,12 +13,16 @@ use Apex\App\Pkg\Helpers\Migration;
 use Apex\App\Network\Models\LocalPackage;
 use Apex\App\Network\Stores\PackagesStore;
 use Apex\App\Attr\Inject;
+use redis;
 
 /**
  * Package
  */
 class PackageManager
 {
+
+    #[Inject(Db::class)]
+    private Db $db;
 
     #[Inject(Opus::class)]
     private Opus $opus;
@@ -34,6 +38,9 @@ class PackageManager
 
     #[Inject(Container::class)]
     private Container $cntr;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
@@ -108,7 +115,40 @@ class PackageManager
 
     }
 
-}
+    /**
+     * Reset package
+     */
+    public function reset(string $pkg_alias):bool
+    {
 
+        // Check package exists
+        $etc_dir = SITE_PATH . '/etc/' . $this->convert->case($pkg_alias, 'title');
+        if (!is_dir($etc_dir)) {
+            return false;
+        }
+
+        // Execute reset.sql file
+        if (file_exists("$etc_dir/reset.sql")) {
+            $this->db->executeSqlFile("$etc_dir/reset.sql");
+        }
+
+        // Check fore migration class
+        $class_name = "Etc\\" . $this->convert->case($pkg_alias, 'title') . "\\migrate";
+        if (!class_exists($class_name)) { 
+            return true;
+        }
+
+        // Load class, check for resetRedis method
+        $obj = $this->cntr->make($class_name);
+        if (method_exists($obj, 'resetRedis')) { 
+            $obj->resetRedis($this->db, $this->redis);
+        }
+
+
+        // Return
+        return true;
+    }
+
+}
 
 
