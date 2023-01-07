@@ -115,9 +115,10 @@ class Checkout implements CliCommandInterface
         // Get package object
         $res['repo_alias'] = $repo->getAlias();
         $pkg = ToInstance::map(LocalPackage::class, $res);
+        $dbinfo = $res['dbinfo'] ?? [];
 
         // Checkout the project
-        $this->svn_checkout->process($pkg, (bool) $res['has_staging'], $res['dbinfo']);
+        $this->svn_checkout->process($pkg, (bool) $res['has_staging'], $dbinfo);
 
         // Success
         $cli->send("Successfully checked out the project '$pkg_serial', and the entire Apex installation directory is now under version control.\r\n\r\n");
