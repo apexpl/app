@@ -7,7 +7,6 @@ use Apex\Svc\{Container, App};
 use Apex\App\Interfaces\{RouterInterface, RouterResponseInterface};
 use Psr\Http\Message\ServerRequestInterface;
 use Apex\App\Exceptions\{ApexYamlException, ApexRouterException};
-use Apex\App\Attr\Inject;
 
 /**
  * Router
@@ -66,10 +65,18 @@ class Router implements RouterInterface
                 $vars = explode('/', preg_replace("/^" . str_replace("/", "\\/", $chk_path) . "/", '', $path));
                 $path = $chk_path;
 
-                foreach ($param_keys as $key) { 
-                    $params[$key] = count($vars) > 0 ? array_shift($vars) : '';
+                foreach ($param_keys as $key) {
+                    $value = count($vars) > 0 ? array_shift($vars) : '';
+                    if ($value != '') {
+                        $params[$key] = $value;
+                    }
                 }
             }
+
+            // Check number of params
+        if (count($param_keys) > count($params)) {
+            continue;
+        }
 
             // Set controller, and break
             $http_controller = $controller;

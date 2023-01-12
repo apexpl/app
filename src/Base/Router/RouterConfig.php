@@ -36,7 +36,41 @@ class RouterConfig
         } else { 
             return;
         }
+
+        // Save file
         $yaml['routes'] = $routes;
+        $this->save($yaml);
+    }
+
+    /**
+     * Remove a route
+     */
+    public function removeRoute(string $path, string $host = 'default'):void
+    {
+
+        // Load router file'
+        $yaml = $this->app->getRoutesConfig('routes.yml', true);
+        $routes = $yaml['routes'] ?? [];
+
+        // Add route as needed
+        if (isset($routes[$host]) && is_array($routes[$host]) && isset($routes[$host][$path])) { 
+            unset($routes[$host][$path]);
+        } elseif (isset($routes[$path])) { 
+            unset($routes[$path]);
+        } else { 
+            return;
+        }
+
+        // Save file
+        $yaml['routes'] = $routes;
+        $this->save($yaml);
+    }
+
+    /**
+     * Save yaml file
+     */
+    private function save(array $yaml):void
+    {
 
         // Set YAML text
         $text = "\n##########\n# Routes\n#\n";
@@ -49,4 +83,7 @@ class RouterConfig
     }
 
 }
+
+
+
 
