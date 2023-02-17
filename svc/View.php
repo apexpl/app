@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\Svc;
 
-use Apex\Svc\{App, Container, Db};
+use Apex\Svc\{App, Db};
 use Apex\Syrus\Render\Templates;
 use Apex\Syrus\Parser\{Parser, VarContainer, Common};
 use Apex\Syrus\Render\Tags;
@@ -18,9 +18,6 @@ final class View extends \Apex\Syrus\Syrus
 
     #[Inject(App::class)]
     private App $app;
-
-    #[Inject(Container::class)]
-    private Container $cntr;
 
     #[Inject(Db::class)]
     private Db  $db;
