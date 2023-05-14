@@ -43,12 +43,18 @@ class Create implements CliCommandInterface
         $pkg_alias = $pkg->getAlias();
 
         // Initialize
-        $opt = $cli->getArgs(['type']);
+        $opt = $cli->getArgs();
         $alias = $args[1] ?? '';
-        $type = $opt['type'] ?? 'apex';
         $diff = $opt['diff'] ?? false;
         $dump = $opt['dump'] ?? false;
 
+        // Get type
+        $type = 'apex';
+        if (isset($opt['doctrine']) && $opt['doctrine'] === true) {
+            $type = 'doctrine';
+        } elseif (isset($opt['eloquent']) && $opt['eloquent'] === true) {
+            $type = 'eloquent';
+        }
 
         // Get current branch
         $svn = $pkg->getSvnRepo();
@@ -82,14 +88,15 @@ class Create implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'Create Migration',
-            usage: 'migration create <PKG_ALIAS> [<ALIAS>] [--type=apex] [--diff] [--dump]',
+            usage: 'migration create <PKG_ALIAS> [<ALIAS>] [--doctrine|eloquent] [--diff] [--dump]',
             description: "Create new database migration."
         );
 
         // Params
         $help->addParam('pkg_alias', 'The package alias to create a migration for.');
         $help->addParam('alias', 'Optional alias / name of the database migration.  Not applicable for Doctrine migrations.');
-        $help->addFlag('--type', 'The type of migration to create.  Supported values are: apex, eloquent, doctrine');
+        $help->addFlag('--doctrine', 'If present, will create a Doctrine migration.');
+        $help->addFlag('--eloquent', 'If present, will create an Eloquent migration.');
         $help->addFlag('--diff', 'Only applicable if creating a Doctrine migration and will diff the database schema.');
         $help->addFlag('--dump', 'Only applicable if creating a Doctrine migration, and will dump the full database schema.');
         $help->addExample('./apex migration create myshop');

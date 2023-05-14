@@ -25,6 +25,7 @@ class AccountHelper
      */
     public function __construct( 
         private Cli $cli,
+        protected Container $cntr,
         private AccountsStore $store,
         private CertificateHelper $certs, 
         private RsaKeysHelper $rsa_keys, 
@@ -43,6 +44,11 @@ class AccountHelper
      */
     public function get():LocalAccount
     {
+
+        // Check if we have account already
+        if ($this->cntr->has(LocalAccount::class)) {
+            return $this->cntr->get(LocalAccount::class);
+        }
 
         // Get account list
         $accounts = $this->store->list(true);
@@ -63,6 +69,9 @@ class AccountHelper
         // Get account
         $alias = $this->cli->getOption("To continue, select an account for this action:", $options, '', true);
         $acct = $this->store->get($alias);
+
+        // Add to container
+        $this->cntr->set(LocalAccount::class, $acct);
 
         // Return
         return $acct;

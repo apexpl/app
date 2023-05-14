@@ -10,6 +10,7 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Apex\Migrations\Exceptions\MigrationsYamlConfigException;
 use Apex\App\Attr\Inject;
+use redis;
 
 /**
  * Migrations config
@@ -22,6 +23,9 @@ class MigrationsConfig
 
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
+
+    #[Inject(redis::class)]
+    private redis $redis;
 
     // Properties
     private string $table_name = 'internal_migrations';
@@ -110,14 +114,17 @@ class MigrationsConfig
         // Set variables
         $dir = SITE_PATH . '/etc/' . $pkg->getAliasTitle() . '/Migrations';
         $namespace = "Etc\\" . $pkg->getAliasTitle() . "\\Migrations";
+        $chk_alias = $this->convert->case($alias, 'title') . '/';
 
         // Check for Doctrine entity paths
         $entity_paths = [];
-        if (file_exists(SITE_PATH . '/boot/doctrine.yml')) { 
-            $yaml = Yaml::parseFile(SITE_PATH . '/boot/doctrine.yml');
-            $entity_paths = $yaml[$pkg->getAlias()] ?? [];
-            $entity_paths = array_map( fn ($path) => SITE_PATH . '/' . trim($path, '/'), $entity_paths);
-        }
+        $dirs = $this->redis->smembers('config:doctrine_entity_classes');
+        foreach ($dirs as $full_dir) {
+            $dir = trim(str_replace(SITE_PATH  . '/src/', '', $full_dir), '/');
+            if (str_starts_with($dir, $chk_alias)) {
+                $entity_paths[] = $full_dir;
+            
+        }}
 
         // Get info
         return [$dir, $namespace, $entity_paths];

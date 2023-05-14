@@ -6,6 +6,7 @@ namespace Apex\App\Sys\Utils;
 use Apex\Svc\{Convert, Container};
 use Apex\App\Cli\Helpers\OpusHelper;
 use Apex\App\Sys\Utils\Io;
+use Doctrine\ORM\Mapping\Entity;
 use Apex\App\Interfaces\ListenerInterface;
 use Apex\App\Attr\Inject;
 use redis;
@@ -73,6 +74,10 @@ class ScanClasses
                 $this->redis->sadd('config:interfaces:' . $interface, $class_name);
             }
 
+            // Check for Doctrine eneity
+            $filename = SITE_PATH . '/' . $file;
+            $this->checkDoctrineEntity($obj, $filename);
+
             // Check for listener
             if ($obj->implementsInterface(ListenerInterface::class)) { 
                 $this->scanListener($obj, $class_name);
@@ -114,6 +119,32 @@ class ScanClasses
     }
 
     /**
+     * Check for Doctrine entity
+     */
+    private function checkDoctrineEntity(\ReflectionClass $obj, string $filename):void
+    {
+
+        // Go through attributes
+        $attributes = $obj->getAttributes();
+        foreach ($attributes as $attr) {
+
+            if ($attr->getName() != Entity::class) {
+                continue;
+            }
+
+            // Add to redis, if needed
+            $dirname = rtrim(dirname($filename), '/');
+            if (!$this->redis->sismember('config:doctrine_entity_classes', $dirname)) {
+                $this->redis->sadd('config:doctrine_entity_classes', $dirname);
+            }
+        }
+
+
+        //$this->redis->del('config:doctrine_entity_classes');
+
+    }
+
+    /**
      * Purge
     */
     private function purge():void
@@ -126,6 +157,9 @@ class ScanClasses
                 $this->redis->del($key);
             }
         }
+
+        // Doctrine enttities
+        $this->redis->del('config:doctrine_entity_classes');
     }
 
 }

@@ -100,7 +100,7 @@ class App extends Bootloader implements RequestHandlerInterface
     /**
      * Output response
      */
-    public function outputResponse(ResponseInterface $response)
+    public function outputResponse(ResponseInterface $response):void
     {
 
         // Set status

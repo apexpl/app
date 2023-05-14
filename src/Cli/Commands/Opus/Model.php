@@ -91,6 +91,12 @@ class Model implements CliCommandInterface
             $this->redis->sadd('config:interfaces:' . BaseModelInterface::class, $class_name);
         }
 
+        // Add to Doctrine, if needed
+        $dirname = rtrim(dirname($full_path), '/');
+        if ($type == 'doctrine' || !$this->redis->sismember('config:doctrine_entity_classes', $dirname)) {
+            $this->redis->sadd('config:doctrine_entity_classes', $dirname);
+        }
+
         // Success message
         $cli->success("Successfully created new model from database table '$dbtable' which is now available at:", $files);
     }

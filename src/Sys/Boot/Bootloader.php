@@ -11,6 +11,7 @@ use Apex\App\Exceptions\{ApexBootloaderException, ApexInvalidArgumentException};
 use Apex\Db\Interfaces\DbInterface;
 use Apex\Armor\Auth\AuthSession;
 use Apex\Armor\Interfaces\ArmorUserInterface;
+use \Doctrine\ORM\EntityManager;
 use redis;
 
 /**
@@ -29,6 +30,10 @@ class Bootloader extends RequestInputs
     protected string $content_type = '';
     protected string $path;
     protected bool $path_is_locked = false;
+
+    // Database properties
+    protected ?object $eloquent = null;
+    protected ?EntityManager $doctrine = null;
 
     /**
      * Load request
@@ -139,11 +144,43 @@ class Bootloader extends RequestInputs
      */
     public function bootEloquent():object
     {
+
+        // Check if already booted
+        if ($this->eloquent !== null) {
+            return $this->eloquent;
+        }
+
         $db = $this->cntr->get(DbInterface::class);
         $connection = \Apex\Db\Wrappers\Eloquent::init($db);
         $connection->bootEloquent();
         $connection->setAsGlobal();
-        return $connection;
+
+        // Return
+        $this->eloquent = $connection;
+        return $this->eloquent;
+    }
+
+    /**
+     * Boot Doctrine
+     */
+    public function bootDoctrine():EntityManager
+    {
+
+        // Check if already booted
+        if ($this->doctrine !== null) {
+            return $this->doctrine;
+        }
+
+        // Get entity dirs
+        $redis = $this->cntr->get(redis::class);
+        $entity_dirs = $redis->smembers('config:doctrine_entity_classes');
+
+        // Boot Doctrine
+        $db = $this->cntr->get(DbInterface::class);
+        $this->doctrine = \Apex\Db\Wrappers\Doctrine::init($db, $entity_dirs);
+
+        // Return
+        return $this->doctrine;
     }
 
     /**

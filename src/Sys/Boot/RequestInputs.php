@@ -18,7 +18,7 @@ class RequestInputs
     /**
      * $_POST
      */
-    public function post(string $key, $default = null, string $filters = 'escape')
+    public function post(string $key, $default = null, string $filters = 'escape'): mixed
     {
         return array_key_exists($key, $this->inputs['post']) ? $this->filter($this->inputs['post'][$key], $filters) : $default; 
     }
@@ -26,7 +26,7 @@ class RequestInputs
     /**
      * $_GET
      */
-    public function get(string $key, $default = null, string $filters = 'escape')
+    public function get(string $key, $default = null, string $filters = 'escape'):mixed
     {
         return array_key_exists($key, $this->inputs['get']) ? $this->filter($this->inputs['get'][$key], $filters) : $default; 
     }
@@ -34,7 +34,7 @@ class RequestInputs
     /**
      * $_REQUEST
      */
-    public function request(string $key, $default = null, string $filters = 'escape')
+    public function request(string $key, $default = null, string $filters = 'escape'):mixed
     {
 
         $value = match(true) { 
@@ -48,7 +48,7 @@ class RequestInputs
     /**
      * $_SERVER
      */
-    public function server(string $key, $default = null, string $filters = 'escape')
+    public function server(string $key, $default = null, string $filters = 'escape'):mixed
     {
         return array_key_exists($key, $this->inputs['server']) ? $this->filter($this->inputs['server'][$key], $filters) : $default; 
     }
@@ -56,7 +56,7 @@ class RequestInputs
     /**
      * $_COOKIE
      */
-    public function cookie(string $key, $default = null, string $filters = 'escape')
+    public function cookie(string $key, $default = null, string $filters = 'escape'):mixed
     {
         return array_key_exists($key, $this->inputs['cookie']) ? $this->filter($this->inputs['cookie'][$key], $filters) : $default; 
     }
@@ -128,7 +128,7 @@ class RequestInputs
     /**
      * Config var
      */
-    public function config(string $key, $default = null)
+    public function config(string $key, $default = null): mixed
     {
 
         if (array_key_exists($key, $this->_config)) { 

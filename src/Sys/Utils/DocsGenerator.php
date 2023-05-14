@@ -34,6 +34,13 @@ class DocsGenerator
         // Go through methods
         $method_list = [];
         foreach ($obj->getMethods() as $method) { 
+
+
+            if ($method->getName() == '__construct') {
+            continue;
+            }
+
+
             $this->generateMethod($method, $dest_dir);
 
             // Get visibility
@@ -91,7 +98,16 @@ class DocsGenerator
         $html .= "    <s:desc>" . $this->getDescription($method) . "</s:desc>\n\n";
         $html .= "$params_html\n";
         $html .= "    <s:return>$return_type</s:return>\n\n";
-        $html .= "</s:docs_function>\n\n";
+
+        // Add ssee also
+        foreach ($obj->getMethods() as $also) {
+
+            if ($also->getName() == $method->getName() || $also->getName() == '__construct') {
+                continue;
+            }
+            $html .= "    <s:also>[" . $also->getName() . "](" . strtolower($also->getName()) . ")</s:also>\n";
+        }
+        $html .= "\n</s:docs_function>\n\n";
 
         // Save file
         $file = $dest_dir . '/' . strtolower($method->getName()) . '.html';
