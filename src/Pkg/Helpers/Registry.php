@@ -99,10 +99,11 @@ class Registry
 
         // Load yaml file
         try {
-            $yaml = Yaml::parseFile($yaml_file);
+            $tmp_yaml = Yaml::parseFile($yaml_file);
         } catch (ParseException $e) { 
             throw new ApexYamlException("Unable to parse YAML file at $yaml_file, Error: " . $e->getMessage());
         }
+        $yaml = $tmp_yaml === null ? [] : $tmp_yaml;
 
         // Return
         return $yaml;

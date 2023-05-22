@@ -29,6 +29,7 @@ class WsListener implements CliCommandInterface
 
         // Get args
         $filename = trim(($args[0] ?? ''), '/');
+        $filename = $this->helper->parseFilename($filename);
 
         // Perform checks
         if (file_exists(SITE_PATH . '/' . $filename)) { 

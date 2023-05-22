@@ -64,6 +64,10 @@ class Shortcuts
             'switch' => 'sw'
         ], 
 
+        'gpt' => [
+            'gen' => 'generate'
+        ],
+
         'migration' => [
             'c' => 'create',
             'h' => 'history',

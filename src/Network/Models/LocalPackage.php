@@ -349,6 +349,7 @@ class LocalPackage
             'pkg_serial' => $this->getSerial(),
             'author' => $this->getAuthor(),
             'category' => $general['category'] ?? '', 
+            'license' => $general['license'] ?? 'MIT', 
             'access' => $general['access'] ?? 'public', 
             'price' => $general['price'] ?? 0, 
             'price_recurring' => $general['price_recurring'] ?? 0, 

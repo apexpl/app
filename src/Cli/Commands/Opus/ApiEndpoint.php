@@ -90,13 +90,12 @@ class ApiEndpoint implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'Generate API Endpoint',
-            usage: 'opus api-endpoint <FILENAME> [--route=]',
+            usage: 'opus api-endpoint <FILENAME>',
             description: 'Generate a new API endpoint class.'
         );
 
         // Params
         $help->addParam('filename', 'File location of the new API endpoint class, relative to the /src/ directory.');
-        $help->addFlag('--route', 'Optional route and if specified will add a new route to the /boot/routes.yml file.');
         $help->addExample('./apex opus api-endpoint MyShop/Api/Invoices/List');
 
         // Return

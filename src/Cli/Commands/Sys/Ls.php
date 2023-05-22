@@ -43,8 +43,10 @@ class Ls implements CliCommandInterface
             $this->listServices($cli, $pkg_alias);
         } elseif ($type == 'crontab') { 
             $this->listCrontab($cli, $pkg_alias);
+        } else if ($type == 'listeners') { 
+            $this->listListeners($cli, $pkg_alias);
         } else { 
-            $cli->error("Invalid type '$type' specified.  Supported values are: services, crontab");
+            $cli->error("Invalid type '$type' specified.  Supported values are: services, crontab, listeners");
         }
 
     }
@@ -127,6 +129,41 @@ class Ls implements CliCommandInterface
     }
 
     /**
+     * Show listeners
+     */
+    private function listListeners(Cli $cli, ?string $pkg_alias = null):void
+    {
+
+        // Initialize
+        $results = [];
+        $keys = $this->redis->keys("config:listeners:*");
+
+        /// GO through listeners
+        foreach ($keys as $key) {
+
+            // Get classes
+            $classes = $this->redis->hgetall($key);
+            $routing_key = str_replace("config:listeners:", "", $key);
+
+            // Delete packages, if needed
+            if ($pkg_alias !== null && !isset($classes[$pkg_alias])) {
+                continue;
+            } else if ($pkg_alias !== null) {
+                $res = [$classes[$pkg_alias]];
+            } else {
+                $res = array_values($classes);
+            }
+
+            // Add to results
+            $results[$routing_key] = implode("\n", $res);
+        }
+
+        // SEnd results
+        $cli->send("Below shows all listeners found, routing key on the left side, and full class name on the right side.\n\n");
+        $cli->sendArray($results);
+    }
+
+    /**
      * Help
      */
     public function help(Cli $cli):CliHelpScreen
@@ -134,10 +171,10 @@ class Ls implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'List Developer Defined Services',
-            usage: 'sys list (services|crontab) [<pkg_alias>]',
-            description: 'Lists all developer defined servers or crontab jobs on the local machine.'
+            usage: 'sys list (services|crontab|listeners) [<pkg_alias>]',
+            description: 'Lists all developer defined services, crontab jobs, or listeners on the local machine.'
         );
-        $help->addParam('type', "The type of classes to list.  Supported values are: services, crontab");
+        $help->addParam('type', "The type of classes to list.  Supported values are: services, crontab, listeners");
         $help->addParam('pkg_alias', "Optional package alias if you wish to only list classes for a specific package.");
         $help->addExample('./apex sys list services');
         $help->addExample('./apex sys list crontab');
@@ -146,5 +183,6 @@ class Ls implements CliCommandInterface
         return $help;
     }
 
+   
 }
 

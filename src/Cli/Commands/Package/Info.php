@@ -77,6 +77,7 @@ class Info implements CliCommandInterface
         $output = [
             'Name:' => $pkg->getSerial(),
             'Category:' => $res['category'],
+            'License' => $res['license'],
             'Latest Release:' => $latest_release,
             'Current Branch:' => '/' . $svn_dir,
             '' => '',

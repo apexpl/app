@@ -63,14 +63,14 @@ class Pull implements CliCommandInterface
     {
 
         $help = new CliHelpScreen(
-            title: 'Update Package',
-            usage: 'update <PKG_ALIAS>',
-            description: 'Updates the local working copy with the latest files on the repository.'
+            title: 'Pull Package',
+            usage: 'pull <PKG_ALIAS>',
+            description: 'Syncs the local working copy with the latest revisions within the repository'
         );
 
         // Add params
-        $help->addParam('pkg_alias', "The package alias to update.");
-        $help->addExample('./apex package update my-shop');
+        $help->addParam('pkg_alias', "The package alias to pull / sync.");
+        $help->addExample('./apex package pull my-shop');
 
         // Return
         return $help;

@@ -37,13 +37,18 @@ class SvnDependencies
     public function process(LocalRepo $repo, string $tmp_dir, bool $noverify = false, bool $is_local_repo = false):void
     {
 
+        // Check if registry file exists
+        if (!file_exists("$tmp_dir/etc/registry.yml")) {
+            return;
+        }
+
         // Load yaml file
         try {
-            $yaml = Yaml::parseFile("$tmp_dir/etc/package.yml");
+            $yaml = Yaml::parseFile("$tmp_dir/etc/registry.yml");
         } catch (ParseException $e) { 
             $yaml = [];
         }
-        $require = $yaml['require'] ?? [];
+        $require = $yaml['require_apex'] ?? [];
 
         // Go through required dependencies
         foreach ($require as $pkg_serial => $version) {

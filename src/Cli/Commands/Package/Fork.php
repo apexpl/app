@@ -149,6 +149,8 @@ class Fork implements CliCommandInterface
         $help->addParam('pkg_alias', "The package alias to create on the local machine.");
         $help->addExample('./apex package fork apex/users my-users');
 
+        return $help;
+
     }
 
 }

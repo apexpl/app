@@ -25,11 +25,11 @@ class Services
     /**
      * Install
      */
-    public function install(array $registry):void
+    public function install(array $yaml):void
     {
 
         // Check for services
-        $services = $registry['services'] ?? [];
+        $services = $yaml['services'] ?? [];
         foreach ($services as $class_name) { 
             $this->redis->hset('config:services', $class_name, $this->pkg_alias);
         }
@@ -39,7 +39,7 @@ class Services
     /**
      * Remove
      */
-    public function remove(array $registry):void
+    public function remove(array $yaml):void
     {
 
         // Go through redis servers

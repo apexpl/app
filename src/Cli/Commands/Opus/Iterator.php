@@ -69,7 +69,7 @@ class Iterator implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'Generate Iterator',
-            usage: 'opus iterator <FILENAME> --item_class=<ITEM_CLASS>',
+            usage: 'opus iterator <FILENAME> --item-class=<ITEM_CLASS>',
             description: 'Generate a new iterator class.'
         );
 

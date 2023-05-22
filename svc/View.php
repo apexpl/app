@@ -19,6 +19,7 @@ final class View extends \Apex\Syrus\Syrus
     #[Inject(App::class)]
     private App $app;
 
+function addJava
     #[Inject(Db::class)]
     private Db  $db;
 
@@ -247,7 +248,7 @@ final class View extends \Apex\Syrus\Syrus
         $html = str_replace("<body>", base64_decode('Cgo8c3R5bGUgdHlwZT0idGV4dC9jc3MiPgoKICAgIC5mb3JtX3RhYmxlIHsgbWFyZ2luLWxlZnQ6IDI1cHg7IH0KICAgIC5mb3JtX3RhYmxlIHRkIHsKICAgICAgICB0ZXh0LWFsaWduOiBsZWZ0OwogICAgICAgIHZlcnRpY2FsLWFsaWduOiB0b3A7CiAgICAgICAgcGFkZGluZzogOHB4OwogICAgfQoKPC9zdHlsZT4KCgoKCgo=') . '<body>', $html);
 
         // Check if Javascript enabled
-        if ($this->app->config('core.enable_javascript') != 1 && $this->app->getArea() != 'admin') { 
+        if ($this->app->config('core.enable_javascript') != 1) {
             return $html;
         }
 

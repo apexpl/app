@@ -37,7 +37,7 @@ class ApexTestCase extends CustomAssertions
     /**
      * Send CLI Command
      */
-    protected function apex(string $command, array $inputs = [], bool $do_confirm = true)
+    protected function apex(string $command, array $inputs = [], bool $do_confirm = true):string
     {
 
         /// Check if loaded

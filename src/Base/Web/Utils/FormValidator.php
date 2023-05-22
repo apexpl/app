@@ -110,7 +110,7 @@ class FormValidator
     /**
      * Check required
      */
-    public function checkRequired(array $required, string $error_type = 'view'):void
+    protected function checkRequired(array $required, string $error_type = 'view'):void
     {
 
         foreach ($required as $var) { 
@@ -133,7 +133,7 @@ class FormValidator
     /**
      * Check data types
      */
-    public function checkDataTypes(array $data_types, string $error_type = 'view'):void
+    protected function checkDataTypes(array $data_types, string $error_type = 'view'):void
     {
 
         // Check data types
@@ -179,7 +179,7 @@ class FormValidator
     /**
      * Check min length
      */
-    public function checkMinLength(array $min_length, string $error_type = 'view'):void
+    protected function checkMinLength(array $min_length, string $error_type = 'view'):void
     {
 
         // Check fields
@@ -206,7 +206,7 @@ class FormValidator
     /**
      * Max length
      */
-    public function checkMaxLength(array $max_length, string $error_type = 'view'):void
+    protected function checkMaxLength(array $max_length, string $error_type = 'view'):void
     {
 
         // Check fields

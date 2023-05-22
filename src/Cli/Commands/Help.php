@@ -30,6 +30,7 @@ class Help
             'acl' => 'Manage access to repositories and signing certificates.',
             'branch' => 'Create and manage branches on repositories.',
             'create' => 'Create components (views, http controllers, tables, et al)',
+            'gpt' => 'Code generation with Chat GPT assistance',
             'image' => 'Create and manage installation images.',
             'migration' => 'Create and manage database migrations.',
             'opus' => 'Code generation utilities (models, crud, et al)',

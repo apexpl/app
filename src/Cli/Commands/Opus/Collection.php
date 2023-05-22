@@ -69,7 +69,7 @@ class Collection implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'Generate Collection',
-            usage: 'opus collection <FILENAME> --item_class=<ITEM_CLASS>',
+            usage: 'opus collection <FILENAME> --item-class=<ITEM_CLASS>',
             description: 'Generate a new collection class.'
         );
 

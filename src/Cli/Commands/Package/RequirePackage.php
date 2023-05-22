@@ -5,7 +5,9 @@ namespace Apex\App\Cli\Commands\Package;
 
 use Apex\Svc\{Convert, Container};
 use Apex\App\Cli\{Cli, CliHelpScreen};
-use Apex\App\Network\Stores\PackagesStore;
+use Apex\App\Network\Stores\{PackagesStore, ReposStore};
+use Apex\App\Cli\Helpers\PackageHelper;
+use Apex\App\Network\Svn\SvnInstall;
 use Apex\App\Pkg\Helpers\Registry;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Symfony\Component\Process\Process;
@@ -25,6 +27,15 @@ class RequirePackage implements CliCommandInterface
 
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
+
+    #[Inject(ReposStore::class  )]
+    private ReposStore $repo_store;
+
+    #[Inject(SvnInstall::class)]
+    private SvnInstall $svn_install;
+
+    #[Inject(PackageHelper::class)]
+    private PackageHelper $pkg_helper;
 
     /**
      * Process
@@ -52,7 +63,7 @@ class RequirePackage implements CliCommandInterface
         if ($is_composer === true) { 
             $this->addComposerPackage($cli, $pkg_alias, $dep_alias, $version);
         } else { 
-            $this->addApexPackage($pkg_alias, $dep_alias, $version);
+            $this->addApexPackage($cli, $pkg_alias, $dep_alias, $version);
         }
 
     }
@@ -110,10 +121,12 @@ class RequirePackage implements CliCommandInterface
 
         // Install, if not already installed
         if (!$pkg = $this->pkg_store->get($dep_alias)) { 
+            $repo = $this->repo_store->get('apex');
 
-            if (!$pkg = $this->network_helper->checkPackageAccess($repo, $dep_alias, 'can_read')) { 
+            if (!$pkg = $this->pkg_helper->checkPackageAccess($repo, $dep_alias, 'can_read')) { 
                 return;
             }
+
             $this->svn_install->process($pkg->getSvnRepo(), $version); 
             $pkg = $this->pkg_store->get($dep_alias);
         }

@@ -49,7 +49,7 @@ class PackageConfig
         }
 
         // Return
-        return $yaml;
+        return $yaml === null ? [] : $yaml;
     }
 
     /**
@@ -61,7 +61,6 @@ class PackageConfig
         // Load config
     $pkg_alias = $this->convert->case($pkg_alias, 'lower');
         $yaml = $this->load($pkg_alias);
-        $registry = $this->load($pkg_alias, 'registry.yml');
 
         // Install config vars
         $config_vars = $this->cntr->make(ConfigVars::class, ['pkg_alias' => $pkg_alias]);
@@ -77,7 +76,7 @@ class PackageConfig
 
         // Install services
         $services = $this->cntr->make(Services::class, ['pkg_alias' => $pkg_alias]);
-        $services->install($registry);
+        $services->install($yaml);
 
         // Install boxlist items
         $boxlist_items = $this->cntr->make(BoxlistItems::class, ['pkg_alias' => $pkg_alias]);
@@ -93,7 +92,6 @@ class PackageConfig
         // Load config
         $pkg_alias = $this->convert->case($pkg_alias, 'lower');
         $yaml = $this->load($pkg_alias);
-        $registry = $this->load($pkg_alias, 'registry.yml');
 
         // Remove config vars
         $config_vars = $this->cntr->make(ConfigVars::class, ['pkg_alias' => $pkg_alias]);
@@ -109,7 +107,7 @@ class PackageConfig
 
         // Remove services
         $services = $this->cntr->make(Services::class, ['pkg_alias' => $pkg_alias]);
-        $services->remove($registry);
+        $services->remove($yaml);
 
         // Remove boxlist items
         $boxlist_items = $this->cntr->make(BoxlistItems::class, ['pkg_alias' => $pkg_alias]);
