@@ -16,7 +16,7 @@
         "apex/armor-x509": "^2.0",
         "apex/armor-sshkeys": "^2.0",
         "apex/armor-apikeys": "^2.0",
-        "apex/syrus": "^2.0",
+        "apex/syrus": "^2.1",
         "apex/storage": "^2.0",
         "apex/debugger": "^2.0",
         "apex/opus": "^2.0",
