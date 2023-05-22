@@ -19,7 +19,6 @@ final class View extends \Apex\Syrus\Syrus
     #[Inject(App::class)]
     private App $app;
 
-function addJava
     #[Inject(Db::class)]
     private Db  $db;
 
