@@ -68,6 +68,13 @@ class Shortcuts
             'gen' => 'generate'
         ],
 
+        'image' => [
+            'c' => 'create',
+            'd' => 'delete',
+            'list' => 'ls',
+            'p' => 'publish'
+        ],
+
         'migration' => [
             'c' => 'create',
             'h' => 'history',

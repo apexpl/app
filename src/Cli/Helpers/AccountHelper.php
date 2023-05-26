@@ -132,7 +132,7 @@ class AccountHelper
         $this->cli->sendHeader('Account Registration');
 
         // Get profile
-        list($username, $email, $password) = $this->getProfileInfo($repo);
+        list($username, $email, $password, $register_code) = $this->getProfileInfo($repo);
         $this->debugger?->add(1, "Obtained account profile, generateing CSR.", 'info');
 
         // Generate CSR
@@ -143,24 +143,25 @@ class AccountHelper
         }
 
         // Ask to use same key for SSH
-        $this->cli->send("For security, all traffic to the network is sent over SSH.  If desired, you may use the private key that was generated for signing also as your SSH key, or you may generate a new keypair for SSH access.\r\n\r\n");
-        if (true === ($this->cli->getConfirm("Use previously generated key for SSH? ", 'y'))) { 
-            $ssh = $csr->getRsaKey();
-            $this->cli->send("\r\n");
-        } else { 
+        //$this->cli->send("For security, all traffic to the network is sent over SSH.  If desired, you may use the private key that was generated for signing also as your SSH key, or you may generate a new keypair for SSH access.\r\n\r\n");
+        //if (true === ($this->cli->getConfirm("Use previously generated key for SSH? ", 'y'))) { 
+            //$ssh = $csr->getRsaKey();
+            //$this->cli->send("\r\n");
+        //} else { 
 
-            // Generate new SSH key
-            $this->cli->send("\r\n");
-            $this->cli->sendHeader('SSH Key');
-            $ssh = $this->rsa_keys->generate($username . '-ssh');
-        }
+            //// Generate new SSH key
+            //$this->cli->send("\r\n");
+            //$this->cli->sendHeader('SSH Key');
+            //$ssh = $this->rsa_keys->generate($username . '-ssh');
+        //}
+        $ssh = $csr->getRsaKey();
 
         // Debug
         $this->debugger?->add(1, "Generated CSR, connecting to remote server to register account.", 'info');
         $this->cli->send("\r\nGenerating signing certificate... done\r\nRegistering account... ");
 
         // Register account
-        $crt = $this->register->process($repo, $username, $password, $email, $csr, $ssh);
+        $crt = $this->register->process($repo, $username, $password, $email, $register_code, $csr, $ssh);
         $csr->setCrt($crt);
 
         // Debug
@@ -244,9 +245,12 @@ class AccountHelper
         // Get password
         $password = $this->cli->getNewPassword();
 
+        // Verify e-mail
+        $register_code = $this->verifyEmail($repo, $email);
+
         // Return
         $this->cli->send("\r\n");
-        return [$username, $email, $password];
+        return [$username, $email, $password, $register_code];
     }
 
     /**
@@ -258,6 +262,35 @@ class AccountHelper
         return $res['exists'];
     }
 
+    /**
+     * Verify e-mail address
+     */
+    private function verifyEmail(LocalRepo $repo, string $email):string
+    {
+
+        // Initialize
+        $res = $this->network->post($repo, 'users/verify-email', ['email' => $email, 'action' => 'init']);
+        $this->cli->send("An e-mail has been sent to $email with a six digit confirmation code, which you must enter below to proceed.\n\n");
+
+        // Confirm code
+        do {
+
+            $code = $this->cli->getInput("Confirmation Code: ");
+            $res = $this->network->post($repo, 'users/verify-email', ['code' => $code, 'email' => $email, 'action' => 'confirm']);
+
+            // Check response
+            $ok = isset($res['status']) && $res['status'] == 'ok' ? true : false;
+            if ($ok === true) {
+                return $res['register_code'];
+            }
+
+            // Get new code
+            $this->cli->send("\nInvalid code.  Please try again or enter 'quit' to exit.\n\n");
+    } while (true);
+
+        // Return
+        return $register_code;
+    }
 
 }
 

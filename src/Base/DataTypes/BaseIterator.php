@@ -1,7 +1,7 @@
 <?php
 declare(strict_types = 1);
 
-namespace Apex\App\Base\Model;
+namespace Apex\App\Base\DataTypes;
 
 use Apex\Db\Mapper\FromInstance;
 
@@ -88,7 +88,7 @@ abstract class BaseIterator implements \Iterator, \Countable, \jsonSerializable
         // Initialize
         $json = [];
         foreach ($this->items as $item) { 
-            $json[] = FromInstance::$item);
+            $json[] = FromInstance::map($item);
         }
 
         // Return

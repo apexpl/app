@@ -350,6 +350,7 @@ class LocalPackage
             'author' => $this->getAuthor(),
             'category' => $general['category'] ?? '', 
             'license' => $general['license'] ?? 'MIT', 
+            'allow_num_installs' => $general['allow_num_installs'] ?? 3, 
             'access' => $general['access'] ?? 'public', 
             'price' => $general['price'] ?? 0, 
             'price_recurring' => $general['price_recurring'] ?? 0, 

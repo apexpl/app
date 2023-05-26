@@ -24,6 +24,7 @@ class RegisterAccount
         string $username, 
         string $password, 
         string $email, 
+        string $register_code,
         Certificate $csr, 
         RsaKey $ssh_key
     ):string { 
@@ -33,6 +34,7 @@ class RegisterAccount
             'username' => $username, 
             'password' => $password, 
             'email' => $email,
+            'register_code' => $register_code,
             'pubkey' => $csr->getRsaKey()->getPublicKey(), 
             'csr' => $csr->getCsr(), 
             'ssh_pubkey' => $ssh_key->getPublicSshKey()

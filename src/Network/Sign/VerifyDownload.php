@@ -80,6 +80,7 @@ class VerifyDownload
 
         // Verify issuer
         if (!$this->verify_cert->verify($crt_text, $crt_name, $release_date)) { 
+            throw new \Exception("Unable to verify upstream of certificate, $crt_name");
             return null;
         }
 

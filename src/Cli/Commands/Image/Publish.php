@@ -111,7 +111,10 @@ class Publish implements CliCommandInterface
         );
 
         $help->addParam('alias', 'The alias of the installation image to publish.');
-        $help->addFlag('./apex image publish ecommerce');
+        $help->addExample('./apex image publish ecommerce');
+
+        // Return
+        return $help;
     }
 
 }

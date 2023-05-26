@@ -63,7 +63,8 @@ class PackageManager
             'alias' => $alias,
             'type' => $type,
             'access' => $access,
-            'name' => $name
+            'name' => $name,
+            'author' => $author
         ]);
 
         // Create package instance

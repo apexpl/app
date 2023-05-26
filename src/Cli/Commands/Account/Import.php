@@ -260,11 +260,9 @@ echo "Saved account\n";
         $help = new CliHelpScreen(
             title: 'Import Account',
             usage: 'account import',
-            description: "Imports an existing Apex account onto the local machine for use.  Used when you have installed Apex on a new machine, and wish to use your existing Apex account to publish commiets and releases to your repositories.",
-            example: [
-                './apex account import'
-            ]
+            description: "Imports an existing Apex account onto the local machine for use.  Used when you have installed Apex on a new machine, and wish to use your existing Apex account to publish commiets and releases to your repositories."
         );
+        $help->addExample("apex account import");
 
         // Return
         return $help;
