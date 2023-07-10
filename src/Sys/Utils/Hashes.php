@@ -180,7 +180,7 @@ class Hashes
     { 
 
         // Get class
-        $class_name = "\\Apex\\App\\Sys\\Lists\\" . ucwords($list) . "List";
+        $class_name = "\\Apex\\App\\Base\\Lists\\" . ucwords($list) . "List";
         if (!class_exists($class_name)) { 
             throw new ApexHashesException("Standard list does not exist, $list");
         }
