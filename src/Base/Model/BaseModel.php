@@ -238,9 +238,14 @@ abstract class BaseModel implements BaseModelInterface
             $this->updated_at = new DateTime();
         }
 
-        // Save
+        // Get primary column
         $db = Di::get(Db::class);
-        $db->insertOrUpdate(static::$dbtable, $this);
+        if (!$primary_col = $db->getPrimaryKey(status::$dbtable)) {
+            throw new \Exception("The database table '" . status::$dbtable . "' does not have a primary key, which is required to execute the save() method against it.");
+        }
+
+        // Save
+        $db->update(status::$dbtable, $this, "$primary_col = %s", $this->$primary_col);
     }
 
     /**
