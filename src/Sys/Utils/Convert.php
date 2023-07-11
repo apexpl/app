@@ -218,7 +218,7 @@ class Convert
         // Exchange to base currency, if needed
         if ($from_currency != $this->app->config('core.default_currency')) {
             if (is_string($amount)) {
-                $amount = bcmul($amount, $rates[$from_currency]);
+                $amount = bcmul($amount, $rates[$from_currency], 8);
             } else {
                 $amount *= $rates[$from_currency];
             }
@@ -237,7 +237,7 @@ class Convert
 
         // Exchange currency
         if (is_string($amount)) {
-            $amount = bcdiv($amount, $rate);
+            $amount = bcdiv($amount, $rate, 8);
         } else {
             $amount /= $rate;
         }
