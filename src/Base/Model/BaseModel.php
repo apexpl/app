@@ -242,9 +242,16 @@ abstract class BaseModel implements BaseModelInterface
 
         }
 
+        // Get updates
+        $uprates = [];
+        foreach (array_keys($values) as $key) {
+            $updates[$key] = $this->$key;
+        }
+
         // Add updated_at, if available
         if (isset($this->updated_at)) { 
             $this->updated_at = new DateTime();
+            $updates['updated_at'] = $this->updated_at->format('Y-m-d H:i:s');
         }
 
         // Get primary column
@@ -254,7 +261,7 @@ abstract class BaseModel implements BaseModelInterface
         }
 
         // Save
-        $db->update(static::$dbtable, $this, "$primary_col = %s", $this->$primary_col);
+        $db->update(static::$dbtable, $updates, "$primary_col = %s", $this->$primary_col);
     }
 
     /**
