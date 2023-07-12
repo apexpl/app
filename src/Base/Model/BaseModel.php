@@ -19,6 +19,9 @@ abstract class BaseModel implements BaseModelInterface
     #[Inject(Convert::class)]
     protected Convert $convert;
 
+    // Properties
+    protected array $updates = [];
+
     /**
      * Get a model instance of the first record found for a given where clause.
      */
@@ -217,6 +220,12 @@ abstract class BaseModel implements BaseModelInterface
     public function save(array $values = []):void
     {
 
+        // Get values
+        if (count($values) == 0) {
+            $values = $this->updates;
+            $this->updates = [];
+        }
+
         // Update properties, if any passed
         foreach ($values as $key => $value) { 
 
@@ -240,12 +249,12 @@ abstract class BaseModel implements BaseModelInterface
 
         // Get primary column
         $db = Di::get(Db::class);
-        if (!$primary_col = $db->getPrimaryKey(status::$dbtable)) {
+        if (!$primary_col = $db->getPrimaryKey(static::$dbtable)) {
             throw new \Exception("The database table '" . status::$dbtable . "' does not have a primary key, which is required to execute the save() method against it.");
         }
 
         // Save
-        $db->update(status::$dbtable, $this, "$primary_col = %s", $this->$primary_col);
+        $db->update(static::$dbtable, $this, "$primary_col = %s", $this->$primary_col);
     }
 
     /**

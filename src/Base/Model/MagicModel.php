@@ -28,6 +28,7 @@ abstract class MagicModel extends BaseModel
     public function __set(string $prop, mixed $value):void
     {
         $this->$prop = $value;
+        $this->updates[$prop] = $value;
     }
 
 
