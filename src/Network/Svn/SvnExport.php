@@ -4,7 +4,7 @@ declare(strict_types = 1);
 namespace Apex\App\Network\Svn;
 
 use Apex\App\Cli\Cli;
-use Apex\App\Network\Svn\SvnRepo;
+use Apex\App\Network\Svn\{SvnRepo, SvnDownloadLicense};
 use Apex\App\Sys\Utils\Io;
 use Apex\App\Exceptions\ApexSvnRepoException;
 use Apex\App\Attr\Inject;
@@ -21,6 +21,9 @@ class SvnExport
     #[Inject(Io::class)]
     private Io $io;
 
+    #[Inject(SvnDownloadLicense::class)]
+    private SvnDownloadLicense $svn_download;
+
     // Properties
     public string $svn_dir = '';
     public string $version = '';
@@ -28,8 +31,15 @@ class SvnExport
     /**
      * Process
      */
-    public function process(SvnRepo $svn, string $version = '', bool $dev = false, bool $is_local_repo = false):string
+    public function process(SvnRepo $svn, string $version = '', bool $dev = false, bool $is_local_repo = false, ?string $license_id = null):string
     {
+
+        // Download commercial, if needed
+        if ($license_id !== null) {
+            $tmp_dir = $this->svn_download->process($svn, $license_id);
+            return $tmp_dir;
+        }
+
 
         // Get latest release
         if ($version == '' && $dev === false) { 

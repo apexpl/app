@@ -149,7 +149,7 @@ class Installer
             }
 
             // Remove dir
-            //rmdir($parent_dir);
+            $this->io->removeDir($parent_dir);
             $parent_dir = dirname($parent_dir);
         } while (true);
 

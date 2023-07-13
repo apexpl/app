@@ -6,7 +6,7 @@ namespace Apex\App\Cli\Helpers;
 use Apex\Svc\Convert;
 use Apex\App\Cli\CLi;
 use Apex\App\Cli\Helpers\AccountHelper;
-use Apex\App\Network\Stores\PackagesStore;
+use Apex\App\Network\Stores\{PackagesStore, AccountsStore};
 use Apex\App\Network\Models\{LocalRepo, LocalPackage, LocalAccount};
 use Apex\App\Network\NetworkClient;
 use Apex\Db\Mapper\ToInstance;
@@ -29,6 +29,9 @@ class PackageHelper
 
     #[Inject(AccountHelper::class)]
     private AccountHelper $acct_helper;
+
+    #[Inject(AccountsStore::class)]
+    private AccountsStore $acct_store;
 
     #[Inject(PackagesStore::class)]
     private PackagesStore $pkg_store;
@@ -106,7 +109,7 @@ class PackageHelper
     /**
      * Check package access
      */
-    public function checkPackageAccess(LocalRepo $repo, string $pkg_alias, string $column = 'can_read', bool $is_install = false):?LocalPackage
+    public function checkPackageAccess(LocalRepo $repo, string $pkg_alias, string $column = 'can_read', bool $is_install = false, ?string $license_id = null):?LocalPackage
     {
 
         // Check repository for package
@@ -122,25 +125,77 @@ class PackageHelper
 
         // Request authentication, if can not download
         if ($res[$column] !== true) {
-            if ($this->account === null) { 
-                $this->account = $this->acct_helper->get();
+
+            // Check license if, if possible
+            if ($column == 'can_read' && $this->account === null && count($this->acct_store->list()) == 0) {
+                if (null === ($res = $this->checkLicenseId($pkg_serial, $repo, $license_id))) {
+                    return null;
+                }
             }
-            $this->network->setAuth($this->account);
-            $res = $this->network->post($repo, 'repos/check', ['pkg_serial' => $pkg_serial, 'is_install' => $is_install]);
+
+            // Check authorization, if appropriate
+            if ($res[$column] !== true) {
+                if ($this->account === null) { 
+                    $this->account = $this->acct_helper->get();
+                }
+                $this->network->setAuth($this->account);
+                $res = $this->network->post($repo, 'repos/check', ['pkg_serial' => $pkg_serial, 'is_install' => $is_install]);
+            }
+
+            // Ask for license id, if needed
+            if ($column == 'can_read' && $res[$column] === false && $license_id === null) {
+                if (null === ($res = $this->checkLicenseId($pkg_serial, $repo, $license_id))) {
+                    return null;
+                }
+            }
         }
 
         // Check access
         if ($res[$column] !== true) { 
             return null;
         }
+        $license_id = $res['license_id'] ?? null;
 
         // Get package object
         $res['repo_alias'] = $repo->getAlias();
         $res['local_user'] = $this->account === null ? '' : $this->account->getUsername();
+        $res['license_id'] = $license_id;
         $pkg = ToInstance::map(LocalPackage::class, $res);
 
         // Return
         return $pkg;
+    }
+
+    /**
+     * Chec license id
+     */
+    private function checkLicenseId(string $pkg_serial, LocalRepo $repo, ?string $license_id = null):?array
+    {
+
+        // Get license id, if needed
+        if ($license_id === null) {
+            $this->cli->sendHeader("License ID");
+            $this->cli->send("If you have purchased the $pkg_serial package and have a license ID for it, please enter it below.  Otherwise, simply leave the field below blank to continue.\n");
+            $license_id = $this->cli->getInput('License ID: ');
+            if (trim($license_id) == '') {
+                return null;
+        }
+        }
+
+        // Send http request
+        $res = $this->network->post($repo, 'repos/check', [
+            'pkg_serial' => $pkg_serial, 
+            'license_id' => $license_id,
+            'is_install' => 1
+        ]);
+
+        // Check response
+        if ($res['can_read'] !== true) {
+            return null;
+        }
+
+        // Return
+        return $res;
     }
 
     /**

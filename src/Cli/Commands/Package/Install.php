@@ -48,11 +48,12 @@ class Install implements CliCommandInterface
     {
 
         // Get args
-        $opt = $cli->getArgs(['repo']);
+        $opt = $cli->getArgs(['repo', 'license-id']);
         $repo_alias = $opt['repo'] ?? 'apex';
         $dev = $opt['dev'] ?? false;
         $noverify = $opt['noverify'] ?? false;
         $is_local_repo = $opt['local'] ?? false;
+        $license_id = $opt['license-id'] ?? null;
 
         // Get repo
         if (!$repo = $this->repo_store->get($repo_alias)) { 
@@ -62,6 +63,7 @@ class Install implements CliCommandInterface
 
         // Generate installation queue
         $install_queue = [];
+        $license_ids = [];
         foreach ($args as $pkg_alias) { 
             $pkg_alias = $this->pkg_helper->getSerial($pkg_alias);
 
@@ -73,7 +75,8 @@ class Install implements CliCommandInterface
                     'alias' => $alias
                 ]);
 
-            } elseif (!$pkg = $this->pkg_helper->checkPackageAccess($repo, $pkg_alias, 'can_read', true)) { 
+            } elseif (!$pkg = $this->pkg_helper->checkPackageAccess($repo, $pkg_alias, 'can_read', true, $license_id)) { 
+                $license_ids[$pkg_alias] = $res['license_id'] ?? null;
                 $cli->error("You do not have access to download the package '$pkg_alias'");
                 return;
             }
@@ -85,7 +88,7 @@ class Install implements CliCommandInterface
 
             // Install
             $svn = $pkg->getSvnRepo();
-            $this->svn_install->process($svn, '', $dev, $noverify, $is_local_repo);
+            $this->svn_install->process($svn, '', $dev, $noverify, $is_local_repo, $pkg->getLicenseId());
 
             // Success message
             $cli->send("Successfully installed the package, " . $pkg->getAlias() . ".\r\n\r\n");
@@ -101,7 +104,7 @@ class Install implements CliCommandInterface
 
         $help = new CliHelpScreen(
             title: 'Install Package',
-            usage: 'package install <PKG_ALIAS> [<PKG_ALIAS2>] [<PKG_ALIAS3>] [--repo=apex] [--noverify]',
+            usage: 'package install <PKG_ALIAS> [<PKG_ALIAS2>] [<PKG_ALIAS3>] [--repo=apex] [--noverify] [--license-id <LICENSE_ID>]',
             description: 'Download and install packages.'
         );
 
@@ -110,6 +113,8 @@ class Install implements CliCommandInterface
         $help->addFlag('--repo', "The repository alias to download the package from, defaults to the main public 'apex' repository.");
         $help->addFlag('--dev', "Does not have a value, and if present the dev-mater / trunk branch of the package will be downloaded.");
         $help->addFlag('--noverify', 'Does not have a value, and if present no digital signature verification checks will be processed during installation.');
+        $help->addFlag('--license-id', "If commercial license has been purchased, you may specify license id with this flag.");
+
 
         // Examples
         $help->addExample('./apex install webapp users transaction support');

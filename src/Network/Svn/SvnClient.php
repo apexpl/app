@@ -17,7 +17,7 @@ class SvnClient
 {
 
     // Dependencies, defined by SvnRepo class
-    protected LocalPackage $pkg;
+    public LocalPackage $pkg;
     protected Container $cntr;
     protected Cli $cli;
     protected RsaKeyStore $rsa_store;

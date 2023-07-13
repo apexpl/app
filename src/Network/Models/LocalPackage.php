@@ -52,7 +52,8 @@ class LocalPackage
         private string $local_user = '',  
         private string $author = '',  
         private string $repo_alias = '',  
-        private string $alias = ''  
+        private string $alias = '',
+        private ?string $license_id = null
     ) { 
 
     }
@@ -196,6 +197,14 @@ class LocalPackage
     public function getAliasTitle():string
     {
         return $this->convert->case($this->alias, 'title');
+    }
+
+    /**
+     * Get license id
+     */
+    public function getLicenseId():?string
+    {
+        return $this->license_id;
     }
 
     /**
