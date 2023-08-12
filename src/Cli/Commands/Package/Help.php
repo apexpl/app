@@ -32,6 +32,7 @@ class Help
         $help->addParam('create', 'Create a new package on the local machine.');
         $help->addParam('delete', 'Delete a package from the local machine.');
         $help->addParam('fork', 'Fork a package from the repository.');
+        $help->addParam('gen-docs', 'Generate reference documentation for all classes and functions within a package.');
         $help->addParam('init-theme', 'Initialize a new theme during development / integration.');
         $help->addParam('info', 'View general information on a package.');
         $help->addParam('install', 'Install one or more packages from the repository.');

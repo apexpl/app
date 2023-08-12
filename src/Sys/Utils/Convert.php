@@ -10,7 +10,7 @@ use Apex\App\Attr\Inject;
 use DateTime;
 
 /**
- * Converter
+ * Convert naming convensions, amounts, dates, etc.
  */
 class Convert
 {
@@ -25,7 +25,12 @@ class Convert
     private ?array $rates = null;
 
     /**
-     * Translate string to language, and merge placeholders.
+     * Translate string to active language
+     *
+     * @param string $text The English text to translate.
+     * @param variadic ...$args Any necessary values to use to replace placeholders within the text.
+    * 
+     * @return Translated string.
      */
     public function tr(string $text, ...$args):string
     { 
@@ -62,6 +67,11 @@ class Convert
 
     /**
      * Format date
+     *
+     * @param string|DateTIme $date The raw date to format, either in YYYY-MM-DD HH:II:SS format or instance of DateTime.
+     * @param bool $add_time Whether or not to include time with the result.
+     *
+     * @return The formatted date / time.
      */
     public function date(string | DateTime $date, bool $add_time = false):string
     { 
@@ -91,7 +101,14 @@ class Convert
     }
 
     /**
-     * Format currency
+     * Format amount.
+     *
+     * @param float|string $amount The amount to format.
+     * @param string $currency Currency code to format amount to.  If blank, will use authenticated user's profile currency.
+     * @param bool $include_abbr   Whether or not to include the three letter currency code in result.
+     * @param bool $is_crypt Whether or not amount is a crypto-currency.
+     *
+     * @return The formatted amount.
      */
     public function money(float | string $amount, string $currency = '', bool $include_abbr = true, bool $is_crypto = false):string
     { 
@@ -143,7 +160,12 @@ class Convert
 
 
     /**
-     * Convert case
+     * Convert naming convention
+     *
+     * @param string $word The word / phrase to convert
+     * @param string $case Naming convention to convert to.  Supported values are -- lower, upper, title, camel, phrase
+     *
+     * @return The converted word / string.
      */
     public function case(string $word, string $case = 'title'):string
     {
@@ -164,7 +186,11 @@ class Convert
     }
 
     /**
-     * Last seen
+     * Format seconds into presentable last seen string.
+     *
+     * @param string $secs Number of seconds to convert into last seen string.
+     * 
+     * @return The converted last seen string.
      */
     public function lastSeen(int $secs):string
     {
@@ -195,7 +221,14 @@ class Convert
     }
 
     /**
-     * Exchange money
+     * Exchange money to another currency.
+     *
+     * @param float|string $amount The amount to convert.
+     * @param string $from_currency Three letter currency code of the amount being converted.
+     * @param string $to_currency Three letter currency code to convert amount to.
+     * @param DateTime $date Optional DateTIme, and if present will use exchange rate from that time.
+     *
+     * @return The converted amount.
      */
     public function exchangeMoney(float | string $amount, string $from_currency, string $to_currency, ?DateTime $date = null):mixed
     { 
@@ -248,6 +281,8 @@ class Convert
 
     /**
      * Date interval
+     *
+     * @param string $interval The raw date interval (eg M1, W2, Y5, etc.)
      */
     public function dateInterval(string $interval):array
     {

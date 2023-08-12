@@ -5,6 +5,7 @@ namespace Apex\App\Cli\Commands\Opus;
 
 use Apex\App\Cli\{Cli, CliHelpScreen};
 use Apex\App\Cli\Helpers\OpusHelper;
+use Apex\App\Interfaces\BaseModelInterface;
 use Apex\Opus\Opus;
 use Apex\App\Interfaces\Opus\CliCommandInterface;
 use Apex\App\Attr\Inject;
@@ -36,14 +37,20 @@ class Crud implements CliCommandInterface
 
         // Parse filename
         $filename = $this->opus_helper->parseFilename($filename);
+        $class_name = $this->opus_helper->pathToNamespace($filename);
 
         // Perform checks
         if ($dbtable == '') {
             $cli->error("No --dbtable flag specified, which is required.");
             return;
         } elseif (file_exists(SITE_PATH . '/' . $filename)) { 
-            $cli->error("File already exists at, $filename");
-            return;
+
+            // Check if it's an Apex model
+            $obj = new \ReflectionClass($class_name);
+            if (!$obj->implementsInterface(BaseModelInterface::class)) {
+                $cli->error("The existing model was found, but it is not an Apex model hence can not be used.");
+                return;
+            }
         }
 
         // Create parent directory, if needed

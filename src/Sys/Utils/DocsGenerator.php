@@ -100,12 +100,19 @@ class DocsGenerator
         $html .= "    <s:return>$return_type</s:return>\n\n";
 
         // Add ssee also
+        $also_names = [];
         foreach ($obj->getMethods() as $also) {
 
             if ($also->getName() == $method->getName() || $also->getName() == '__construct') {
                 continue;
             }
-            $html .= "    <s:also>[" . $also->getName() . "](" . strtolower($also->getName()) . ")</s:also>\n";
+            $also_names[] = $also->getName();
+        }
+
+        // Add see also
+        sort($also_names);
+        foreach ($also_names as $name) {
+            $html .= "    <s:also>[" . $name . "](" . strtolower($name) . ")</s:also>\n";
         }
         $html .= "\n</s:docs_function>\n\n";
 

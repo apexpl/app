@@ -146,6 +146,7 @@ class Container
         // Get tag namespaces
         $tag_namespaces = [
             "\\Apex\\App\\Base\\Web\\Tags", 
+            "\\Apex\\Docs\\SyrusTags",
             "Apex\\Syrus\\Tags"
         ];
 
