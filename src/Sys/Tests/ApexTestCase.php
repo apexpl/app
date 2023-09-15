@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Sys\Tests;
 
-use Apex\Svc\{App, Di, Container};
+use Apex\Svc\{App, Di, Container, Db};
 use Apex\App\Sys\Tests\CustomAssertions;
 use Apex\App\Sys\Tests\Stubs\CliStub;
 use Nyholm\Psr7\Response;
@@ -67,6 +67,10 @@ class ApexTestCase extends CustomAssertions
             'REQUEST_METHOD' => strtoupper($method)
         ];
 
+        // Set env variables
+        $_SERVER['REQUEST_URI'] = $uri;
+        $_SERVER['REQUEST_METHOD'] = strtoupper($method);
+
         // Create factory
         $factory = new \Nyholm\Psr7\Factory\Psr17Factory();
         $request_creator = new ServerRequestCreator($factory, $factory, $factory, $factory);
@@ -124,9 +128,12 @@ class ApexTestCase extends CustomAssertions
     public function login(string $username, string $area = 'admin'):void
     {
 
+        // Initialize
+        $db = Di::get(Db::class);
+
         // Get uuid
         $type = $area == 'admin' ? 'admin' : 'user';
-        if (!$uuid = $this->db->getField("SELECT uuid FROM armor_users WHERE username = %s AND type = %s", $username, $type)) {
+        if (!$uuid = $db->getField("SELECT uuid FROM armor_users WHERE username = %s AND type = %s", $username, $type)) {
             throw new \Exception("No user with username $username exists as type $type");
         }
 

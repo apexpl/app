@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Sys\Tests;
 
-use Apex\Svc\{Di, Db, View};
+use Apex\Svc\{Di, Db, View, App};
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -109,11 +109,13 @@ class CustomAssertions extends TestCase
     private function checkPageTitle(string $title, bool $has = true)
     { 
 
+        // Initialize
+        $app = Di::get(App::class);
+
         // Assert
-        $view = Di::get(View::class);
-        $chk_title = $view->getPageTitle();
+        $chk_title = Di::get('syrus.page_title');
         if ($has === true) { 
-            $this->assertEquals($title, $chk_title, tr("Title of page at {1}/{2} does NOT equal the title: {3}", app::get_area(), app::get_uri(), $title));
+            $this->assertEquals($title, $chk_title, tr("Title of page at {1}/{2} does NOT equal the title: {3}", $app->getArea(), $app->getPath(), $title));
         } else { 
             $this->assertNotEquals($title, $chk_title, tr("Title of page at {1}/{2} does equal the title: {3}", app::get_area(), app::get_uri(), $title));
         }

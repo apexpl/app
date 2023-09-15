@@ -30,7 +30,8 @@ class Shortcuts
         'set-config' => ['sys', 'set-config'],
         'crontab' => ['sys', 'crontab'],
         'listen' => ['sys', 'listen'],
-        'scan-classes' => ['sys', 'scan-classes']
+        'scan-classes' => ['sys', 'scan-classes'],
+        'docs' => ['package', 'gen-docs']
     ];
 
     // Top-level shortcuts
