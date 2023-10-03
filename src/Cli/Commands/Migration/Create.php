@@ -100,7 +100,7 @@ class Create implements CliCommandInterface
         $help->addFlag('--diff', 'Only applicable if creating a Doctrine migration and will diff the database schema.');
         $help->addFlag('--dump', 'Only applicable if creating a Doctrine migration, and will dump the full database schema.');
         $help->addExample('./apex migration create myshop');
-        $help->addParam('./apex migration create myshop --type doctrine --dump');
+        $help->addExample('./apex migration create myshop --type doctrine --dump');
 
         // Return
         return $help;

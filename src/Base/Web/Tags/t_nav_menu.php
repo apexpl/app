@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Base\Web\Tags;
 
-use Apex\Svc\App;
+use Apex\Svc\{App, Db};
 use Apex\Syrus\Parser\StackElement;
 use Apex\Syrus\Render\Tags;
 use Apex\Syrus\Interfaces\TagInterface;
@@ -23,9 +23,11 @@ class t_nav_menu implements TagInterface
      * Constructor
      */
 public function __construct(
-        private App $app, 
+        private App $app,
+        private Db $db,
         private redis $redis, 
-        private Tags $tags
+        private Tags $tags,
+        private array $allowed = []
     ) { 
 
     }
@@ -44,13 +46,22 @@ public function __construct(
             return '';
         }
 
+        // Get allowed menus
+        if ($this->app->getArea() == 'admin') {
+            $rows = $this->db->query("SELECT * FROM cms_menus_acl WHERE area = 'admin' AND uuid = %s", $this->app->getUuid());
+            foreach ($rows as $row) {
+                $alias = $row['alias'] == '' ? $row['parent'] : $row['parent'] . '.' . $row['alias'];
+                $this->allowed[] = $alias;
+            }
+        }
+
         // Go through menus
         $html = '';
         $nav_num=1;
         foreach ($menus as $alias => $row) { 
 
             // Check if viewable
-            if (!$this->isViewable($row)) 
+            if (!$this->isViewable($alias, $row)) 
                 { continue; 
             }
 
@@ -60,7 +71,7 @@ public function __construct(
                 foreach ($sub_menus as $sub_alias => $srow) { 
 
                 // Check if viewable
-                if (!$this->isViewable($srow)) 
+                if (!$this->isViewable($alias . '.' . $sub_alias, $srow)) 
                     { continue; 
                 }
 
@@ -136,7 +147,7 @@ public function __construct(
     /**
      * Check whether or not menu is viewable
      */
-    public function isViewable(array $menu):bool
+    public function isViewable(string $alias, array $menu):bool
     {
 
         // Skip if public site, and login / no_login required
@@ -145,6 +156,13 @@ public function __construct(
                 return false; 
             }
             if ($menu['require_nologin'] == 1 && $this->app->isAuth() === true) {
+                return false;
+            }
+        }
+
+        // Check acl
+        if (count($this->allowed) > 0) {
+            if (!in_array($alias, $this->allowed)) {
                 return false;
             }
         }
