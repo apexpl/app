@@ -128,7 +128,7 @@ class Container
 
         // Set armor cookie
         if ($domain_name = $redis->hget('config', 'core.domain_name')) {
-            $cookie = $cntr->get('armor_cookie');
+            $cookie = $cntr->get('armor.cookie');
             $cookie['domain'] = $domain_name;
         $cntr->set('armor.cookie', $cookie);
         }

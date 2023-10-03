@@ -176,8 +176,6 @@ final class View extends \Apex\Syrus\Syrus
             // Replace
             $uri = $this->app->getPath() . '?' . $query;
             $href = "<a href=\"$uri\" $match[3]>$match[4]</a>";
-//if ($vars[0] == 'webapp/sort_table') {
-    //header("Content-type: text/plain"); print "$href\n\n"; exit; }
 
             $html = str_replace($match[0], $href, $html);
         }
@@ -258,7 +256,7 @@ final class View extends \Apex\Syrus\Syrus
 
         // Set Apex Javascript
         $js = "\t" . '<script type="text/javascript" src="/plugins/apex.js"></script>' . "\n";
-        //$js .= "\t" . '<script src="/plugins/parsley.js/parsley.min.js" type="text/javascript"></script>' . "\n";
+        $js .= "\t" . '<script src="/plugins/parsley.js/parsley.min.js" type="text/javascript"></script>' . "\n";
         $js .= "\t" . '<script src="https://www.google.com/recaptcha/api.js"></script>' . "\n\n";
         $js .= "</head>\n\n";
 
