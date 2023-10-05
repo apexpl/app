@@ -132,7 +132,9 @@ class AccountHelper
         $this->cli->sendHeader('Account Registration');
 
         // Get profile
-        list($username, $email, $password, $register_code) = $this->getProfileInfo($repo);
+        list($username, $email, $password, $register_code, $sponsor) = 
+            $this->getProfileInfo($repo);
+
         $this->debugger?->add(1, "Obtained account profile, generateing CSR.", 'info');
 
         // Generate CSR
@@ -161,7 +163,7 @@ class AccountHelper
         $this->cli->send("\r\nGenerating signing certificate... done\r\nRegistering account... ");
 
         // Register account
-        $crt = $this->register->process($repo, $username, $password, $email, $register_code, $csr, $ssh);
+        $crt = $this->register->process($repo, $username, $password, $email, $register_code, $sponsor, $csr, $ssh);
         $csr->setCrt($crt);
 
         // Debug
@@ -219,7 +221,7 @@ class AccountHelper
         do { 
             $username = strtolower($this->cli->getInput('Desired Username: '));
             if (strlen($username) < 3 || !preg_match("/^[a-zA-z0-9_-]+$/", $username)) { 
-                $this->cli->send("Username must be minimum of 4 characters and can not contain spaces or special characters.  Please try again.\r\n\r\n");
+                $this->cli->send("Username must be minimum of 3 characters and can not contain spaces or special characters.  Please try again.\r\n\r\n");
                 continue;
             }
 
@@ -248,9 +250,17 @@ class AccountHelper
         // Verify e-mail
         $register_code = $this->verifyEmail($repo, $email);
 
+        // Get sponsor, if needed
+        $sponsor = '';
+        if ($repo->getAlias() == 'apex') {
+            $this->cli->send("\r\n");
+            $this->cli->send("If you were referred to Apex by someone, please enter their username below.  Otherwise, leave the below field blank and press enter to continue.\r\n\r\n");
+            $sponsor = $this->cli->getInput('Sponsor: ');
+        }
+
         // Return
         $this->cli->send("\r\n");
-        return [$username, $email, $password, $register_code];
+        return [$username, $email, $password, $register_code, $sponsor];
     }
 
     /**

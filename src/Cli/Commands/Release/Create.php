@@ -54,14 +54,14 @@ class Create implements CliCommandInterface
 
         // Set variables
         $opt = $cli->getArgs();
+        $commit_args = $cli->getCommitArgs();
         $pkg_alias = $pkg->getAlias();
         $version = $args[1] ?? '';
         $is_breaking = isset($opt['breaking']) && $opt['breaking'] === true ? 1 : 0;
         $is_commit = isset($opt['commit']) || isset($opt['c']) ? true : false;
-        $commit_args = $cli->getCommitArgs();
 
         // Get version
-        if ($version == '') { 
+        if ($version == '' || !preg_match("/^\d+)\.(\d+)/", $version)) { 
             $next_version = $this->getNextVersion($pkg);
             $version = $cli->getInput("Release Version [$next_version]: ", $next_version);
         }
@@ -73,7 +73,7 @@ class Create implements CliCommandInterface
         } elseif ($pkg->isVersionControlled() !== true) { 
             $cli->error("This package is not currently under version control, and can not be released.");
             return;
-        } elseif (preg_match("/![\d\.]/", $version)) { 
+        } elseif (!preg_match("/^\d+\.\d+/", $version)) { 
             $cli->error("Invalid version number specified, $version");
             return;
         }
