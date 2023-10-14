@@ -314,6 +314,42 @@ class Convert
         return [$names[$period], (int) $m[2]];
     }
 
+    /**
+     * Full name
+     */
+    public function full_name(array $post = []): array
+    {
+
+        // Check post
+        if (count($post) == 0) {
+            $post = $this-app->getAllPost();
+        }
+
+        // Check for first and last name
+        $first_name = $post['first_name'] ?? '';
+        $last_name = $post['last_name'] ?? '';
+        if ($first_name != '' && $last_name != '') {
+            return [$first_name, $last_name];
+        }
+
+        // Check full name
+        $full_name = $post['full_name'] ?? '';
+        if ($full_name == '') {
+            return ['', ''];
+        }
+
+        // Parse full name
+        if (str_contains($full_name, ' ')) {
+            list($first_name, $last_name) = explode(' ', $full_name, 2);
+        } else {
+            $first_name = $full_name;
+        }
+
+
+        // Return
+        return [$first_name, $last_name];
+    }
+
 }
 
 

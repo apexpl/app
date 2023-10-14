@@ -66,7 +66,7 @@ interface EmailNotificationControllerInterface
      * This should return the sender name and e-mail address as a 
      * EmailContact object.  Otherwise, return null.
      */
-    public function getSender(string $sender, UserInterface $user, array $data = []):?EmailContact;
+    public function getSender(string $sender, ?UserInterface $user, array $data = []):?EmailContact;
 
     /**
      * Get recipient
@@ -75,7 +75,7 @@ interface EmailNotificationControllerInterface
      * This should return the recipient name and e-mail address as a 
      * EmailContact object.  Otherwise, return null.
      */
-    public function getRecipients(string $recipient, UserInterface $user, array $data = []):?EmailContactCollection;
+    public function getRecipients(string $recipient, ?UserInterface $user, array $data = []):?EmailContactCollection;
 
     /**
      * Get reply-to

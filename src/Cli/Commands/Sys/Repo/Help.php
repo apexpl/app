@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Apex\App\Cli\Commands\Sys\Repo;
 
-use Apex\App\CLi\{Cli, CliHelpScreen};
+use Apex\App\Cli\{Cli, CliHelpScreen};
 
 /**
  * Help
@@ -22,7 +22,7 @@ class Help
             usage: 'sys repo <SUB_COMMAND> [OPTIONS]',
             description: 'List and manage the repositories configured on this system.'
         );
-        $help->setParamTitle('AVAILABLE COMMANDS');
+        $help->setParamsTitle('AVAILABLE COMMANDS');
 
         // Add commands
         $help->addParam('add', 'Add a new repository.');

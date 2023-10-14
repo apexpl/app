@@ -301,6 +301,9 @@ abstract class BaseModel implements BaseModelInterface
 
         $vars = [];
         foreach ($this as $key => $value) { 
+            if ($key == 'updates') { 
+                continue;
+            }
 
             // Check for DateTime
             if (is_object($value) && $value::class == 'DateTime') { 
