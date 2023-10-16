@@ -6,6 +6,8 @@ namespace Apex\App\Interfaces;
 use Apex\Mercury\Email\{EmailContact, EmailContactCollection};
 use Apex\App\Base\Web\Utils\FormBuilder;
 use Apex\App\Interfaces\UserInterface;
+use Apex\App\Base\Model\ModelIterator;
+use App\Webapp\Models\EmailQueueRecipient;
 
 /**
  * Notifications controller interface
@@ -100,6 +102,18 @@ interface EmailNotificationControllerInterface
      * Otherwise, return null.
      */
     public function getBcc(array $data = []):?array;
+
+    /**
+     * Get broadcast iterator
+     */
+    public function getBroadcastIterator(int $offset, array $condition = []):?ModelIterator;
+
+    /**
+     * Get broadcast recipient
+     */
+    public function getBroadcastRecipient(object $model):?EmailQueueRecipient;
+
+
 
 
 }

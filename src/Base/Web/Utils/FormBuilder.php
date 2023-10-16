@@ -115,7 +115,7 @@ class FormBuilder
      */
     public function time():FormField
     {
-        return new FormField('time');
+        return new FormField('time_selector');
     }
 
     /**
