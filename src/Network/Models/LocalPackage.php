@@ -53,7 +53,8 @@ class LocalPackage
         private string $author = '',  
         private string $repo_alias = '',  
         private string $alias = '',
-        private ?string $license_id = null
+        private ?string $license_id = null,
+        private ?string $gpt_description = null
     ) { 
 
     }
@@ -208,6 +209,14 @@ class LocalPackage
     }
 
     /**
+     * Get GPT description
+     */
+    public function getGptDescription():?string
+    {
+        return $this->gpt_description;
+    }
+
+    /**
      * Get serial
      */
     public function getSerial():string
@@ -307,6 +316,14 @@ class LocalPackage
     }
 
     /**
+     * Set Gpt description
+     */
+    public function setGptDescription(?string $description):void
+    {
+        $this->gpt_description = $description;
+    }
+
+    /**
      * Set repo alias
      */
     public function setRepoAlias(string $alias):void
@@ -334,7 +351,9 @@ class LocalPackage
             'author' => $this->author, 
             'local_user' => $this->local_user, 
             'repo_alias' => $this->repo_alias, 
-            'installed_at' => $this->installed_at?->getTimestamp() 
+            'installed_at' => $this->installed_at?->getTimestamp(),
+            'license_id' => $this->license_id,
+            'gpt_description' => $this->gpt_description
         ];
 
         // Return

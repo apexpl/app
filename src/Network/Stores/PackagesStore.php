@@ -79,7 +79,7 @@ class PackagesStore extends AbstractStore
 
         // Save new config
         $config['packages'][$pkg->getAlias()] = $pkg->toArray();
-        file_put_contents(SITE_PATH . '/etc/.config.yml', Yaml::dump($config, 5));
+        file_put_contents(SITE_PATH . '/etc/.config.yml', Yaml::dump($config, 6));
     }
 
     /**

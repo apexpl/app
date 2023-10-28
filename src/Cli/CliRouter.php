@@ -25,7 +25,6 @@ class CliRouter
         'account',
         'branch',
         'create',
-        'docs',
         'gpt',
         'image',
         'migration',

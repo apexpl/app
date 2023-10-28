@@ -45,7 +45,7 @@ class GenDocs implements CliCommandInterface
         $pkg_alias = $this->convert->case($args[0], 'title');
 
         // Ensure package is under version control
-        if (!is_dir(SITE_PATH . '/.apex/svn/' . $pkg->getAlias())) { 
+        if ($pkg->isLocal() === false && !is_dir(SITE_PATH . '/.apex/svn/' . $pkg->getAlias())) { 
             $cli->error("This package is not currently under version control, $pkg_alias");
             return;
         }

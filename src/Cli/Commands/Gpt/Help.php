@@ -20,13 +20,17 @@ class Help
         $help = new CliHelpScreen(
             title: 'Chat GPT Commands',
             usage: 'gpt <SUB_COMMAND>',
-            description: 'Automatically generate code including database schema, controllers, models, views for any software system.'
+            description: 'Automatically generate code and components including database schema, controllers, models, views for any software system.'
         );
         $help->setParamsTitle('AVAILABLE COMMANDS');
 
         // Add params
-        $help->addParam('generate', 'Generate all code components for a software system.');
+        $help->addParam('auto-complete', 'Generate auto-complete component with AI assistance.');
+        $help->addParam('form', 'Generate form component with AI assistance.');
         $help->addParam('init', 'Initialize Chat GPT API');
+        $help->addParam('package', 'Create new package, and generate everything necessary from plain text including SQL database schema, models, views, controllers, menu, etc.');
+        $help->addParam('rest-api', 'Generate REST API endpoints from plain text.'); 
+        $help->addParam('table', 'Generate data table component with AI assistance.');
 
         // Return
         return $help;
