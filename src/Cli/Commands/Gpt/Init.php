@@ -33,8 +33,10 @@ class Init implements CliCommandInterface
         $this->app->setConfigVar('core.openai_apikey', $api_key);
 
         // Success
-        $cli->send("Successfully set your OpenAI API key.  You may now begin automatically generating fully functional components by running the command:\n\n");
-        $cli->send("    apex gpt generate\n\n");
+        $cli->send("Successfully set your OpenAI API key.  You may now begin automatically generating fully functional packages by running the command:\n\n");
+        $cli->send("    apex gpt package <PKG_ALIAS>\n\n");
+        $cli->send("Or view all available commands by running:\n\n");
+        $cli->send("    apex help gpt\n\n");
     }
 
     /**

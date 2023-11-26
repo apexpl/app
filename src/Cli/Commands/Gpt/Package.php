@@ -81,7 +81,8 @@ class Package extends GptClient implements CliCommandInterface
 
         // Success message
         $cli->send("\n");
-        $cli->success("Successfully completed code generation with Chat GPT assistance.  Below lists all files that have been generated.\n", $files);
+        $cli->sendHeader("Code Generation Complete");
+        $cli->send("Successfully completed code generation with Chat GPT assistance.  All files that have been generated are listed within the generated_files.txt file.\n\n");
     }
 
     /**

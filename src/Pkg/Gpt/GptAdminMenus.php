@@ -66,9 +66,7 @@ class GptAdminMenus extends GptClient
         // GO through tables
         $x=1;
         foreach ($tables as $name => $type) {
-            if ($type == 'parent') {
-                $selected[] = (string) $x;
-            }
+            $selected[] = (string) $x;
             $this->cli->send("    [$x] " . $this->convert->case(str_replace($pkg_alias . '_', '', $name)) . "\n");
             $nums[(string) $x] = $name; 
         $x++; }
@@ -82,7 +80,7 @@ class GptAdminMenus extends GptClient
         $menus = [];
         foreach (explode(",", $input) as $x) {
             $num = trim((string) $x);
-            $menus[] = $nums[$x];
+            $menus[] = $nums[$num];
         }
 
         // Return
