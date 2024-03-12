@@ -38,6 +38,14 @@ abstract class Ajax
     }
 
     /**
+     * Redirect
+     */
+    final public function redirect(string $url):void
+    {
+        $this->add('redirect', array('url' => $url));
+    }
+
+    /**
      * Clear table rows
      */
     final public function clearTable(string $divid):void
