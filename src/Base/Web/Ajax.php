@@ -167,6 +167,14 @@ abstract class Ajax
     }
 
     /**
+     * Set value
+     */
+    final public function setValue(string $divid, $text):void
+    { 
+        $this->add('set_value', array('divid' => $divid, 'text' => $text));
+    }
+
+    /**
      * Set display
      */ 
     final public function setDisplay(string $divid, string $display):void
