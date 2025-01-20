@@ -248,7 +248,8 @@ class AccountHelper
         $password = $this->cli->getNewPassword();
 
         // Verify e-mail
-        $register_code = $this->verifyEmail($repo, $email);
+        //$register_code = $this->verifyEmail($repo, $email);
+        $register_code = '0';
 
         // Get sponsor, if needed
         $sponsor = '';
