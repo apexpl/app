@@ -63,8 +63,11 @@ class ArmorAdapter implements AdapterInterface
             break;
         }
 
+        $armor_table = $this->getTableName('armor_users');
+        $table_name = $this->getTableName($table_name);
+
         // Get object
-        if (!$user = $db->getObject($class_name, "SELECT * FROM $table_name, armor_users WHERE $table_name.uuid = %s AND $table_name.uuid = armor_users.uuid AND armor_users.is_deleted = %b", $uuid, $is_deleted)) {  
+        if (!$user = $db->getObject($class_name, "SELECT * FROM $table_name, $armor_table WHERE $table_name.uuid = %s AND $table_name.uuid = $armor_table.uuid AND $armor_table.is_deleted = %b", $uuid, $is_deleted)) {  
             return null;
         }
 
@@ -72,6 +75,12 @@ class ArmorAdapter implements AdapterInterface
         return $user;
     }
 
+    public function getTableName(string $table_name):string {
+        if ($this->app->config('users.sso_enabled') == 1) {
+            $table_name = $this->app->config('users.sso_dbname') . '.' . $table_name;
+        }
+        return $table_name;
+    }
 
     /**
      * Send e-mail message
