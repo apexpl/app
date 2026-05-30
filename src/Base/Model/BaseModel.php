@@ -257,7 +257,7 @@ abstract class BaseModel implements BaseModelInterface
         // Get primary column
         $db = Di::get(Db::class);
         if (!$primary_col = $db->getPrimaryKey(static::$dbtable)) {
-            throw new \Exception("The database table '" . status::$dbtable . "' does not have a primary key, which is required to execute the save() method against it.");
+            $primary_col = 'id';
         }
 
         // Save
