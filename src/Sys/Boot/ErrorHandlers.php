@@ -11,6 +11,10 @@ use Apex\Svc\{Di, App, Logger, Debugger, View};
 class ErrorHandlers
 {
 
+    private App $app;
+    private Logger $logger;
+    private Debugger $debugger;
+
     /**
      * Exception handler
      */
@@ -62,6 +66,11 @@ class ErrorHandlers
         // Add log
         $log_line = '(' . $file . ':' . $line . ') ' . $message;
         $this->logger?->$level($log_line);
+
+        // Do not throw / exit on deprecated messages, simply log and continue
+        if (in_array($errno, [8192, 16384])) {
+            return;
+        }
 
         // Finish debug session
         $this->debugger?->finish();
