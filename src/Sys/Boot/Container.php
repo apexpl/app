@@ -245,7 +245,7 @@ class Container
 
         // Mark aliases
         foreach ($aliases as $item => $alias) { 
-            $cntr->addAlias($item, $alias, false);
+            $cntr->addAlias($item, $alias);
         }
         $cntr->addAlias(\Apex\Syrus\Syrus::class, \Apex\Svc\View::class, false);
 

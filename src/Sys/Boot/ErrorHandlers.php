@@ -29,6 +29,14 @@ class ErrorHandlers
     public function error(int $errno, string $message, string $file, int $line):void
     {
 
+        // Do not throw / exit on deprecated messages; ignore them entirely.
+        // (Handling them here, before the DI container is available, would
+        //  trigger premature autoloading of the Apex\Svc\* classes and break
+        //  the class_alias() registration during boot.)
+        if (in_array($errno, [8192, 16384])) {
+            return;
+        }
+
         // Format file
         $file = str_replace(SITE_PATH, '', $file);
         if (preg_match("/\/\.apex\/svn\/(.+?)\/(.+?)\/(.+)$/", $file, $m)) { 
@@ -66,11 +74,6 @@ class ErrorHandlers
         // Add log
         $log_line = '(' . $file . ':' . $line . ') ' . $message;
         $this->logger?->$level($log_line);
-
-        // Do not throw / exit on deprecated messages, simply log and continue
-        if (in_array($errno, [8192, 16384])) {
-            return;
-        }
 
         // Finish debug session
         $this->debugger?->finish();
